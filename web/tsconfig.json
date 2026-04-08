@@ -14,9 +14,7 @@
     "noEmit": true,
     "resolveJsonModule": true,
 
-    /* Paths */
-    "baseUrl": ".",
-    "paths": { "@/*": ["src/*"] },
+    /* Paths — alias '@' is configured in vite.config.ts */
 
     /* Linting */
     "noUnusedLocals": true,
