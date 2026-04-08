@@ -1,0 +1,23 @@
+.local/
+.venv/
+__pycache__/
+
+# Build intermediates
+build/
+*.obj
+*.res
+*.exp
+*.lib
+
+# Original Birman source files (not redistributed)
+English *.keylayout
+English *.icns
+Russian *.keylayout
+Russian *.icns
+
+# Frontend
+web/node_modules/
+web/dist/
+
+# Playwright
+.playwright-mcp/

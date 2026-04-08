@@ -1,0 +1,78 @@
+{
+  "nav": {
+    "keyboard": "Klawiatura",
+    "download": "Pobierz",
+    "about": "O projekcie"
+  },
+  "hero": {
+    "title": "Kirkouski Typographic",
+    "subtitle": "Znaki typograficzne na wyciągnięciem ręki — dla polskiej i rosyjskiej klawiatury",
+    "scroll": "Zobacz układ"
+  },
+  "keyboard": {
+    "title": "Eksplorator układu",
+    "polish": "Polski Typograficzny",
+    "russian": "Rosyjski Typograficzny",
+    "legend": {
+      "base": "Bazowy",
+      "shift": "Shift",
+      "altgr": "AltGr",
+      "shAltgr": "Shift+AltGr",
+      "polish": "Polski",
+      "russian": "Rosyjski",
+      "deadKey": "Martwy klawisz"
+    },
+    "tooltip": {
+      "key": "Klawisz",
+      "altgr": "AltGr",
+      "shAltgr": "Shift+AltGr",
+      "deadAltgr": "AltGr (martwy klawisz)",
+      "deadShAltgr": "Shift+AltGr (martwy klawisz)",
+      "none": "Brak mapowania AltGr"
+    }
+  },
+  "download": {
+    "title": "Pobierz",
+    "subtitle": "Pobierz układ dla swojego systemu",
+    "windows": "Windows",
+    "macos": "macOS",
+    "detected": "Wykryto: {os}",
+    "installer": "Skrypt instalacyjny",
+    "layoutDll": "Plik DLL układu",
+    "layoutFile": "Plik układu",
+    "recommended": "Zalecane dla Twojego systemu"
+  },
+  "install": {
+    "title": "Instalacja",
+    "windows": {
+      "tab": "Windows",
+      "step1": "Pobierz {dll} i {script} z najnowszego wydania",
+      "step2": "Umieść oba pliki w tym samym folderze",
+      "step3": "Kliknij prawym przyciskiem {script} i wybierz \"Uruchom w PowerShell\" (automatycznie poprosi o uprawnienia)",
+      "step4": "Uruchom ponownie komputer",
+      "step5": "Przejdź do Ustawienia > Czas i język > Język i region > Klawiatura i dodaj nowy układ",
+      "loginScreen": "Ekran logowania: Win+R > intl.cpl > Administracyjne > Kopiuj ustawienia > zaznacz obie opcje",
+      "uninstall": "Aby odinstalować, uruchom skrypt ponownie — wykryje instalację i zaproponuje odinstalowanie.",
+      "hardCleanup": "Jeśli Eksplorator się zawiesza: uruchom {cmd} aby usunąć wszystkie ślady."
+    },
+    "macos": {
+      "tab": "macOS",
+      "step1": "Pobierz plik {file} z najnowszego wydania",
+      "step2": "Skopiuj do {userPath} (bieżący użytkownik) lub {systemPath} (wszyscy użytkownicy + ekran logowania, wymaga sudo)",
+      "step3": "Wyloguj się i zaloguj ponownie",
+      "step4": "Otwórz Ustawienia systemowe > Klawiatura > Źródła wprowadzania i dodaj układ"
+    }
+  },
+  "about": {
+    "title": "O projekcie",
+    "description": "Ten projekt rozszerza standardowe układy klawiatury o znaki typograficzne dostępne przez AltGr (prawy Alt). Pauzy, cudzysłowy, znaki copyright, symbole walut i wiele więcej — bez przełączania układów i zapamiętywania kodów Unicode.",
+    "based": "Na podstawie {link} autorstwa Ilyi Birmana.",
+    "birmanLink": "Typograficznego układu klawiatury",
+    "license": "Open source na licencji MIT.",
+    "github": "Zobacz na GitHub"
+  },
+  "theme": {
+    "light": "Jasny",
+    "dark": "Ciemny"
+  }
+}

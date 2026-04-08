@@ -1,0 +1,513 @@
+{
+  "name": "Russian Typographic by Kirkouski v0.1",
+  "layers": {
+    "altgr": {
+      "`": {
+        "char": "`",
+        "name": "GRAVE ACCENT",
+        "source": "BI"
+      },
+      "1": {
+        "char": "¹",
+        "name": "SUPERSCRIPT ONE",
+        "source": "BI"
+      },
+      "2": {
+        "char": "²",
+        "name": "SUPERSCRIPT TWO",
+        "source": "BI"
+      },
+      "3": {
+        "char": "³",
+        "name": "SUPERSCRIPT THREE",
+        "source": "BI"
+      },
+      "4": {
+        "char": "$",
+        "name": "DOLLAR SIGN",
+        "source": "BI"
+      },
+      "5": {
+        "char": "€",
+        "name": "EURO SIGN",
+        "source": "MOVE"
+      },
+      "6": {
+        "char": "↑",
+        "name": "UPWARDS ARROW",
+        "source": "BI"
+      },
+      "7": {
+        "char": "§",
+        "name": "SECTION SIGN",
+        "source": "MOVE"
+      },
+      "8": {
+        "char": "×",
+        "name": "MULTIPLICATION SIGN",
+        "source": "MOVE"
+      },
+      "9": {
+        "char": "←",
+        "name": "LEFTWARDS ARROW",
+        "source": "BI"
+      },
+      "0": {
+        "char": "→",
+        "name": "RIGHTWARDS ARROW",
+        "source": "BI"
+      },
+      "-": {
+        "char": "—",
+        "name": "EM DASH",
+        "source": "BI"
+      },
+      "=": {
+        "char": "≠",
+        "name": "NOT EQUAL TO",
+        "source": "BI"
+      },
+      "Q": {
+        "char": "©",
+        "name": "COPYRIGHT SIGN",
+        "source": "MOVE"
+      },
+      "W": {
+        "char": "✓",
+        "name": "CHECK MARK",
+        "source": "BI"
+      },
+      "E": null,
+      "R": {
+        "char": "®",
+        "name": "REGISTERED SIGN",
+        "source": "BI"
+      },
+      "T": {
+        "char": "™",
+        "name": "TRADE MARK SIGN",
+        "source": "BI"
+      },
+      "Y": {
+        "char": "ѣ",
+        "name": "CYRILLIC SMALL LETTER YAT",
+        "source": "RU"
+      },
+      "U": {
+        "char": "ѵ",
+        "name": "CYRILLIC SMALL LETTER IZHITSA",
+        "source": "RU"
+      },
+      "I": {
+        "char": "і",
+        "name": "CYRILLIC SMALL LETTER BYELORUSSIAN-UKRAINIAN I",
+        "source": "RU"
+      },
+      "O": {
+        "char": "ѳ",
+        "name": "CYRILLIC SMALL LETTER FITA",
+        "source": "RU"
+      },
+      "P": {
+        "char": "′",
+        "name": "PRIME",
+        "source": "BI"
+      },
+      "[": {
+        "char": "[",
+        "name": "LEFT SQUARE BRACKET",
+        "source": "BI"
+      },
+      "]": {
+        "char": "]",
+        "name": "RIGHT SQUARE BRACKET",
+        "source": "BI"
+      },
+      "A": {
+        "char": "₽",
+        "name": "RUBLE SIGN",
+        "source": "RU"
+      },
+      "S": null,
+      "D": {
+        "char": "°",
+        "name": "DEGREE SIGN",
+        "source": "BI"
+      },
+      "F": {
+        "char": "£",
+        "name": "POUND SIGN",
+        "source": "BI"
+      },
+      "G": {
+        "char": "·",
+        "name": "MIDDLE DOT",
+        "source": "MOVE"
+      },
+      "H": {
+        "char": "„",
+        "name": "DOUBLE LOW-9 QUOTATION MARK",
+        "source": "MOVE"
+      },
+      "J": {
+        "char": "“",
+        "name": "LEFT DOUBLE QUOTATION MARK",
+        "source": "MOVE"
+      },
+      "K": {
+        "char": "”",
+        "name": "RIGHT DOUBLE QUOTATION MARK",
+        "source": "MOVE"
+      },
+      "L": null,
+      ";": {
+        "char": "‘",
+        "name": "LEFT SINGLE QUOTATION MARK",
+        "source": "BI"
+      },
+      "'": {
+        "char": "’",
+        "name": "RIGHT SINGLE QUOTATION MARK",
+        "source": "BI"
+      },
+      "\\": null,
+      "Z": null,
+      "X": null,
+      "C": null,
+      "V": {
+        "char": "↓",
+        "name": "DOWNWARDS ARROW",
+        "source": "BI"
+      },
+      "B": {
+        "char": "ß",
+        "name": "LATIN SMALL LETTER SHARP S",
+        "source": "BI"
+      },
+      "N": null,
+      "M": {
+        "char": "−",
+        "name": "MINUS SIGN",
+        "source": "BI"
+      },
+      ",": {
+        "char": "«",
+        "name": "LEFT-POINTING DOUBLE ANGLE QUOTATION MARK",
+        "source": "BI"
+      },
+      ".": {
+        "char": "»",
+        "name": "RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK",
+        "source": "BI"
+      },
+      "/": {
+        "char": "…",
+        "name": "HORIZONTAL ELLIPSIS",
+        "source": "BI"
+      }
+    },
+    "shift_altgr": {
+      "`": {
+        "char": "dk:grave",
+        "name": "dead key: grave",
+        "source": "BI"
+      },
+      "1": {
+        "char": "¡",
+        "name": "INVERTED EXCLAMATION MARK",
+        "source": "BI"
+      },
+      "2": {
+        "char": "¹⁄₂",
+        "name": "SUPERSCRIPT ONE + FRACTION SLASH + SUBSCRIPT TWO",
+        "source": "BI"
+      },
+      "3": {
+        "char": "¹⁄₃",
+        "name": "SUPERSCRIPT ONE + FRACTION SLASH + SUBSCRIPT THREE",
+        "source": "BI"
+      },
+      "4": {
+        "char": "¹⁄₄",
+        "name": "SUPERSCRIPT ONE + FRACTION SLASH + SUBSCRIPT FOUR",
+        "source": "BI"
+      },
+      "5": {
+        "char": "‰",
+        "name": "PER MILLE SIGN",
+        "source": "MOVE"
+      },
+      "6": {
+        "char": "dk:circumflex",
+        "name": "dead key: circumflex",
+        "source": "BI"
+      },
+      "7": {
+        "char": "¿",
+        "name": "INVERTED QUESTION MARK",
+        "source": "BI"
+      },
+      "8": {
+        "char": "∞",
+        "name": "INFINITY",
+        "source": "MOVE"
+      },
+      "9": {
+        "char": "‹",
+        "name": "SINGLE LEFT-POINTING ANGLE QUOTATION MARK",
+        "source": "BI"
+      },
+      "0": {
+        "char": "›",
+        "name": "SINGLE RIGHT-POINTING ANGLE QUOTATION MARK",
+        "source": "BI"
+      },
+      "-": {
+        "char": "–",
+        "name": "EN DASH",
+        "source": "BI"
+      },
+      "=": {
+        "char": "±",
+        "name": "PLUS-MINUS SIGN",
+        "source": "BI"
+      },
+      "Q": {
+        "char": "≈",
+        "name": "ALMOST EQUAL TO",
+        "source": "MOVE"
+      },
+      "W": {
+        "char": "⌃",
+        "name": "UP ARROWHEAD",
+        "source": "BI"
+      },
+      "E": {
+        "char": "Ѵ",
+        "name": "CYRILLIC CAPITAL LETTER IZHITSA",
+        "source": "RU"
+      },
+      "R": {
+        "char": "dk:ring",
+        "name": "dead key: ring",
+        "source": "BI"
+      },
+      "T": {
+        "char": "#",
+        "name": "NUMBER SIGN",
+        "source": "BI"
+      },
+      "Y": {
+        "char": "Ѣ",
+        "name": "CYRILLIC CAPITAL LETTER YAT",
+        "source": "RU"
+      },
+      "U": {
+        "char": "dk:breve",
+        "name": "dead key: breve",
+        "source": "MOVE"
+      },
+      "I": {
+        "char": "І",
+        "name": "CYRILLIC CAPITAL LETTER BYELORUSSIAN-UKRAINIAN I",
+        "source": "RU"
+      },
+      "O": {
+        "char": "Ѳ",
+        "name": "CYRILLIC CAPITAL LETTER FITA",
+        "source": "RU"
+      },
+      "P": {
+        "char": "″",
+        "name": "DOUBLE PRIME",
+        "source": "BI"
+      },
+      "[": {
+        "char": "{",
+        "name": "LEFT CURLY BRACKET",
+        "source": "BI"
+      },
+      "]": {
+        "char": "}",
+        "name": "RIGHT CURLY BRACKET",
+        "source": "BI"
+      },
+      "A": null,
+      "S": null,
+      "D": {
+        "char": "⌀",
+        "name": "DIAMETER SIGN",
+        "source": "BI"
+      },
+      "F": {
+        "char": "¢",
+        "name": "CENT SIGN",
+        "source": "MOVE"
+      },
+      "G": {
+        "char": "dk:cedilla",
+        "name": "dead key: cedilla",
+        "source": "MOVE"
+      },
+      "H": {
+        "char": "dk:double-acute",
+        "name": "dead key: double-acute",
+        "source": "BI"
+      },
+      "J": {
+        "char": "‘",
+        "name": "LEFT SINGLE QUOTATION MARK",
+        "source": "MOVE"
+      },
+      "K": {
+        "char": "’",
+        "name": "RIGHT SINGLE QUOTATION MARK",
+        "source": "MOVE"
+      },
+      "L": null,
+      ";": {
+        "char": "dk:diaeresis",
+        "name": "dead key: diaeresis",
+        "source": "BI"
+      },
+      "'": {
+        "char": "dk:tilde",
+        "name": "dead key: tilde",
+        "source": "MOVE"
+      },
+      "\\": null,
+      "Z": null,
+      "X": null,
+      "C": null,
+      "V": {
+        "char": "dk:caron",
+        "name": "dead key: caron",
+        "source": "BI"
+      },
+      "B": {
+        "char": "ẞ",
+        "name": "LATIN CAPITAL LETTER SHARP S",
+        "source": "BI"
+      },
+      "N": null,
+      "M": {
+        "char": "•",
+        "name": "BULLET",
+        "source": "BI"
+      },
+      ",": {
+        "char": "„",
+        "name": "DOUBLE LOW-9 QUOTATION MARK",
+        "source": "BI"
+      },
+      ".": {
+        "char": "“",
+        "name": "LEFT DOUBLE QUOTATION MARK",
+        "source": "BI"
+      },
+      "/": {
+        "char": "dk:acute-2",
+        "name": "dead key: acute-2",
+        "source": "BI"
+      }
+    },
+    "base": {
+      "`": "ё",
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6",
+      "7": "7",
+      "8": "8",
+      "9": "9",
+      "0": "0",
+      "-": "-",
+      "=": "=",
+      "Q": "й",
+      "W": "ц",
+      "E": "у",
+      "R": "к",
+      "T": "е",
+      "Y": "н",
+      "U": "г",
+      "I": "ш",
+      "O": "щ",
+      "P": "з",
+      "[": "х",
+      "]": "ъ",
+      "A": "ф",
+      "S": "ы",
+      "D": "в",
+      "F": "а",
+      "G": "п",
+      "H": "р",
+      "J": "о",
+      "K": "л",
+      "L": "д",
+      ";": "ж",
+      "'": "э",
+      "\\": "\\",
+      "Z": "я",
+      "X": "ч",
+      "C": "с",
+      "V": "м",
+      "B": "и",
+      "N": "т",
+      "M": "ь",
+      ",": "б",
+      ".": "ю",
+      "/": "."
+    },
+    "shift": {
+      "`": "Ё",
+      "1": "!",
+      "2": "\"",
+      "3": "№",
+      "4": ";",
+      "5": "%",
+      "6": ":",
+      "7": "?",
+      "8": "*",
+      "9": "(",
+      "0": ")",
+      "-": "_",
+      "=": "+",
+      "Q": "Й",
+      "W": "Ц",
+      "E": "У",
+      "R": "К",
+      "T": "Е",
+      "Y": "Н",
+      "U": "Г",
+      "I": "Ш",
+      "O": "Щ",
+      "P": "З",
+      "[": "Х",
+      "]": "Ъ",
+      "A": "Ф",
+      "S": "Ы",
+      "D": "В",
+      "F": "А",
+      "G": "П",
+      "H": "Р",
+      "J": "О",
+      "K": "Л",
+      "L": "Д",
+      ";": "Ж",
+      "'": "Э",
+      "\\": "/",
+      "Z": "Я",
+      "X": "Ч",
+      "C": "С",
+      "V": "М",
+      "B": "И",
+      "N": "Т",
+      "M": "Ь",
+      ",": "Б",
+      ".": "Ю",
+      "/": ","
+    }
+  }
+}

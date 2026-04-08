@@ -1,0 +1,108 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g. 0.1)'
+        required: true
+        default: '0.1'
+
+jobs:
+  # ── Windows: DLLs + NSIS installer + zip ─────────────────────────────
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install NSIS
+        run: choco install nsis -y
+
+      - name: Install MSVC Build Tools
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Build Windows (DLLs + KLC + NSIS installer + zip)
+        run: python build.py windows klc
+
+      - name: List outputs
+        run: |
+          Get-ChildItem -Recurse dist/ | Format-Table Name, Length
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-release
+          path: |
+            dist/kirkouski-typographic-*-windows-setup.exe
+            dist/kirkouski-typographic-*-windows.zip
+            dist/windows-v*/
+
+  # ── macOS: keylayouts + .pkg installer + zip ─────────────────────────
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build macOS (keylayouts + pkg + zip)
+        run: python build.py macos
+
+      - name: List outputs
+        run: ls -laR dist/
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-release
+          path: |
+            dist/kirkouski-typographic-*-macos.zip
+            dist/kirkouski-typographic-*-macos.pkg
+            dist/macos-v*/
+
+  # ── Create GitHub Release ────────────────────────────────────────────
+  release:
+    needs: [build-windows, build-macos]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Windows artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-release
+          path: release/
+
+      - name: Download macOS artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-release
+          path: release/
+
+      - name: List release files
+        run: find release/ -type f | sort
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            release/kirkouski-typographic-*-windows-setup.exe
+            release/kirkouski-typographic-*-windows.zip
+            release/kirkouski-typographic-*-macos.zip
+            release/kirkouski-typographic-*-macos.pkg

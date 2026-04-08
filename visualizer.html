@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kirkouski Typographic Keyboard Layout</title>
+<style>
+  :root {
+    --key-size: 54px;
+    --key-gap: 3px;
+    --bg: #1a1a2e;
+    --key-bg: #16213e;
+    --key-border: #0f3460;
+    --key-hover: #1a3a6e;
+    --text-base: #8899aa;
+    --text-altgr: #e94560;
+    --text-sh-altgr: #f5a623;
+    --text-pl: #53d769;
+    --text-ru: #5bc0de;
+    --text-dead: #bb86fc;
+    --font: 'Segoe UI', system-ui, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: #ccc;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px;
+    min-height: 100vh;
+  }
+
+  h1 {
+    font-size: 20px;
+    font-weight: 400;
+    margin-bottom: 8px;
+    color: #eee;
+  }
+
+  .controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    align-items: center;
+  }
+
+  .controls select {
+    font-family: var(--font);
+    font-size: 14px;
+    padding: 6px 12px;
+    background: var(--key-bg);
+    color: #eee;
+    border: 1px solid var(--key-border);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .legend {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 16px;
+    font-size: 12px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .legend-swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+  }
+
+  .keyboard {
+    display: flex;
+    flex-direction: column;
+    gap: var(--key-gap);
+  }
+
+  .row {
+    display: flex;
+    gap: var(--key-gap);
+  }
+
+  .key {
+    width: var(--key-size);
+    height: var(--key-size);
+    background: var(--key-bg);
+    border: 1px solid var(--key-border);
+    border-radius: 6px;
+    position: relative;
+    cursor: default;
+    transition: background 0.15s;
+  }
+
+  .key:hover {
+    background: var(--key-hover);
+  }
+
+  /* Character positions on keycap */
+  .key .base {
+    position: absolute;
+    left: 5px;
+    bottom: 4px;
+    font-size: 13px;
+    color: var(--text-base);
+    line-height: 1;
+  }
+
+  .key .altgr {
+    position: absolute;
+    right: 5px;
+    bottom: 4px;
+    font-size: 12px;
+    line-height: 1;
+  }
+
+  .key .sh-altgr {
+    position: absolute;
+    right: 5px;
+    top: 4px;
+    font-size: 11px;
+    line-height: 1;
+  }
+
+  .key .shift-char {
+    position: absolute;
+    left: 5px;
+    top: 4px;
+    font-size: 11px;
+    color: var(--text-base);
+    opacity: 0.5;
+    line-height: 1;
+  }
+
+  /* Source-based colors */
+  .src-BI { color: var(--text-altgr); }
+  .src-MOVE { color: var(--text-altgr); }
+  .src-PL { color: var(--text-pl); }
+  .src-RU { color: var(--text-ru); }
+  .src-dead { color: var(--text-dead); }
+
+  /* Special key widths */
+  .key-tab { width: calc(var(--key-size) * 1.5 + var(--key-gap) * 0.5); }
+  .key-caps { width: calc(var(--key-size) * 1.75 + var(--key-gap) * 0.75); }
+  .key-lshift { width: calc(var(--key-size) * 2.25 + var(--key-gap) * 1.25); }
+  .key-rshift { width: calc(var(--key-size) * 2.75 + var(--key-gap) * 1.75); }
+  .key-backspace { width: calc(var(--key-size) * 2 + var(--key-gap)); }
+  .key-backslash { width: calc(var(--key-size) * 1.5 + var(--key-gap) * 0.5); }
+  .key-enter { width: calc(var(--key-size) * 2.25 + var(--key-gap) * 1.25); }
+  .key-space { width: calc(var(--key-size) * 6.25 + var(--key-gap) * 5.25); }
+  .key-ctrl { width: calc(var(--key-size) * 1.25 + var(--key-gap) * 0.25); }
+  .key-alt { width: calc(var(--key-size) * 1.25 + var(--key-gap) * 0.25); }
+  .key-win { width: calc(var(--key-size) * 1.25 + var(--key-gap) * 0.25); }
+
+  .key-modifier {
+    background: #0f1a30;
+  }
+
+  .key-modifier .base {
+    font-size: 10px;
+    opacity: 0.6;
+  }
+
+  .key-modifier .alt-label {
+    position: absolute;
+    right: 5px;
+    bottom: 4px;
+    font-size: 14px;
+    opacity: 0.35;
+    line-height: 1;
+    color: #aaa;
+  }
+
+  .key-altgr-highlight {
+    background: #1a0a20;
+    border-color: #3a1a4e;
+  }
+
+  .tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #222;
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 100;
+    pointer-events: none;
+    color: #ddd;
+  }
+
+  .tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #444;
+  }
+
+  .key:hover .tooltip {
+    display: block;
+  }
+
+  .tooltip-line {
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+  }
+
+  .tooltip-label {
+    color: #888;
+  }
+</style>
+</head>
+<body>
+
+<h1 id="layout-title">Loading...</h1>
+
+<div class="controls">
+  <select id="layout-select">
+    <option value="polish_typographic.json">Polish Typographic</option>
+    <option value="russian_typographic.json">Russian Typographic</option>
+  </select>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--text-base)"></div> Base / Shift</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--text-altgr)"></div> AltGr</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--text-sh-altgr)"></div> Shift+AltGr</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--text-pl)"></div> Polish</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--text-ru)"></div> Russian</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:var(--text-dead)"></div> Dead key</div>
+</div>
+
+<div class="keyboard" id="keyboard"></div>
+
+<script>
+// US ANSI keyboard layout definition
+// Each row: array of {id, base, shift, width?}
+const KEYBOARD_ROWS = [
+  // Number row
+  [
+    {id:'`', base:'`', shift:'~'},
+    {id:'1', base:'1', shift:'!'},
+    {id:'2', base:'2', shift:'@'},
+    {id:'3', base:'3', shift:'#'},
+    {id:'4', base:'4', shift:'$'},
+    {id:'5', base:'5', shift:'%'},
+    {id:'6', base:'6', shift:'^'},
+    {id:'7', base:'7', shift:'&'},
+    {id:'8', base:'8', shift:'*'},
+    {id:'9', base:'9', shift:'('},
+    {id:'0', base:'0', shift:')'},
+    {id:'-', base:'-', shift:'_'},
+    {id:'=', base:'=', shift:'+'},
+    {id:'_backspace', base:'Backspace', alt:'⌫', cls:'key-backspace key-modifier'},
+  ],
+  // QWERTY row
+  [
+    {id:'_tab', base:'Tab', alt:'⇥', cls:'key-tab key-modifier'},
+    {id:'Q', base:'q', shift:'Q'},
+    {id:'W', base:'w', shift:'W'},
+    {id:'E', base:'e', shift:'E'},
+    {id:'R', base:'r', shift:'R'},
+    {id:'T', base:'t', shift:'T'},
+    {id:'Y', base:'y', shift:'Y'},
+    {id:'U', base:'u', shift:'U'},
+    {id:'I', base:'i', shift:'I'},
+    {id:'O', base:'o', shift:'O'},
+    {id:'P', base:'p', shift:'P'},
+    {id:'[', base:'[', shift:'{'},
+    {id:']', base:']', shift:'}'},
+    {id:'\\', base:'\\', shift:'|', cls:'key-backslash'},
+  ],
+  // Home row
+  [
+    {id:'_caps', base:'Caps', alt:'⇪', cls:'key-caps key-modifier'},
+    {id:'A', base:'a', shift:'A'},
+    {id:'S', base:'s', shift:'S'},
+    {id:'D', base:'d', shift:'D'},
+    {id:'F', base:'f', shift:'F'},
+    {id:'G', base:'g', shift:'G'},
+    {id:'H', base:'h', shift:'H'},
+    {id:'J', base:'j', shift:'J'},
+    {id:'K', base:'k', shift:'K'},
+    {id:'L', base:'l', shift:'L'},
+    {id:';', base:';', shift:':'},
+    {id:"'", base:"'", shift:'"'},
+    {id:'_enter', base:'Enter', alt:'⏎', cls:'key-enter key-modifier'},
+  ],
+  // Bottom row
+  [
+    {id:'_lshift', base:'Shift', alt:'⇧', cls:'key-lshift key-modifier'},
+    {id:'Z', base:'z', shift:'Z'},
+    {id:'X', base:'x', shift:'X'},
+    {id:'C', base:'c', shift:'C'},
+    {id:'V', base:'v', shift:'V'},
+    {id:'B', base:'b', shift:'B'},
+    {id:'N', base:'n', shift:'N'},
+    {id:'M', base:'m', shift:'M'},
+    {id:',', base:',', shift:'<'},
+    {id:'.', base:'.', shift:'>'},
+    {id:'/', base:'/', shift:'?'},
+    {id:'_rshift', base:'Shift', alt:'⇧', cls:'key-rshift key-modifier'},
+  ],
+  // Space row
+  [
+    {id:'_lctrl', base:'Ctrl', alt:'⌃', cls:'key-ctrl key-modifier'},
+    {id:'_win', base:'Win', alt:'⌘', cls:'key-win key-modifier'},
+    {id:'_lalt', base:'Alt', alt:'⌥', cls:'key-alt key-modifier'},
+    {id:'_space', base:'', cls:'key-space'},
+    {id:'_ralt', base:'AltGr', alt:'⌥', cls:'key-alt key-modifier key-altgr-highlight'},
+    {id:'_rwin', base:'Win', alt:'⌘', cls:'key-win key-modifier'},
+    {id:'_menu', base:'Menu', alt:'☰', cls:'key-win key-modifier'},
+    {id:'_rctrl', base:'Ctrl', alt:'⌃', cls:'key-ctrl key-modifier'},
+  ],
+];
+
+let currentLayout = null;
+
+// Dead key name → spacing diacritical symbol
+const DEAD_KEY_SYMBOLS = {
+  'grave':        '\u02CB',  // ˋ
+  'acute':        '\u00B4',  // ´
+  'acute-2':      '\u00B4',  // ´
+  'circumflex':   '\u02C6',  // ˆ
+  'tilde':        '\u02DC',  // ˜
+  'diaeresis':    '\u00A8',  // ¨
+  'ring':         '\u02DA',  // ˚
+  'cedilla':      '\u00B8',  // ¸
+  'caron':        '\u02C7',  // ˇ
+  'breve':        '\u02D8',  // ˘
+  'double-acute': '\u02DD',  // ˝
+};
+
+function getCharDisplay(entry) {
+  if (!entry) return null;
+  const ch = entry.char;
+  if (!ch) return null;
+  // Dead keys
+  if (ch.startsWith('dk:')) {
+    const dkName = ch.replace('dk:', '');
+    const symbol = DEAD_KEY_SYMBOLS[dkName] || dkName;
+    return { display: symbol, isDead: true, name: entry.name, source: entry.source };
+  }
+  if (ch.startsWith('act:')) {
+    const actName = ch.replace('act:', '');
+    const symbol = DEAD_KEY_SYMBOLS[actName] || actName;
+    return { display: symbol, isDead: true, name: entry.name, source: entry.source };
+  }
+  return { display: ch, isDead: false, name: entry.name, source: entry.source };
+}
+
+function getColorClass(info) {
+  if (!info) return '';
+  if (info.isDead) return 'src-dead';
+  if (info.source === 'PL') return 'src-PL';
+  if (info.source === 'RU') return 'src-RU';
+  return 'src-BI';
+}
+
+function renderKeyboard(layout) {
+  const kb = document.getElementById('keyboard');
+  kb.innerHTML = '';
+  document.getElementById('layout-title').textContent = layout.name;
+
+  const baseLayer = layout.layers.base || {};
+  const shiftLayer = layout.layers.shift || {};
+  const altgr = layout.layers.altgr || {};
+  const shAltgr = layout.layers.shift_altgr || {};
+
+  for (const row of KEYBOARD_ROWS) {
+    const rowEl = document.createElement('div');
+    rowEl.className = 'row';
+
+    for (const keyDef of row) {
+      const keyEl = document.createElement('div');
+      keyEl.className = 'key ' + (keyDef.cls || '');
+
+      const isModifier = keyDef.id.startsWith('_');
+
+      // Use JSON base/shift if available, fall back to hardcoded
+      const baseChar = baseLayer[keyDef.id] || keyDef.base;
+      const shiftChar = shiftLayer[keyDef.id] || keyDef.shift;
+
+      // Base character (left bottom)
+      const baseEl = document.createElement('span');
+      baseEl.className = 'base';
+      baseEl.textContent = baseChar;
+      keyEl.appendChild(baseEl);
+
+      // Mac alt label for modifier keys
+      if (isModifier && keyDef.alt) {
+        const altEl = document.createElement('span');
+        altEl.className = 'alt-label';
+        altEl.textContent = keyDef.alt;
+        keyEl.appendChild(altEl);
+      }
+
+      // Shift character (left top) - only for printable keys
+      if (shiftChar && !isModifier) {
+        const shiftEl = document.createElement('span');
+        shiftEl.className = 'shift-char';
+        shiftEl.textContent = shiftChar;
+        keyEl.appendChild(shiftEl);
+      }
+
+      if (!isModifier) {
+        const agEntry = altgr[keyDef.id];
+        const sagEntry = shAltgr[keyDef.id];
+        const agInfo = getCharDisplay(agEntry);
+        const sagInfo = getCharDisplay(sagEntry);
+
+        // Skip AltGr if it matches base char
+        const showAg = agInfo && agInfo.display !== baseChar;
+        // Skip Sh+AltGr if it matches shift char
+        const showSag = sagInfo && sagInfo.display !== shiftChar;
+
+        // AltGr character (right bottom)
+        if (showAg) {
+          const agEl = document.createElement('span');
+          agEl.className = 'altgr ' + getColorClass(agInfo);
+          agEl.textContent = agInfo.display;
+          keyEl.appendChild(agEl);
+        }
+
+        // Shift+AltGr character (right top)
+        if (showSag) {
+          const sagEl = document.createElement('span');
+          sagEl.className = 'sh-altgr ' + getColorClass(sagInfo);
+          sagEl.textContent = sagInfo.display;
+          keyEl.appendChild(sagEl);
+        }
+
+        // Tooltip
+        const tooltip = document.createElement('div');
+        tooltip.className = 'tooltip';
+        let tooltipHtml = `<div class="tooltip-line"><span class="tooltip-label">Key:</span> <span>${shiftChar || baseChar}</span></div>`;
+        if (showAg) {
+          const label = agInfo.isDead ? 'AltGr (dead):' : 'AltGr:';
+          tooltipHtml += `<div class="tooltip-line"><span class="tooltip-label">${label}</span> <span>${agInfo.display} &mdash; ${agInfo.name || ''}</span></div>`;
+        }
+        if (showSag) {
+          const label = sagInfo.isDead ? 'Sh+AltGr (dead):' : 'Sh+AltGr:';
+          tooltipHtml += `<div class="tooltip-line"><span class="tooltip-label">${label}</span> <span>${sagInfo.display} &mdash; ${sagInfo.name || ''}</span></div>`;
+        }
+        if (!showAg && !showSag) {
+          tooltipHtml += `<div class="tooltip-line"><span class="tooltip-label">AltGr:</span> <span>(none)</span></div>`;
+        }
+        tooltip.innerHTML = tooltipHtml;
+        keyEl.appendChild(tooltip);
+      }
+
+      rowEl.appendChild(keyEl);
+    }
+
+    kb.appendChild(rowEl);
+  }
+}
+
+async function loadLayout(url) {
+  const resp = await fetch(url);
+  const data = await resp.json();
+  currentLayout = data;
+  renderKeyboard(data);
+}
+
+document.getElementById('layout-select').addEventListener('change', (e) => {
+  loadLayout(e.target.value);
+});
+
+// Load default
+loadLayout('polish_typographic.json');
+</script>
+</body>
+</html>

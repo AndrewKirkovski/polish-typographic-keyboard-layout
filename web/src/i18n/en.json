@@ -1,0 +1,78 @@
+{
+  "nav": {
+    "keyboard": "Keyboard",
+    "download": "Download",
+    "about": "About"
+  },
+  "hero": {
+    "title": "Kirkouski Typographic",
+    "subtitle": "Typography symbols at your fingertips — for Polish and Russian keyboards",
+    "scroll": "Explore the layout"
+  },
+  "keyboard": {
+    "title": "Layout Explorer",
+    "polish": "Polish Typographic",
+    "russian": "Russian Typographic",
+    "legend": {
+      "base": "Base",
+      "shift": "Shift",
+      "altgr": "AltGr",
+      "shAltgr": "Shift+AltGr",
+      "polish": "Polish",
+      "russian": "Russian",
+      "deadKey": "Dead key"
+    },
+    "tooltip": {
+      "key": "Key",
+      "altgr": "AltGr",
+      "shAltgr": "Shift+AltGr",
+      "deadAltgr": "AltGr (dead key)",
+      "deadShAltgr": "Shift+AltGr (dead key)",
+      "none": "No AltGr mapping"
+    }
+  },
+  "download": {
+    "title": "Download",
+    "subtitle": "Get the layout for your system",
+    "windows": "Windows",
+    "macos": "macOS",
+    "detected": "Detected: {os}",
+    "installer": "Installer script",
+    "layoutDll": "Layout DLL",
+    "layoutFile": "Layout file",
+    "recommended": "Recommended for your system"
+  },
+  "install": {
+    "title": "Installation",
+    "windows": {
+      "tab": "Windows",
+      "step1": "Download {dll} and {script} from the latest release",
+      "step2": "Place both files in the same folder",
+      "step3": "Right-click {script} and select \"Run with PowerShell\" (it auto-elevates to admin)",
+      "step4": "Restart your computer",
+      "step5": "Go to Settings > Time & Language > Language & Region > Keyboard and add the new layout",
+      "loginScreen": "To apply to login screen: Win+R > intl.cpl > Administrative > Copy settings > check both boxes",
+      "uninstall": "To uninstall, run the script again — it detects the install and offers uninstall interactively.",
+      "hardCleanup": "If Explorer crashes: run {cmd} to remove all traces."
+    },
+    "macos": {
+      "tab": "macOS",
+      "step1": "Download the {file} file from the latest release",
+      "step2": "Copy to {userPath} (current user) or {systemPath} (all users + login screen, requires sudo)",
+      "step3": "Log out and log back in",
+      "step4": "Open System Settings > Keyboard > Input Sources and add the layout"
+    }
+  },
+  "about": {
+    "title": "About",
+    "description": "This project extends standard keyboard layouts with typographic symbols accessible via AltGr (Right Alt). Em dashes, curly quotes, copyright signs, currency symbols, and more — all without switching layouts or memorizing Unicode codes.",
+    "based": "Based on {link} by Ilya Birman.",
+    "birmanLink": "Typography Keyboard Layout",
+    "license": "Open source under MIT License.",
+    "github": "View on GitHub"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark"
+  }
+}
