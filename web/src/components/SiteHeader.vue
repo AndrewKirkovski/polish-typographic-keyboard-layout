@@ -1,13 +1,19 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t, locale } = useI18n()
+const menuOpen = ref(false)
 
 const langs = [
   { code: 'en', label: 'EN' },
   { code: 'pl', label: 'PL' },
   { code: 'ru', label: 'RU' },
 ]
+
+function closeMenu() {
+  menuOpen.value = false
+}
 </script>
 
 <template>
@@ -17,12 +23,22 @@ const langs = [
         <span class="logo-mark">&mdash;</span>
         <span class="logo-text">Kirkouski</span>
       </a>
-      <nav class="nav">
-        <a href="#keyboard">{{ t('nav.keyboard') }}</a>
-        <a href="#download">{{ t('nav.download') }}</a>
-        <a href="#about">{{ t('nav.about') }}</a>
+      <nav class="nav" :class="{ open: menuOpen }">
+        <a href="#keyboard" @click="closeMenu">{{ t('nav.keyboard') }}</a>
+        <a href="#download" @click="closeMenu">{{ t('nav.download') }}</a>
+        <a href="#about" @click="closeMenu">{{ t('nav.about') }}</a>
+        <div class="lang-switcher lang-switcher--mobile">
+          <button
+            v-for="lang in langs"
+            :key="lang.code"
+            :class="{ active: locale === lang.code }"
+            @click="locale = lang.code; closeMenu()"
+          >
+            {{ lang.label }}
+          </button>
+        </div>
       </nav>
-      <div class="lang-switcher">
+      <div class="lang-switcher lang-switcher--desktop">
         <button
           v-for="lang in langs"
           :key="lang.code"
@@ -32,6 +48,9 @@ const langs = [
           {{ lang.label }}
         </button>
       </div>
+      <button class="hamburger" :class="{ open: menuOpen }" @click="menuOpen = !menuOpen" aria-label="Menu">
+        <span /><span /><span />
+      </button>
     </div>
   </header>
 </template>
@@ -118,5 +137,67 @@ const langs = [
 
 .lang-switcher button:hover:not(.active) {
   color: var(--text-secondary);
+}
+
+/* Hamburger button — hidden on desktop */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  padding: 4px;
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  border-radius: 1px;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Mobile lang switcher hidden on desktop, shown in mobile nav */
+.lang-switcher--mobile { display: none; }
+
+/* ── Mobile ────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .lang-switcher--desktop { display: none; }
+  .lang-switcher--mobile { display: flex; margin-top: 0.5rem; }
+
+  .hamburger { display: flex; }
+
+  .nav {
+    display: none;
+    position: absolute;
+    top: 56px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    gap: 0;
+    padding: 0.5rem 1.5rem 1rem;
+    background: color-mix(in srgb, var(--bg) 95%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    margin-left: 0;
+  }
+
+  .nav.open { display: flex; }
+
+  .nav a {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav a:last-of-type {
+    border-bottom: none;
+  }
 }
 </style>

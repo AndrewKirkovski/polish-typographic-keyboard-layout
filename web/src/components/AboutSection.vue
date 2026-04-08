@@ -1,6 +1,14 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-const { t } = useI18n()
+const { t, tm } = useI18n()
+
+const basedParts = computed(() => {
+  const raw = (tm('about.based') as string) || 'Based on {link} by Ilya Birman.'
+  const idx = raw.indexOf('{link}')
+  if (idx === -1) return { before: raw, after: '' }
+  return { before: raw.slice(0, idx), after: raw.slice(idx + 6) }
+})
 </script>
 
 <template>
@@ -10,11 +18,11 @@ const { t } = useI18n()
       <div class="about-content">
         <p>{{ t('about.description') }}</p>
         <p>
-          {{ t('about.based', { link: '' }).split('')[0] }}
+          {{ basedParts.before }}
           <a href="https://ilyabirman.ru/typography-layout/" target="_blank" rel="noopener">
             {{ t('about.birmanLink') }}
           </a>
-          {{ t('about.based', { link: '' }).split('').pop() }}
+          {{ basedParts.after }}
         </p>
         <p>{{ t('about.license') }}</p>
         <a

@@ -20,7 +20,8 @@
       "shAltgr": "Shift+AltGr",
       "polish": "Polish",
       "russian": "Russian",
-      "deadKey": "Dead key"
+      "deadKey": "Dead key",
+      "deadKeyTip": "Press dead key, then a letter to produce an accented character (e.g. ´ then a → á)"
     },
     "tooltip": {
       "key": "Key",

@@ -55,9 +55,10 @@ const { active, activeId, setActive } = useLayout()
           <span class="legend-swatch" style="background: var(--color-russian)"></span>
           {{ t('keyboard.legend.russian') }}
         </div>
-        <div class="legend-item">
+        <div class="legend-item legend-item--has-tip" :title="t('keyboard.legend.deadKeyTip')">
           <span class="legend-swatch" style="background: var(--color-dead)"></span>
           {{ t('keyboard.legend.deadKey') }}
+          <span class="legend-help">?</span>
         </div>
       </div>
     </div>
@@ -101,7 +102,7 @@ const { active, activeId, setActive } = useLayout()
 }
 
 .keyboard-wrapper {
-  overflow: visible;
+  overflow-x: auto;
   padding: 1rem 0;
   margin: 0 -2rem;
   padding-left: 2rem;
@@ -138,5 +139,23 @@ const { active, activeId, setActive } = useLayout()
   width: 10px;
   height: 10px;
   border-radius: 3px;
+}
+
+.legend-item--has-tip {
+  cursor: help;
+}
+
+.legend-help {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  margin-left: 2px;
 }
 </style>

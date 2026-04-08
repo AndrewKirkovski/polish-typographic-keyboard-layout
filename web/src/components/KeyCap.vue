@@ -1,13 +1,51 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { KeyDef } from '../composables/keyboardData'
 import type { LayoutData } from '../composables/useLayout'
 import { parseEntry } from '../composables/useLayout'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   keyDef: KeyDef
   layout: LayoutData | null
 }>()
+
+const keyEl = ref<HTMLElement | null>(null)
+const showTooltip = ref(false)
+const tooltipStyle = ref<Record<string, string>>({})
+
+function updateTooltip() {
+  if (!keyEl.value) return
+  const rect = keyEl.value.getBoundingClientRect()
+  const tooltipHeight = 80
+  const above = rect.top > tooltipHeight + 12
+
+  if (above) {
+    tooltipStyle.value = {
+      left: `${rect.left + rect.width / 2}px`,
+      top: `${rect.top - 8}px`,
+      transform: 'translate(-50%, -100%)',
+    }
+  } else {
+    tooltipStyle.value = {
+      left: `${rect.left + rect.width / 2}px`,
+      top: `${rect.bottom + 8}px`,
+      transform: 'translate(-50%, 0)',
+    }
+  }
+}
+
+function onEnter() {
+  if (props.keyDef.isModifier) return
+  updateTooltip()
+  showTooltip.value = true
+}
+
+function onLeave() {
+  showTooltip.value = false
+}
 
 const baseChar = computed(() => {
   if (!props.layout || props.keyDef.isModifier) return props.keyDef.base
@@ -54,12 +92,15 @@ const isAltGrKey = computed(() => props.keyDef.id === '_ra')
 
 <template>
   <div
+    ref="keyEl"
     class="key"
     :class="{
       'key--modifier': keyDef.isModifier,
       'key--altgr': isAltGrKey,
     }"
     :style="{ width: keyWidth }"
+    @mouseenter="onEnter"
+    @mouseleave="onLeave"
   >
     <!-- Base char (bottom-left) -->
     <span class="key__base">{{ baseChar }}</span>
@@ -83,9 +124,11 @@ const isAltGrKey = computed(() => props.keyDef.id === '_ra')
     <span v-if="shAltgrInfo" class="key__sh-altgr" :class="colorClass(shAltgrInfo)">
       {{ shAltgrInfo.display }}
     </span>
+  </div>
 
-    <!-- Tooltip -->
-    <div v-if="!keyDef.isModifier" class="key__tooltip">
+  <!-- Teleported tooltip — renders in document body, never clipped -->
+  <Teleport to="body">
+    <div v-if="showTooltip && !keyDef.isModifier" class="key-tooltip-portal" :style="tooltipStyle">
       <div class="tooltip-row">
         <span class="tooltip-label">{{ shiftChar || baseChar }}</span>
       </div>
@@ -98,10 +141,10 @@ const isAltGrKey = computed(() => props.keyDef.id === '_ra')
         <span>{{ shAltgrInfo.display }} &mdash; {{ shAltgrInfo.name }}</span>
       </div>
       <div v-if="!altgrInfo && !shAltgrInfo" class="tooltip-row tooltip-empty">
-        No AltGr mapping
+        {{ t('keyboard.tooltip.none') }}
       </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <style scoped>
@@ -197,60 +240,5 @@ const isAltGrKey = computed(() => props.keyDef.id === '_ra')
 .color-russian { color: var(--color-russian); }
 .color-dead { color: var(--color-dead); }
 
-/* Tooltip */
-.key__tooltip {
-  display: none;
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-strong);
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 11px;
-  white-space: nowrap;
-  z-index: 100;
-  pointer-events: none;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-  font-family: var(--font-body);
-}
-
-.key__tooltip::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 5px solid transparent;
-  border-top-color: var(--border-strong);
-}
-
-.key:hover .key__tooltip {
-  display: block;
-}
-
-.tooltip-row {
-  display: flex;
-  gap: 8px;
-  line-height: 1.6;
-}
-
-.tooltip-label {
-  font-family: var(--font-mono);
-  font-weight: 600;
-  font-size: 13px;
-}
-
-.tooltip-key {
-  font-family: var(--font-mono);
-  color: var(--text-muted);
-  font-size: 10px;
-  min-width: 55px;
-}
-
-.tooltip-empty {
-  color: var(--text-muted);
-  font-style: italic;
-}
+/* Old tooltip styles removed — tooltip now uses Teleport (see style.css) */
 </style>

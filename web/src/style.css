@@ -1,5 +1,9 @@
 /* ── Kirkouski Typographic — Editorial Typography Theme ─────────────── */
 
+html, body {
+  overflow-x: hidden;
+}
+
 :root {
   --font-display: 'DM Serif Display', Georgia, serif;
   --font-body: 'Instrument Sans', -apple-system, sans-serif;
@@ -154,4 +158,43 @@ code {
 ::selection {
   background: var(--color-altgr);
   color: white;
+}
+
+/* ── Teleported key tooltip (rendered in <body> via Vue Teleport) ────── */
+.key-tooltip-portal {
+  position: fixed;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 11px;
+  white-space: nowrap;
+  z-index: 10000;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  font-family: var(--font-body);
+}
+
+.key-tooltip-portal .tooltip-row {
+  display: flex;
+  gap: 8px;
+  line-height: 1.6;
+}
+
+.key-tooltip-portal .tooltip-label {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.key-tooltip-portal .tooltip-key {
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  font-size: 10px;
+  min-width: 55px;
+}
+
+.key-tooltip-portal .tooltip-empty {
+  color: var(--text-muted);
+  font-style: italic;
 }

@@ -20,7 +20,8 @@
       "shAltgr": "Shift+AltGr",
       "polish": "Polski",
       "russian": "Rosyjski",
-      "deadKey": "Martwy klawisz"
+      "deadKey": "Martwy klawisz",
+      "deadKeyTip": "Naciśnij martwy klawisz, potem literę, aby uzyskać znak diakrytyczny (np. ´ potem a → á)"
     },
     "tooltip": {
       "key": "Klawisz",
