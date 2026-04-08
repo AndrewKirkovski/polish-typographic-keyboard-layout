@@ -59,6 +59,7 @@ const LAYOUT_FILES: Record<string, string> = {
 
 async function loadLayout(id: string) {
   if (layouts.value[id]) return
+  if (typeof window === 'undefined') return // Skip during SSR
   loading.value = true
   try {
     const resp = await fetch(LAYOUT_FILES[id])

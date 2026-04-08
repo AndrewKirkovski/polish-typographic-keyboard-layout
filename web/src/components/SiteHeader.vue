@@ -1,15 +1,20 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t, locale } = useI18n()
 const menuOpen = ref(false)
 
 const langs = [
-  { code: 'en', label: 'EN' },
-  { code: 'pl', label: 'PL' },
-  { code: 'ru', label: 'RU' },
+  { code: 'en', label: 'EN', href: '/' },
+  { code: 'pl', label: 'PL', href: '/pl/' },
+  { code: 'ru', label: 'RU', href: '/ru/' },
 ]
+
+function langHref(lang: typeof langs[0]) {
+  const hash = typeof window !== 'undefined' ? window.location.hash : ''
+  return lang.href + hash
+}
 
 function closeMenu() {
   menuOpen.value = false
@@ -28,25 +33,25 @@ function closeMenu() {
         <a href="#download" @click="closeMenu">{{ t('nav.download') }}</a>
         <a href="#about" @click="closeMenu">{{ t('nav.about') }}</a>
         <div class="lang-switcher lang-switcher--mobile">
-          <button
+          <a
             v-for="lang in langs"
             :key="lang.code"
+            :href="langHref(lang)"
             :class="{ active: locale === lang.code }"
-            @click="locale = lang.code; closeMenu()"
           >
             {{ lang.label }}
-          </button>
+          </a>
         </div>
       </nav>
       <div class="lang-switcher lang-switcher--desktop">
-        <button
+        <a
           v-for="lang in langs"
           :key="lang.code"
+          :href="langHref(lang)"
           :class="{ active: locale === lang.code }"
-          @click="locale = lang.code"
         >
           {{ lang.label }}
-        </button>
+        </a>
       </div>
       <button class="hamburger" :class="{ open: menuOpen }" @click="menuOpen = !menuOpen" aria-label="Menu">
         <span /><span /><span />
@@ -116,7 +121,7 @@ function closeMenu() {
   padding: 2px;
 }
 
-.lang-switcher button {
+.lang-switcher a {
   font-family: var(--font-mono);
   font-size: 0.7rem;
   font-weight: 500;

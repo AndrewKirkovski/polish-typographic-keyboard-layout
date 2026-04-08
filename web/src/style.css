@@ -6,7 +6,7 @@ html, body {
 
 :root {
   --font-display: 'DM Serif Display', Georgia, serif;
-  --font-body: 'Instrument Sans', -apple-system, sans-serif;
+  --font-body: 'Noto Sans', -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', 'Menlo', monospace;
 
   /* Light theme (default) */

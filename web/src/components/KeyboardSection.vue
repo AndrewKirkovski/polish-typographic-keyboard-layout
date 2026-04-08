@@ -55,10 +55,11 @@ const { active, activeId, setActive } = useLayout()
           <span class="legend-swatch" style="background: var(--color-russian)"></span>
           {{ t('keyboard.legend.russian') }}
         </div>
-        <div class="legend-item legend-item--has-tip" :title="t('keyboard.legend.deadKeyTip')">
+        <div class="legend-item legend-item--has-tip">
           <span class="legend-swatch" style="background: var(--color-dead)"></span>
           {{ t('keyboard.legend.deadKey') }}
           <span class="legend-help">?</span>
+          <div class="legend-tooltip">{{ t('keyboard.legend.deadKeyTip') }}</div>
         </div>
       </div>
     </div>
@@ -157,5 +158,33 @@ const { active, activeId, setActive } = useLayout()
   border: 1px solid var(--border-strong);
   border-radius: 50%;
   margin-left: 2px;
+}
+
+.legend-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 11px;
+  white-space: nowrap;
+  z-index: 100;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  font-family: var(--font-body);
+  color: var(--text-secondary);
+}
+
+.legend-item--has-tip:hover .legend-tooltip {
+  display: block;
+}
+
+.legend-item--has-tip {
+  cursor: help;
+  position: relative;
 }
 </style>

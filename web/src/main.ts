@@ -6,11 +6,16 @@ import pl from './i18n/pl.json'
 import ru from './i18n/ru.json'
 import './style.css'
 
+function detectLocale(): string {
+  const path = window.location.pathname
+  if (path.startsWith('/pl')) return 'pl'
+  if (path.startsWith('/ru')) return 'ru'
+  return 'en'
+}
+
 const i18n = createI18n({
   legacy: false,
-  locale: navigator.language.startsWith('pl') ? 'pl'
-        : navigator.language.startsWith('ru') ? 'ru'
-        : 'en',
+  locale: detectLocale(),
   fallbackLocale: 'en',
   messages: { en, pl, ru },
 })

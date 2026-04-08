@@ -8,6 +8,7 @@ const RELEASE_DL = 'https://github.com/AndrewKirkovski/polish-typographic-keyboa
 const RELEASE_PAGE = 'https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/releases/latest'
 
 const detectedOS = computed(() => {
+  if (typeof navigator === 'undefined') return 'windows'
   const ua = navigator.userAgent
   if (ua.includes('Mac')) return 'macos'
   return 'windows'
