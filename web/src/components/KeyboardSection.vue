@@ -101,12 +101,9 @@ const { active, activeId, setActive } = useLayout()
 }
 
 .keyboard-wrapper {
-  overflow-x: auto;
-  overflow-y: visible;
+  overflow: visible;
   padding: 1rem 0;
-  padding-top: 4rem; /* space for tooltips above top row */
   margin: 0 -2rem;
-  margin-top: -3rem; /* compensate for extra padding */
   padding-left: 2rem;
   padding-right: 2rem;
 }
