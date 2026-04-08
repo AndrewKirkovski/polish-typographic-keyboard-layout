@@ -4,9 +4,10 @@ Reads the simple overlay JSONs (polish_typographic.json, russian_typographic.jso
 and generates .klc files compatible with MSKLC / kbdutool.exe.
 
 Usage:
-    python build_klc.py                    # builds both
+    python build_klc.py                    # builds all layouts
     python build_klc.py polish             # builds Polish only
     python build_klc.py russian            # builds Russian only
+    python build_klc.py us                 # builds US+POL only
 
 Output goes to dist/<name>.klc (UTF-16 LE with BOM).
 
@@ -181,6 +182,15 @@ LAYOUTS = {
         "lang_id": "0419",
         "lang_name": "Russian",
     },
+    "us": {
+        "json": "polish_typographic.json",
+        "kbd_name": "ustypo",
+        "description": "US+POL Typographic by Kirkouski",
+        "locale_name": "en-US",
+        "locale_id": "00000409",
+        "lang_id": "0409",
+        "lang_name": "English",
+    },
 }
 
 
@@ -232,7 +242,7 @@ def build_klc(config):
     # Header
     w(f'KBD\t{config["kbd_name"]}\t"{config["description"]}"')
     w()
-    w(f'COPYRIGHT\t"(c) 2026 Andrew Kirkovski"')
+    w(f'COPYRIGHT\t"(c) 2026 Andrew Kirkouski"')
     w()
     w(f'COMPANY\t"Kirkouski"')
     w()

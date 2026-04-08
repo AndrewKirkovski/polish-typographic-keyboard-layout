@@ -475,10 +475,10 @@ def main():
 
     # Apply overlays
     print("Applying Polish overlay...", file=sys.stderr)
-    pl_data = apply_overlay(en_full, pl_overlay, "Polish Typographic by Kirkouski v0.1")
+    pl_data = apply_overlay(en_full, pl_overlay, "Polish Typographic by Kirkouski v0.2")
 
     print("Applying Russian overlay...", file=sys.stderr)
-    ru_data = apply_overlay(ru_full, ru_overlay, "Russian Typographic by Kirkouski v0.1")
+    ru_data = apply_overlay(ru_full, ru_overlay, "Russian Typographic by Kirkouski v0.2")
 
     # Save complete JSONs (these become the tracked source of truth)
     pl_json_path = os.path.join(SCRIPT_DIR, "polish_typographic_full.json")

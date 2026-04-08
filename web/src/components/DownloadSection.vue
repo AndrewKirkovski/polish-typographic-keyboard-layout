@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
-const RELEASE_DL = 'https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/releases/download/v0.1'
+const RELEASE_DL = 'https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/releases/download/v0.2'
 const RELEASE_PAGE = 'https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/releases/latest'
 
 const detectedOS = computed(() => {
@@ -19,8 +19,8 @@ const platforms = computed(() => {
     id: 'windows',
     name: t('download.windows'),
     files: [
-      { label: t('download.installer'), file: 'kirkouski-typographic-v0.1-windows-setup.exe', url: `${RELEASE_DL}/kirkouski-typographic-v0.1-windows-setup.exe` },
-      { label: 'ZIP', file: 'kirkouski-typographic-v0.1-windows.zip', url: `${RELEASE_DL}/kirkouski-typographic-v0.1-windows.zip` },
+      { label: t('download.installer'), file: 'kirkouski-typographic-v0.2-windows-setup.exe', url: `${RELEASE_DL}/kirkouski-typographic-v0.2-windows-setup.exe` },
+      { label: 'ZIP', file: 'kirkouski-typographic-v0.2-windows.zip', url: `${RELEASE_DL}/kirkouski-typographic-v0.2-windows.zip` },
     ],
     primary: detectedOS.value === 'windows',
   }
@@ -28,8 +28,8 @@ const platforms = computed(() => {
     id: 'macos',
     name: t('download.macos'),
     files: [
-      { label: t('download.installer'), file: 'kirkouski-typographic-v0.1-macos.pkg', url: `${RELEASE_DL}/kirkouski-typographic-v0.1-macos.pkg` },
-      { label: 'ZIP', file: 'kirkouski-typographic-v0.1-macos.zip', url: `${RELEASE_DL}/kirkouski-typographic-v0.1-macos.zip` },
+      { label: t('download.installer'), file: 'kirkouski-typographic-v0.2-macos.pkg', url: `${RELEASE_DL}/kirkouski-typographic-v0.2-macos.pkg` },
+      { label: 'ZIP', file: 'kirkouski-typographic-v0.2-macos.zip', url: `${RELEASE_DL}/kirkouski-typographic-v0.2-macos.zip` },
     ],
     primary: detectedOS.value === 'macos',
   }

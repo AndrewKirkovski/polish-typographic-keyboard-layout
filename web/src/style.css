@@ -160,6 +160,28 @@ code {
   color: white;
 }
 
+/* ── Platform labels (AltGr / ⌥ swap on macOS) ─────────────────────── */
+.os-mac { display: none; }
+html[data-os="mac"] .os-win { display: none; }
+html[data-os="mac"] .os-mac { display: inline; }
+
+/* macOS: swap modifier key labels — Mac symbol primary (left, dark), Win text secondary (right, subtle) */
+html[data-os="mac"] .key--modifier .key__base {
+  right: 5px;
+  left: auto;
+  font-size: 8px;
+  opacity: 0.3;
+  color: var(--text-muted);
+}
+
+html[data-os="mac"] .key__alt-label {
+  left: 5px;
+  right: auto;
+  font-size: 16px;
+  opacity: 0.7;
+  color: var(--color-base);
+}
+
 /* ── Teleported key tooltip (rendered in <body> via Vue Teleport) ────── */
 .key-tooltip-portal {
   position: fixed;

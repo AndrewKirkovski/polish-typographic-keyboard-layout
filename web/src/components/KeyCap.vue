@@ -110,7 +110,7 @@ const isAltGrKey = computed(() => props.keyDef.id === '_ra')
       {{ shiftChar }}
     </span>
 
-    <!-- Mac alt label for modifiers -->
+    <!-- Platform-alternate label for modifiers (Mac symbols) -->
     <span v-if="keyDef.isModifier && keyDef.altLabel" class="key__alt-label">
       {{ keyDef.altLabel }}
     </span>
@@ -133,11 +133,11 @@ const isAltGrKey = computed(() => props.keyDef.id === '_ra')
         <span class="tooltip-label">{{ shiftChar || baseChar }}</span>
       </div>
       <div v-if="altgrInfo" class="tooltip-row">
-        <span class="tooltip-key">AltGr</span>
+        <span class="tooltip-key"><span class="os-win">AltGr</span><span class="os-mac">⌥</span></span>
         <span>{{ altgrInfo.display }} &mdash; {{ altgrInfo.name }}</span>
       </div>
       <div v-if="shAltgrInfo" class="tooltip-row">
-        <span class="tooltip-key">Sh+AltGr</span>
+        <span class="tooltip-key"><span class="os-win">Sh+AltGr</span><span class="os-mac">⇧⌥</span></span>
         <span>{{ shAltgrInfo.display }} &mdash; {{ shAltgrInfo.name }}</span>
       </div>
       <div v-if="!altgrInfo && !shAltgrInfo" class="tooltip-row tooltip-empty">
@@ -233,6 +233,7 @@ const isAltGrKey = computed(() => props.keyDef.id === '_ra')
   line-height: 1;
   font-family: var(--font-mono);
 }
+
 
 /* Color classes */
 .color-altgr { color: var(--color-altgr); }

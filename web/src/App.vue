@@ -14,6 +14,10 @@ const { locale } = useI18n()
 
 onMounted(async () => {
   await init()
+  // Detect macOS for platform-specific labels (AltGr → ⌥, Win → ⌘)
+  if (typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.userAgent)) {
+    document.documentElement.setAttribute('data-os', 'mac')
+  }
 })
 </script>
 

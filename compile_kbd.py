@@ -8,6 +8,7 @@ Usage:
     python compile_kbd.py                # compiles all layouts in build/
     python compile_kbd.py polish         # compile Polish only
     python compile_kbd.py russian        # compile Russian only
+    python compile_kbd.py us             # compile US+POL only
     python compile_kbd.py --arch x86     # cross-compile for x86
 
 Prerequisites:
@@ -24,6 +25,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 LAYOUTS = {
     "polish": "pltypo",
     "russian": "rutypo",
+    "us": "ustypo",
 }
 
 
@@ -318,7 +320,7 @@ def main():
             targets.append(arg)
         else:
             print(f"Unknown argument: {arg}")
-            print(f"Usage: python compile_kbd.py [polish|russian] [--arch x64|x86|arm64]")
+            print(f"Usage: python compile_kbd.py [polish|russian|us] [--arch x64|x86|arm64]")
             sys.exit(1)
         i += 1
 

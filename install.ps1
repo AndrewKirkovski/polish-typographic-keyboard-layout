@@ -29,7 +29,7 @@ param(
     [switch]$Uninstall,
     [switch]$HardCleanup,
     [switch]$Force,
-    [ValidateSet("all", "polish", "russian")]
+    [ValidateSet("all", "polish", "russian", "us")]
     [string]$Layout = "all"
 )
 
@@ -56,6 +56,11 @@ $Layouts = @{
         DllName    = "rutypo.dll"
         LayoutText = "Russian Typographic by Kirkouski"
         LangId     = "0419"
+    }
+    "us" = @{
+        DllName    = "ustypo.dll"
+        LayoutText = "US+POL Typographic by Kirkouski"
+        LangId     = "0409"
     }
 }
 
@@ -270,7 +275,7 @@ function Invoke-Install {
 function Invoke-HardCleanup {
     Write-Host ""
     Write-Host "  Removing ALL traces of Kirkouski layouts..." -ForegroundColor Red
-    $dllNames = @("pltypo.dll", "rutypo.dll")
+    $dllNames = @("pltypo.dll", "rutypo.dll", "ustypo.dll")
 
     $allEntries = Get-ChildItem $RegBase -ErrorAction SilentlyContinue | Where-Object {
         $lf = (Get-ItemProperty $_.PSPath -Name "Layout File" -ErrorAction SilentlyContinue)."Layout File"

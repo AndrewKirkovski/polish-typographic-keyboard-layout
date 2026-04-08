@@ -5,19 +5,19 @@
 
 ; ---- General ----
 Name "Kirkouski Typographic Keyboard Layout"
-OutFile "dist\kirkouski-typographic-v0.1-windows-setup.exe"
+OutFile "dist\kirkouski-typographic-v0.2-windows-setup.exe"
 InstallDir "$TEMP\kirkouski-typographic-install"
 RequestExecutionLevel admin
 Unicode true
 
 ; ---- Version Info ----
-VIProductVersion "0.1.0.0"
+VIProductVersion "0.2.0.0"
 VIAddVersionKey "ProductName" "Kirkouski Typographic Keyboard Layout"
-VIAddVersionKey "ProductVersion" "0.1"
+VIAddVersionKey "ProductVersion" "0.2"
 VIAddVersionKey "CompanyName" "Andrew Kirkouski"
 VIAddVersionKey "LegalCopyright" "(c) 2026 Andrew Kirkouski. MIT License."
 VIAddVersionKey "FileDescription" "Keyboard layout installer"
-VIAddVersionKey "FileVersion" "0.1"
+VIAddVersionKey "FileVersion" "0.2"
 
 ; ---- Interface Settings ----
 !define MUI_ABORTWARNING
@@ -45,9 +45,10 @@ Section "Install Keyboard Layouts" SecInstall
     SetOutPath $INSTDIR
 
     ; Extract files to temp dir
-    File "dist\windows-v0.1\pltypo.dll"
-    File "dist\windows-v0.1\rutypo.dll"
-    File "dist\windows-v0.1\install.ps1"
+    File "dist\windows-v0.2\pltypo.dll"
+    File "dist\windows-v0.2\rutypo.dll"
+    File "dist\windows-v0.2\ustypo.dll"
+    File "dist\windows-v0.2\install.ps1"
 
     ; Run install.ps1 with -Force (non-interactive)
     DetailPrint "Installing keyboard layouts..."
@@ -66,7 +67,7 @@ Section "Install Keyboard Layouts" SecInstall
     WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\KirkouskiTypographic" \
         "UninstallString" '"$INSTDIR\uninstall.exe"'
     WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\KirkouskiTypographic" \
-        "DisplayVersion" "0.1"
+        "DisplayVersion" "0.2"
     WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\KirkouskiTypographic" \
         "Publisher" "Andrew Kirkouski"
     WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\KirkouskiTypographic" \
@@ -94,6 +95,7 @@ Section "Uninstall"
     ; Clean up installer files
     Delete "$INSTDIR\pltypo.dll"
     Delete "$INSTDIR\rutypo.dll"
+    Delete "$INSTDIR\ustypo.dll"
     Delete "$INSTDIR\install.ps1"
     Delete "$INSTDIR\uninstall.exe"
     RMDir "$INSTDIR"

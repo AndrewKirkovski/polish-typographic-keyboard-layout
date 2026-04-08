@@ -6,7 +6,7 @@
   },
   "hero": {
     "title": "Kirkouski Typographic",
-    "subtitle": "Typography symbols at your fingertips — for Polish and Russian keyboards",
+    "subtitle": "Typography symbols at your fingertips — for Polish and Russian keyboards. Works with English system language too",
     "scroll": "Explore the layout"
   },
   "keyboard": {
@@ -65,11 +65,23 @@
   },
   "about": {
     "title": "About",
-    "description": "This project extends standard keyboard layouts with typographic symbols accessible via AltGr (Right Alt). Em dashes, curly quotes, copyright signs, currency symbols, and more — all without switching layouts or memorizing Unicode codes.",
+    "description": "This project extends standard keyboard layouts with typographic symbols accessible via AltGr (Right Alt). Em dashes, curly quotes, copyright signs, currency symbols, and more — all without switching layouts or memorizing Unicode codes. The US+POL variant lets you keep English as your Windows system language while having all Polish and typographic characters available.",
     "based": "Based on {link} by Ilya Birman.",
     "birmanLink": "Typography Keyboard Layout",
     "license": "Open source under MIT License.",
-    "github": "View on GitHub"
+    "github": "View on GitHub",
+    "support": "Support the author",
+    "starOnGithub": "Star on GitHub",
+    "starHint": "If you find this useful, a star helps others discover it"
+  },
+  "share": {
+    "title": "Share",
+    "twitter": "Share on X",
+    "facebook": "Share on Facebook",
+    "linkedin": "Share on LinkedIn",
+    "reddit": "Share on Reddit",
+    "copyLink": "Copy link",
+    "copied": "Copied!"
   },
   "theme": {
     "light": "Light",

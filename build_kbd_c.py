@@ -4,9 +4,10 @@ Produces .c, .rc, and .def files that can be compiled with MSVC into a keyboard
 layout DLL — no MSKLC dependency needed.
 
 Usage:
-    python build_kbd_c.py                # generates both Polish and Russian
+    python build_kbd_c.py                # generates all layouts
     python build_kbd_c.py polish         # Polish only
     python build_kbd_c.py russian        # Russian only
+    python build_kbd_c.py us             # US+POL only
 
 Output goes to build/<kbd_name>.c, build/<kbd_name>.rc, build/<kbd_name>.def
 """
@@ -158,6 +159,14 @@ LAYOUTS = {
         "kbd_name": "rutypo",
         "description": "Russian Typographic by Kirkouski",
         "locale_id": "0419",
+        "res_id_text": 100,
+        "res_id_lang": 101,
+    },
+    "us": {
+        "json": "polish_typographic.json",
+        "kbd_name": "ustypo",
+        "description": "US+POL Typographic by Kirkouski",
+        "locale_id": "0409",
         "res_id_text": 100,
         "res_id_lang": 101,
     },
@@ -586,8 +595,8 @@ BEGIN
 END
 
 1 VERSIONINFO
-FILEVERSION     0,1,0,0
-PRODUCTVERSION  0,1,0,0
+FILEVERSION     0,2,0,0
+PRODUCTVERSION  0,2,0,0
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
 FILEFLAGS       0
 FILEOS          VOS_NT_WINDOWS32
@@ -600,12 +609,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName",      "Andrew Kirkouski"
             VALUE "FileDescription",  "{config['description']} Keyboard Layout"
-            VALUE "FileVersion",      "0.1"
-            VALUE "InternalName",     "{config['kbd_name']} (0.1)"
+            VALUE "FileVersion",      "0.2"
+            VALUE "InternalName",     "{config['kbd_name']} (0.2)"
             VALUE "ProductName",      "{config['description']}"
-            VALUE "LegalCopyright",   "\\251 2025\\2014 2026 Andrew Kirkouski"
+            VALUE "LegalCopyright",   "\\251 2025\\x20142026 Andrew Kirkouski"
             VALUE "OriginalFilename", "{config['kbd_name']}"
-            VALUE "ProductVersion",   "0.1"
+            VALUE "ProductVersion",   "0.2"
         END
     END
     BLOCK "VarFileInfo"

@@ -1,8 +1,10 @@
-# Kirkouski Typographic Keyboard Layout v0.1
+# Kirkouski Typographic Keyboard Layout v0.2
 
 > **[Interactive Layout Preview & Downloads](https://polish-typographic-keyboard-layout.pages.dev/)** — explore the layout, download installers, and read installation guides.
 
 Custom keyboard layouts for **Windows** and **macOS** that add typographic symbols (em dash, curly quotes, copyright, euro, etc.) accessible via AltGr (Right Alt) on top of standard Polish Programmers and Russian ЙЦУКЕН layouts.
+
+**Want Polish typographic symbols but keep English as your system language?** The **US+POL Typographic** variant gives you the same layout registered under English (US), so you don't need to add Polish as an input language in Windows.
 
 Based on [Ilya Birman's Typography Layout](https://ilyabirman.ru/typography-layout/). Typographic symbols are in the same positions across both language variants — switch between Polish and Russian without relearning symbol locations.
 
@@ -15,6 +17,12 @@ Based on [Ilya Birman's Typography Layout](https://ilyabirman.ru/typography-layo
 ### Russian Typographic
 
 ![Russian Typographic Layout](screenshots/russian_layout.png)
+
+### US+POL Typographic (Windows only)
+
+Same as Polish Typographic, but registered under the English (US) locale. Use this if you want to keep English as your Windows system language while having all Polish typographic characters available via AltGr. The key mappings are identical — only the language association differs.
+
+> **Note:** On macOS, keyboard layouts aren't tied to a system language, so the Polish Typographic keylayout already works regardless of your system language. The US+POL variant is only needed on Windows.
 
 ### Legend
 
@@ -32,12 +40,12 @@ Based on [Ilya Birman's Typography Layout](https://ilyabirman.ru/typography-layo
 
 ### Windows
 
-1. Download `pltypo.dll` (or `rutypo.dll`) and `install.ps1` from the latest release
+1. Download `pltypo.dll` (or `rutypo.dll`, or `ustypo.dll` for English system language) and `install.ps1` from the latest release
 2. Place both files in the same folder
 3. Right-click `install.ps1` > **Run with PowerShell** (it will auto-elevate to admin)
 4. Restart, then go to **Settings > Time & Language > Language & Region > Keyboard** and add the new layout
 
-**Uninstall:** Run `.\install.ps1 -Uninstall` and restart. Use `-Layout polish` or `-Layout russian` to uninstall selectively.
+**Uninstall:** Run `.\install.ps1 -Uninstall` and restart. Use `-Layout polish`, `-Layout russian`, or `-Layout us` to uninstall selectively.
 
 **Apply to login screen & new users:** After installing and switching to the new layout, open `intl.cpl` (Win+R > `intl.cpl`) > **Administrative** tab > **Copy settings** > check both **"Welcome screen and system accounts"** and **"New user accounts"** > OK. This ensures the login screen and any new user accounts use your layout instead of the default.
 
@@ -84,6 +92,7 @@ python build.py klc              # .klc files (for MSKLC)
 
 # Build specific layout
 python build.py windows polish
+python build.py windows us
 python build.py macos russian
 ```
 
@@ -106,12 +115,12 @@ macOS:    JSON (full) ──> build_keylayout.py ──> .keylayout ──> .pkg
 
 | File | Description |
 |------|-------------|
-| `kirkouski-typographic-v0.1-windows-setup.exe` | NSIS installer (Add/Remove Programs, UAC) |
-| `kirkouski-typographic-v0.1-windows.zip` | DLLs + install.ps1 for manual install |
-| `kirkouski-typographic-v0.1-macos.zip` | .keylayout files for manual install |
-| `kirkouski-typographic-v0.1-macos.pkg` | macOS installer (built on macOS only) |
-| `windows-v0.1/` | Loose Windows files |
-| `macos-v0.1/` | Loose macOS files |
+| `kirkouski-typographic-v0.2-windows-setup.exe` | NSIS installer (Add/Remove Programs, UAC) |
+| `kirkouski-typographic-v0.2-windows.zip` | DLLs + install.ps1 for manual install |
+| `kirkouski-typographic-v0.2-macos.zip` | .keylayout files for manual install |
+| `kirkouski-typographic-v0.2-macos.pkg` | macOS installer (built on macOS only) |
+| `windows-v0.2/` | Loose Windows files |
+| `macos-v0.2/` | Loose macOS files |
 
 ## Project Structure
 
@@ -178,6 +187,13 @@ This removes all traces of Kirkouski layouts (registry keys, DLLs, preload entri
 ### Windows: "Layout name already in use"
 
 Previous install left ghost registry entries. Run `.\install.ps1 -Uninstall` as admin first, restart, then reinstall.
+
+## Support
+
+If you find this useful, consider:
+
+- **[Support on Ko-fi](https://ko-fi.com/ryotsuke)** — buy me a coffee
+- **Star this repo** — helps others discover the project
 
 ## Credits
 

@@ -6,7 +6,7 @@
   },
   "hero": {
     "title": "Kirkouski Typographic",
-    "subtitle": "Znaki typograficzne na wyciągnięciem ręki — dla polskiej i rosyjskiej klawiatury",
+    "subtitle": "Znaki typograficzne na wyciągnięciu ręki — dla polskiej i rosyjskiej klawiatury. Działa też z angielskim językiem systemu",
     "scroll": "Zobacz układ"
   },
   "keyboard": {
@@ -65,11 +65,23 @@
   },
   "about": {
     "title": "O projekcie",
-    "description": "Ten projekt rozszerza standardowe układy klawiatury o znaki typograficzne dostępne przez AltGr (prawy Alt). Pauzy, cudzysłowy, znaki copyright, symbole walut i wiele więcej — bez przełączania układów i zapamiętywania kodów Unicode.",
+    "description": "Ten projekt rozszerza standardowe układy klawiatury o znaki typograficzne dostępne przez AltGr (prawy Alt). Pauzy, cudzysłowy, znaki copyright, symbole walut i wiele więcej — bez przełączania układów i zapamiętywania kodów Unicode. Wariant US+POL pozwala zachować angielski jako język systemu Windows, mając jednocześnie dostęp do wszystkich i polskich, i typograficznych znaków.",
     "based": "Na podstawie {link} autorstwa Ilyi Birmana.",
     "birmanLink": "Typograficznego układu klawiatury",
     "license": "Open source na licencji MIT.",
-    "github": "Zobacz na GitHub"
+    "github": "Zobacz na GitHub",
+    "support": "Wesprzyj autora",
+    "starOnGithub": "Gwiazdka na GitHub",
+    "starHint": "Jeśli to przydatne, gwiazdka pomoże innym to odkryć"
+  },
+  "share": {
+    "title": "Udostępnij",
+    "twitter": "Udostępnij na X",
+    "facebook": "Udostępnij na Facebooku",
+    "linkedin": "Udostępnij na LinkedIn",
+    "reddit": "Udostępnij na Reddit",
+    "copyLink": "Kopiuj link",
+    "copied": "Skopiowano!"
   },
   "theme": {
     "light": "Jasny",

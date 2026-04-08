@@ -16,13 +16,14 @@ import os
 import shutil
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-VERSION = "0.1"
+VERSION = "0.2"
 
 # Nice filenames for distribution (DLL names stay short for Windows registry)
 # Format: lang-variation-author-version
 NICE_NAMES = {
     "polish": "polish-typographic-kirkouski",
     "russian": "russian-typographic-kirkouski",
+    "us": "us-pol-typographic-kirkouski",
 }
 
 
@@ -167,11 +168,11 @@ def main():
             platforms.append("macos")
         elif arg == "klc":
             platforms.append("klc")
-        elif arg in ("polish", "russian"):
+        elif arg in ("polish", "russian", "us"):
             layouts.append(arg)
         else:
             print(f"Unknown argument: {arg}")
-            print("Usage: python build.py [windows|macos|klc] [polish|russian]")
+            print("Usage: python build.py [windows|macos|klc] [polish|russian|us]")
             print("")
             print("Builds DLLs, keylayouts, NSIS installer, .pkg (macOS only), and zip archives.")
             print("Prerequisites: Python 3.10+, MSVC Build Tools (windows), NSIS (windows installer)")
@@ -217,7 +218,7 @@ def main():
 
 def organize_dist(dist_dir, platforms):
     """Organize build outputs into versioned subdirectories, remove loose files."""
-    dll_map = {"polish": "pltypo", "russian": "rutypo"}
+    dll_map = {"polish": "pltypo", "russian": "rutypo", "us": "ustypo"}
     ps1_src = os.path.join(SCRIPT_DIR, "install.ps1")
 
     if "windows" in platforms:

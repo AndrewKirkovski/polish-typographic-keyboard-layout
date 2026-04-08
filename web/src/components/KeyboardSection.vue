@@ -11,7 +11,6 @@ const { active, activeId, setActive } = useLayout()
 <template>
   <section id="keyboard" class="section">
     <div class="container">
-      <h2 class="section-title">{{ t('keyboard.title') }}</h2>
       <div class="keyboard-controls">
         <div class="layout-switcher">
           <button
@@ -45,7 +44,8 @@ const { active, activeId, setActive } = useLayout()
         </div>
         <div class="legend-item">
           <span class="legend-swatch" style="background: var(--color-altgr)"></span>
-          {{ t('keyboard.legend.altgr') }}
+          <span class="os-win">{{ t('keyboard.legend.altgr') }}</span>
+          <span class="os-mac">⌥ Option</span>
         </div>
         <div class="legend-item">
           <span class="legend-swatch" style="background: var(--color-polish)"></span>
@@ -67,6 +67,10 @@ const { active, activeId, setActive } = useLayout()
 </template>
 
 <style scoped>
+.section {
+  padding-top: 2rem;
+}
+
 .keyboard-controls {
   margin-bottom: 2rem;
 }
@@ -140,10 +144,6 @@ const { active, activeId, setActive } = useLayout()
   width: 10px;
   height: 10px;
   border-radius: 3px;
-}
-
-.legend-item--has-tip {
-  cursor: help;
 }
 
 .legend-help {
