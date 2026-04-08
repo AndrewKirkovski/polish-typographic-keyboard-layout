@@ -47,21 +47,20 @@
     "title": "Instalacja",
     "windows": {
       "tab": "Windows",
-      "step1": "Pobierz {dll} i {script} z najnowszego wydania",
-      "step2": "Umieść oba pliki w tym samym folderze",
-      "step3": "Kliknij prawym przyciskiem {script} i wybierz \"Uruchom w PowerShell\" (automatycznie poprosi o uprawnienia)",
-      "step4": "Uruchom ponownie komputer",
-      "step5": "Przejdź do Ustawienia > Czas i język > Język i region > Klawiatura i dodaj nowy układ",
+      "step1_exe": "Pobierz i uruchom instalator .exe — wszystko zrobi automatycznie",
+      "step1_zip": "Lub pobierz .zip, rozpakuj, kliknij prawym na install.ps1 i wybierz \"Uruchom w PowerShell\"",
+      "step2": "Uruchom ponownie komputer",
+      "step3": "Przejdź do Ustawienia > Czas i język > Język i region > Klawiatura i dodaj nowy układ",
       "loginScreen": "Ekran logowania: Win+R > intl.cpl > Administracyjne > Kopiuj ustawienia > zaznacz obie opcje",
-      "uninstall": "Aby odinstalować, uruchom skrypt ponownie — wykryje instalację i zaproponuje odinstalowanie.",
+      "uninstall": "Aby odinstalować, uruchom install.ps1 ponownie — wykryje instalację i zaproponuje odinstalowanie.",
       "hardCleanup": "Jeśli Eksplorator się zawiesza: uruchom {cmd} aby usunąć wszystkie ślady."
     },
     "macos": {
       "tab": "macOS",
-      "step1": "Pobierz plik {file} z najnowszego wydania",
-      "step2": "Skopiuj do {userPath} (bieżący użytkownik) lub {systemPath} (wszyscy użytkownicy + ekran logowania, wymaga sudo)",
-      "step3": "Wyloguj się i zaloguj ponownie",
-      "step4": "Otwórz Ustawienia systemowe > Klawiatura > Źródła wprowadzania i dodaj układ"
+      "step1_pkg": "Pobierz i uruchom instalator .pkg",
+      "step1_zip": "Lub pobierz .zip i skopiuj pliki .keylayout do {userPath} (bieżący użytkownik) lub {systemPath} (wszyscy użytkownicy)",
+      "step2": "Wyloguj się i zaloguj ponownie",
+      "step3": "Otwórz Ustawienia systemowe > Klawiatura > Źródła wprowadzania i dodaj układ"
     }
   },
   "about": {

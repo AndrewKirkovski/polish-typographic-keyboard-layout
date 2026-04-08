@@ -16,6 +16,16 @@ function langHref(lang: typeof langs[0]) {
   return lang.href + hash
 }
 
+function switchLang(e: Event, lang: typeof langs[0]) {
+  e.preventDefault()
+  if (locale.value === lang.code) return
+  locale.value = lang.code
+  const url = langHref(lang)
+  history.pushState(null, '', url)
+  document.documentElement.lang = lang.code
+  menuOpen.value = false
+}
+
 function closeMenu() {
   menuOpen.value = false
 }
@@ -38,6 +48,7 @@ function closeMenu() {
             :key="lang.code"
             :href="langHref(lang)"
             :class="{ active: locale === lang.code }"
+            @click="switchLang($event, lang)"
           >
             {{ lang.label }}
           </a>
@@ -49,6 +60,7 @@ function closeMenu() {
           :key="lang.code"
           :href="langHref(lang)"
           :class="{ active: locale === lang.code }"
+          @click="switchLang($event, lang)"
         >
           {{ lang.label }}
         </a>
@@ -126,21 +138,21 @@ function closeMenu() {
   font-size: 0.7rem;
   font-weight: 500;
   padding: 4px 8px;
-  border: none;
   border-radius: 4px;
   background: transparent;
   color: var(--text-muted);
+  text-decoration: none;
   cursor: pointer;
   transition: all 0.15s;
 }
 
-.lang-switcher button.active {
+.lang-switcher a.active {
   background: var(--bg-elevated);
   color: var(--text);
   box-shadow: 0 1px 2px rgba(0,0,0,0.08);
 }
 
-.lang-switcher button:hover:not(.active) {
+.lang-switcher a:hover:not(.active) {
   color: var(--text-secondary);
 }
 

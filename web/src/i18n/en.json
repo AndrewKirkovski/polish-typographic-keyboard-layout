@@ -47,21 +47,20 @@
     "title": "Installation",
     "windows": {
       "tab": "Windows",
-      "step1": "Download {dll} and {script} from the latest release",
-      "step2": "Place both files in the same folder",
-      "step3": "Right-click {script} and select \"Run with PowerShell\" (it auto-elevates to admin)",
-      "step4": "Restart your computer",
-      "step5": "Go to Settings > Time & Language > Language & Region > Keyboard and add the new layout",
+      "step1_exe": "Download and run the .exe installer — it handles everything automatically",
+      "step1_zip": "Or download the .zip, extract, right-click install.ps1 and select \"Run with PowerShell\"",
+      "step2": "Restart your computer",
+      "step3": "Go to Settings > Time & Language > Language & Region > Keyboard and add the new layout",
       "loginScreen": "To apply to login screen: Win+R > intl.cpl > Administrative > Copy settings > check both boxes",
-      "uninstall": "To uninstall, run the script again — it detects the install and offers uninstall interactively.",
+      "uninstall": "To uninstall, run install.ps1 again — it detects the install and offers uninstall interactively.",
       "hardCleanup": "If Explorer crashes: run {cmd} to remove all traces."
     },
     "macos": {
       "tab": "macOS",
-      "step1": "Download the {file} file from the latest release",
-      "step2": "Copy to {userPath} (current user) or {systemPath} (all users + login screen, requires sudo)",
-      "step3": "Log out and log back in",
-      "step4": "Open System Settings > Keyboard > Input Sources and add the layout"
+      "step1_pkg": "Download and run the .pkg installer",
+      "step1_zip": "Or download the .zip and copy .keylayout files to {userPath} (current user) or {systemPath} (all users)",
+      "step2": "Log out and log back in",
+      "step3": "Open System Settings > Keyboard > Input Sources and add the layout"
     }
   },
   "about": {

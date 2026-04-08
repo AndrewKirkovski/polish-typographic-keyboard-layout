@@ -52,7 +52,8 @@ const platforms = computed(() => {
         >
           <div class="download-card__header">
             <span class="download-card__icon">
-              {{ platform.id === 'windows' ? '&#xE764;' : '&#xF8FF;' }}
+              <iconify-icon v-if="platform.id === 'windows'" icon="mdi:microsoft-windows" width="22"></iconify-icon>
+              <iconify-icon v-else icon="mdi:apple" width="22"></iconify-icon>
             </span>
             <h3>{{ platform.name }}</h3>
             <span v-if="platform.primary" class="badge">

@@ -25,7 +25,11 @@ const activeTab = ref<'windows' | 'macos'>('windows')
       <div v-if="activeTab === 'windows'" class="install-steps">
         <div class="step">
           <span class="step-num">1</span>
-          <p>{{ t('install.windows.step1', { dll: 'pltypo.dll', script: 'install.ps1' }) }}</p>
+          <p>{{ t('install.windows.step1_exe') }}</p>
+        </div>
+        <div class="step step--alt">
+          <span class="step-num">&mdash;</span>
+          <p>{{ t('install.windows.step1_zip') }}</p>
         </div>
         <div class="step">
           <span class="step-num">2</span>
@@ -33,15 +37,7 @@ const activeTab = ref<'windows' | 'macos'>('windows')
         </div>
         <div class="step">
           <span class="step-num">3</span>
-          <p>{{ t('install.windows.step3', { script: 'install.ps1' }) }}</p>
-        </div>
-        <div class="step">
-          <span class="step-num">4</span>
-          <p>{{ t('install.windows.step4') }}</p>
-        </div>
-        <div class="step">
-          <span class="step-num">5</span>
-          <p>{{ t('install.windows.step5') }}</p>
+          <p>{{ t('install.windows.step3') }}</p>
         </div>
         <p class="info-note">
           {{ t('install.windows.loginScreen') }}
@@ -57,22 +53,22 @@ const activeTab = ref<'windows' | 'macos'>('windows')
       <div v-if="activeTab === 'macos'" class="install-steps">
         <div class="step">
           <span class="step-num">1</span>
-          <p>{{ t('install.macos.step1', { file: 'polish_typographic.keylayout' }) }}</p>
+          <p>{{ t('install.macos.step1_pkg') }}</p>
         </div>
-        <div class="step">
-          <span class="step-num">2</span>
-          <p>{{ t('install.macos.step2', {
+        <div class="step step--alt">
+          <span class="step-num">&mdash;</span>
+          <p>{{ t('install.macos.step1_zip', {
             userPath: '~/Library/Keyboard Layouts/',
             systemPath: '/Library/Keyboard Layouts/'
           }) }}</p>
         </div>
         <div class="step">
-          <span class="step-num">3</span>
-          <p>{{ t('install.macos.step3') }}</p>
+          <span class="step-num">2</span>
+          <p>{{ t('install.macos.step2') }}</p>
         </div>
         <div class="step">
-          <span class="step-num">4</span>
-          <p>{{ t('install.macos.step4') }}</p>
+          <span class="step-num">3</span>
+          <p>{{ t('install.macos.step3') }}</p>
         </div>
       </div>
     </div>
