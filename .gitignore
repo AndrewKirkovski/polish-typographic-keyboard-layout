@@ -1,9 +1,13 @@
 .local/
 .venv/
+.cache/
+.claude/
 __pycache__/
+node_modules/
 
 # Build intermediates
 build/
+dist/
 *.obj
 *.res
 *.exp
