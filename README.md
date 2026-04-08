@@ -1,5 +1,7 @@
 # Kirkouski Typographic Keyboard Layout v0.1
 
+> **[Interactive Layout Preview & Downloads](https://polish-typographic-keyboard-layout.pages.dev/)** — explore the layout, download installers, and read installation guides.
+
 Custom keyboard layouts for **Windows** and **macOS** that add typographic symbols (em dash, curly quotes, copyright, euro, etc.) accessible via AltGr (Right Alt) on top of standard Polish Programmers and Russian ЙЦУКЕН layouts.
 
 Based on [Ilya Birman's Typography Layout](https://ilyabirman.ru/typography-layout/). Typographic symbols are in the same positions across both language variants — switch between Polish and Russian without relearning symbol locations.

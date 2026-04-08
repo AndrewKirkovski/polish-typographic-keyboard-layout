@@ -4,7 +4,8 @@ import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
-const GITHUB_RELEASES = 'https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/releases/latest'
+const RELEASE_DL = 'https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/releases/download/v0.1'
+const RELEASE_PAGE = 'https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/releases/latest'
 
 const detectedOS = computed(() => {
   const ua = navigator.userAgent
@@ -17,8 +18,8 @@ const platforms = computed(() => {
     id: 'windows',
     name: t('download.windows'),
     files: [
-      { label: t('download.installer'), file: 'install.ps1' },
-      { label: t('download.layoutDll'), file: 'pltypo.dll' },
+      { label: t('download.installer'), file: 'kirkouski-typographic-v0.1-windows-setup.exe', url: `${RELEASE_DL}/kirkouski-typographic-v0.1-windows-setup.exe` },
+      { label: 'ZIP', file: 'kirkouski-typographic-v0.1-windows.zip', url: `${RELEASE_DL}/kirkouski-typographic-v0.1-windows.zip` },
     ],
     primary: detectedOS.value === 'windows',
   }
@@ -26,7 +27,8 @@ const platforms = computed(() => {
     id: 'macos',
     name: t('download.macos'),
     files: [
-      { label: t('download.layoutFile'), file: 'polish_typographic.keylayout' },
+      { label: t('download.installer'), file: 'kirkouski-typographic-v0.1-macos.pkg', url: `${RELEASE_DL}/kirkouski-typographic-v0.1-macos.pkg` },
+      { label: 'ZIP', file: 'kirkouski-typographic-v0.1-macos.zip', url: `${RELEASE_DL}/kirkouski-typographic-v0.1-macos.zip` },
     ],
     primary: detectedOS.value === 'macos',
   }
@@ -58,7 +60,7 @@ const platforms = computed(() => {
           </div>
           <ul class="download-card__files">
             <li v-for="file in platform.files" :key="file.file">
-              <a :href="GITHUB_RELEASES" target="_blank" rel="noopener">
+              <a :href="file.url" target="_blank" rel="noopener">
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                   <path d="M7 1v8M3 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                   <path d="M1 11v1.5h12V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
