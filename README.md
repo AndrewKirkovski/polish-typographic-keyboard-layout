@@ -165,20 +165,19 @@ This is only needed if you modify the overlay JSONs and want to update the macOS
 
 ### Windows: Explorer crashes after install
 
-1. Boot into Safe Mode or switch to a standard keyboard layout
-2. Open `regedit` as Administrator
-3. Delete the layout's registry key under `HKLM\SYSTEM\CurrentControlSet\Control\Keyboard Layouts\` (look for keys starting with `a0` whose `Layout File` matches `pltypo.dll` or `rutypo.dll`)
-4. Also check and clean: `HKCU\Keyboard Layout\Preload` and `HKCU\Keyboard Layout\Substitutes`
-5. Delete `C:\Windows\System32\pltypo.dll` (or `rutypo.dll`)
-6. Restart
+This is **expected** if you haven't rebooted yet. The new layout DLL is registered but Explorer still holds the old keyboard state. Simply restart your computer and the layout will work normally.
+
+If Explorer keeps crashing after reboot, run the hard cleanup:
+
+```powershell
+.\install.ps1 -HardCleanup
+```
+
+This removes all traces of Kirkouski layouts (registry keys, DLLs, preload entries) so you can start fresh.
 
 ### Windows: "Layout name already in use"
 
 Previous install left ghost registry entries. Run `.\install.ps1 -Uninstall` as admin first, restart, then reinstall.
-
-### Windows: MSKLC won't build
-
-Use the direct DLL pipeline instead (`python build.py windows`). It doesn't need MSKLC.
 
 ## Credits
 
