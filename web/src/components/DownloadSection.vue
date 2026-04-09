@@ -10,11 +10,13 @@ const VERSION = __APP_VERSION__
 const RELEASE_TAG = `v${VERSION}`
 const RELEASE_DL = `https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/releases/download/${RELEASE_TAG}`
 
+// `data-os` is set on `<html>` by App.vue's onMounted hook (richer regex
+// than this component had, catches iOS too). Reading from there avoids the
+// drift risk of two different OS-detection regexes living in the codebase.
+// SSR fallback: assume Windows (the larger user base).
 const detectedOS = computed(() => {
-  if (typeof navigator === 'undefined') return 'windows'
-  const ua = navigator.userAgent
-  if (ua.includes('Mac')) return 'macos'
-  return 'windows'
+  if (typeof document === 'undefined') return 'windows'
+  return document.documentElement.dataset.os === 'mac' ? 'macos' : 'windows'
 })
 
 const platforms = computed(() => {

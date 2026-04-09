@@ -47,26 +47,26 @@ const { active, activeId, setActive } = useLayout()
 
       <div class="legend">
         <div class="legend-item">
-          <span class="legend-swatch" style="background: var(--color-base)"></span>
+          <span class="legend-swatch" style="background: var(--color-base)" aria-hidden="true"></span>
           {{ t('keyboard.legend.base') }}
         </div>
         <div class="legend-item">
-          <span class="legend-swatch" style="background: var(--color-altgr)"></span>
+          <span class="legend-swatch" style="background: var(--color-altgr)" aria-hidden="true"></span>
           <span class="os-win">{{ t('keyboard.legend.altgr') }}</span>
           <span class="os-mac">⌥ Option</span>
         </div>
         <div class="legend-item">
-          <span class="legend-swatch" style="background: var(--color-polish)"></span>
+          <span class="legend-swatch" style="background: var(--color-polish)" aria-hidden="true"></span>
           {{ t('keyboard.legend.polish') }}
         </div>
         <div class="legend-item">
-          <span class="legend-swatch" style="background: var(--color-russian)"></span>
+          <span class="legend-swatch" style="background: var(--color-russian)" aria-hidden="true"></span>
           {{ t('keyboard.legend.russian') }}
         </div>
         <div class="legend-item legend-item--has-tip">
-          <span class="legend-swatch" style="background: var(--color-dead)"></span>
+          <span class="legend-swatch" style="background: var(--color-dead)" aria-hidden="true"></span>
           {{ t('keyboard.legend.deadKey') }}
-          <span class="legend-help">?</span>
+          <span class="legend-help" aria-hidden="true">?</span>
           <div class="legend-tooltip">{{ t('keyboard.legend.deadKeyTip') }}</div>
         </div>
       </div>

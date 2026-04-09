@@ -34,8 +34,8 @@ function closeMenu() {
 <template>
   <header class="site-header">
     <div class="header-inner container">
-      <a href="#" class="logo">
-        <span class="logo-mark">&mdash;</span>
+      <a href="#main" class="logo">
+        <span class="logo-mark" aria-hidden="true">&mdash;</span>
         <span class="logo-text">Kirkouski</span>
       </a>
       <nav id="site-nav" class="nav" :class="{ open: menuOpen }">

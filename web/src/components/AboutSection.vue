@@ -6,6 +6,10 @@ const { t, tm } = useI18n()
 const SITE_URL = 'https://polish-typographic-keyboard-layout.pages.dev/'
 const SHARE_TEXT = 'Kirkouski Typographic — Polish & Russian keyboard layout with 80+ typographic symbols via AltGr'
 
+// Static feature detection — never changes after the first paint, so a
+// plain `const` is enough (was a `ref()` for no reason).
+const canNativeShare = typeof navigator !== 'undefined' && 'share' in navigator
+
 const basedParts = computed(() => {
   const raw = (tm('about.based') as string) || 'Based on {link} by Ilya Birman.'
   const idx = raw.indexOf('{link}')
@@ -39,13 +43,6 @@ const shareLinks = computed(() => [
     icon: 'ri:reddit-fill',
   },
 ])
-
-// `navigator.share` is `((data?: ShareData) => Promise<void>) | undefined` in
-// older lib.dom.d.ts versions but always-defined in modern ones — TS narrows
-// it to "always truthy" and warns. Test for the property explicitly via `in`.
-const canNativeShare = ref(
-  typeof navigator !== 'undefined' && 'share' in navigator,
-)
 
 async function nativeShare() {
   try {

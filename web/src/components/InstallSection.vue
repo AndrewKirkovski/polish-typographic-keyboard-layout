@@ -38,7 +38,7 @@ const activeTab = ref<'windows' | 'macos'>('windows')
           <p>{{ t('install.windows.step1_exe') }}</p>
         </div>
         <div class="step step--alt">
-          <span class="step-num">&mdash;</span>
+          <span class="step-num" aria-hidden="true">&mdash;</span>
           <p>{{ t('install.windows.step1_zip') }}</p>
         </div>
         <div class="step step--warning">

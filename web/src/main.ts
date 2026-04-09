@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import { createI18n } from 'vue-i18n'
 import FloatingVue from 'floating-vue'
 import App from './App.vue'
+import { FLOATING_VUE_OPTIONS } from './floating-vue-options'
 import en from './i18n/en.json'
 import pl from './i18n/pl.json'
 import ru from './i18n/ru.json'
@@ -29,21 +30,7 @@ const i18n = createI18n({
 const app = createApp(App)
 app.use(i18n)
 // floating-vue exposes <VTooltip>, <VDropdown>, and the v-tooltip directive.
-// Configured globally so KeyCap.vue can drop the homemade Teleport-based
-// positioning and let Floating UI handle viewport collision (the homemade
-// math only flipped vertically; horizontal overflow on narrow mobile screens
-// clipped tooltips on edge keys).
-app.use(FloatingVue, {
-  themes: {
-    'key-tooltip': {
-      $extend: 'tooltip',
-      // 'auto' lets Floating UI pick the best side per-anchor; 'flip' and
-      // 'shift' middleware then keep the tooltip onscreen.
-      placement: 'top',
-      triggers: ['hover', 'focus', 'touch'],
-      // Touch users get a tap-to-show tooltip; the keycap itself isn't
-      // a button, so the existing hover semantics extend naturally.
-    },
-  },
-})
+// Options are shared with entry-server.ts via floating-vue-options so the
+// SSR and client renders can never drift on tooltip config.
+app.use(FloatingVue, FLOATING_VUE_OPTIONS)
 app.mount('#app')
