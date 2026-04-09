@@ -34,3 +34,32 @@ app.use(i18n)
 // SSR and client renders can never drift on tooltip config.
 app.use(FloatingVue, FLOATING_VUE_OPTIONS)
 app.mount('#app')
+
+// floating-vue v5 hardcodes `tabindex="0"` on every popper element so
+// "interactive" tooltips (with clickable content inside) can be reached
+// by keyboard. Our keycap tooltips are read-only and we don't want them
+// in the tab order — the popper appearing in the focus chain after the
+// trigger key causes a focus race that makes Tab navigation flash the
+// tooltip in and out. There's no theme option to disable this in v5, so
+// we strip the attribute as poppers are added to <body>.
+const popperTabindexStripper = new MutationObserver((mutations) => {
+  for (const m of mutations) {
+    for (const node of m.addedNodes) {
+      if (node.nodeType !== 1) continue
+      const el = node as HTMLElement
+      if (el.classList?.contains('v-popper__popper')) {
+        el.removeAttribute('tabindex')
+      }
+      // Also handle deeper insertions where the popper isn't the direct
+      // added node (defensive — floating-vue currently appends directly
+      // to body, but this future-proofs against teleport-target changes).
+      el.querySelectorAll?.('.v-popper__popper[tabindex]').forEach((p) => {
+        p.removeAttribute('tabindex')
+      })
+    }
+  }
+})
+popperTabindexStripper.observe(document.body, {
+  childList: true,
+  subtree: true,
+})

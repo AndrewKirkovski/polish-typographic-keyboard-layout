@@ -105,6 +105,20 @@ html, body {
   border-radius: inherit;
 }
 
+/* Floating-vue gives the popper element `tabindex="0"` for "interactive"
+   tooltips, which means our global `:focus-visible` rule paints a red
+   outline on the tooltip body whenever it gains focus (e.g. when the
+   trigger key is keyboard-focused). Tooltips are decorative — the
+   trigger already carries its own focus indicator. The MutationObserver
+   in main.ts strips the tabindex so the popper isn't tabbable in the
+   first place; this rule is the belt-and-braces visual override. */
+.v-popper__popper:focus,
+.v-popper__popper:focus-visible,
+.v-popper__popper *:focus,
+.v-popper__popper *:focus-visible {
+  outline: none;
+}
+
 /* Honour the user's reduced-motion preference. We collapse all transition
    and animation durations to ~0 (not zero, to avoid layout-thrash bugs in
    some engines) and disable smooth scrolling. Affects the keycap hover

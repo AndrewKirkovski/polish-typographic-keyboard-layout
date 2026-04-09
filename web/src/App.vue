@@ -13,20 +13,59 @@ import AboutSection from './components/AboutSection.vue'
 const { init } = useLayout()
 const { t, locale } = useI18n()
 
+// Move focus into <main> from the skip link.
+//
+// Browsers handle skip links inconsistently:
+//   - Mouse click on the <a> → fires `click`, hash changes, browser scrolls,
+//     but focus stays on the <a> in most browsers.
+//   - Enter on a focused <a> → fires `click`, same as above.
+//   - Space on a focused <a> → DOES NOT fire click. Browsers default Space
+//     to "scroll page down". So a Space-pressing user gets no skip behavior
+//     at all from a vanilla `<a href="#main">`.
+//   - Programmatic hash change / browser back → fires `hashchange` but
+//     again, focus stays put.
+//
+// We bind one handler to both `click` and `keydown.space` (with prevent on
+// Space to suppress the page-scroll default), AND a `hashchange` listener
+// to catch any other entry point. All three call into the same focus-shift.
+function skipToMain(e?: Event) {
+  e?.preventDefault()
+  const main = document.getElementById('main')
+  if (!main) return
+  main.focus({ preventScroll: false })
+  main.scrollIntoView({ block: 'start', behavior: 'auto' })
+}
+
 onMounted(async () => {
   await init()
   // Detect macOS for platform-specific labels (AltGr → ⌥, Win → ⌘)
   if (typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.userAgent)) {
     document.documentElement.setAttribute('data-os', 'mac')
   }
+  window.addEventListener('hashchange', () => {
+    if (window.location.hash === '#main') skipToMain()
+  })
 })
 </script>
 
 <template>
   <div class="app" :lang="locale">
-    <a href="#main" class="skip-link">{{ t('a11y.skipToMain') }}</a>
+    <a
+      href="#main"
+      class="skip-link"
+      @click="skipToMain"
+      @keydown.space.prevent="skipToMain"
+      @keydown.enter="skipToMain"
+    >{{ t('a11y.skipToMain') }}</a>
     <SiteHeader />
-    <main id="main">
+    <!--
+      `tabindex="-1"` makes the <main> programmatically focusable so the
+      browser actually moves focus there when the skip-link's hash target
+      is followed. Without it, `<a href="#main">` only scrolls; focus
+      stays on the skip link, the next Tab returns to the header nav,
+      and the skip link is useless.
+    -->
+    <main id="main" tabindex="-1">
       <HeroSection />
       <KeyboardSection />
       <WhySection />
