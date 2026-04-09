@@ -19,5 +19,8 @@
     "vue": "^3.5.32",
     "vue-i18n": "^11.3.2",
     "vue-tsc": "^3.2.6"
+  },
+  "optionalDependencies": {
+    "@rolldown/binding-linux-x64-gnu": "1.0.0-rc.13"
   }
 }
