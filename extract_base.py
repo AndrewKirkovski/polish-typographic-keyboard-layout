@@ -14,10 +14,25 @@ import sys
 import os
 import xml.etree.ElementTree as ET
 import copy
+from typing import Any
 
-sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+# Pyright doesn't know `reconfigure` exists on the TextIO base class, but it
+# does on the concrete TextIOWrapper used at runtime. Call via getattr so the
+# type checker is satisfied without losing the safety the call provides.
+_reconfigure = getattr(sys.stdout, "reconfigure", None)
+if _reconfigure is not None:
+    _reconfigure(encoding="utf-8", errors="replace")
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+def _read_version():
+    """Read project version from the repo-root VERSION file."""
+    with open(os.path.join(SCRIPT_DIR, "VERSION"), encoding="utf-8") as f:
+        return f.read().strip()
+
+
+VERSION = _read_version()
 
 
 def parse_xml11(filepath):
@@ -86,7 +101,10 @@ def extract_keylayout(filepath):
             base_map_set = km.get("baseMapSet")
             base_index = km.get("baseIndex")
 
-            km_data = {"keys": {}}
+            # `km_data` is heterogeneous (mixes str values and a nested dict),
+            # so type-annotate as dict[str, Any] to silence Pyright's narrowing
+            # of the empty literal to dict[str, dict[Unknown, Unknown]].
+            km_data: dict[str, Any] = {"keys": {}}
             if base_map_set:
                 km_data["baseMapSet"] = base_map_set
                 km_data["baseIndex"] = base_index
@@ -388,7 +406,7 @@ def serialize_keylayout(data):
                     attrs_parts.append(f'through="{esc_attr(when["through"])}"')
                 if "multiplier" in when:
                     attrs_parts.append(f'multiplier="{esc_attr(when["multiplier"])}"')
-                lines.append(f'\t\t\t<when {" ".join(attrs_parts)}"/>')
+                lines.append(f'\t\t\t<when {" ".join(attrs_parts)}/>')
             lines.append(f'\t\t</action>')
         lines.append('\t</actions>')
 
@@ -475,10 +493,10 @@ def main():
 
     # Apply overlays
     print("Applying Polish overlay...", file=sys.stderr)
-    pl_data = apply_overlay(en_full, pl_overlay, "Polish Typographic by Kirkouski v0.2")
+    pl_data = apply_overlay(en_full, pl_overlay, f"Polish Typographic by Kirkouski v{VERSION}")
 
     print("Applying Russian overlay...", file=sys.stderr)
-    ru_data = apply_overlay(ru_full, ru_overlay, "Russian Typographic by Kirkouski v0.2")
+    ru_data = apply_overlay(ru_full, ru_overlay, f"Russian Typographic by Kirkouski v{VERSION}")
 
     # Save complete JSONs (these become the tracked source of truth)
     pl_json_path = os.path.join(SCRIPT_DIR, "polish_typographic_full.json")

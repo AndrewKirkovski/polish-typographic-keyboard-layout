@@ -5,12 +5,13 @@ import { useLayout } from './composables/useLayout'
 import SiteHeader from './components/SiteHeader.vue'
 import HeroSection from './components/HeroSection.vue'
 import KeyboardSection from './components/KeyboardSection.vue'
+import WhySection from './components/WhySection.vue'
 import DownloadSection from './components/DownloadSection.vue'
 import InstallSection from './components/InstallSection.vue'
 import AboutSection from './components/AboutSection.vue'
 
 const { init } = useLayout()
-const { locale } = useI18n()
+const { t, locale } = useI18n()
 
 onMounted(async () => {
   await init()
@@ -23,10 +24,12 @@ onMounted(async () => {
 
 <template>
   <div class="app" :lang="locale">
+    <a href="#main" class="skip-link">{{ t('a11y.skipToMain') }}</a>
     <SiteHeader />
-    <main>
+    <main id="main">
       <HeroSection />
       <KeyboardSection />
+      <WhySection />
       <DownloadSection />
       <InstallSection />
       <AboutSection />

@@ -12,12 +12,20 @@ const { active, activeId, setActive } = useLayout()
   <section id="keyboard" class="section">
     <div class="container">
       <div class="keyboard-controls">
-        <div class="layout-switcher">
+        <div class="layout-switcher" role="tablist" :aria-label="t('keyboard.layoutSwitcher')">
           <button
+            id="layout-polish"
+            role="tab"
+            :aria-selected="activeId === 'polish'"
+            :tabindex="activeId === 'polish' ? 0 : -1"
             :class="{ active: activeId === 'polish' }"
             @click="setActive('polish')"
           >{{ t('keyboard.polish') }}</button>
           <button
+            id="layout-russian"
+            role="tab"
+            :aria-selected="activeId === 'russian'"
+            :tabindex="activeId === 'russian' ? 0 : -1"
             :class="{ active: activeId === 'russian' }"
             @click="setActive('russian')"
           >{{ t('keyboard.russian') }}</button>
@@ -68,11 +76,16 @@ const { active, activeId, setActive } = useLayout()
 
 <style scoped>
 .section {
-  padding-top: 2rem;
+  /* Bigger top padding so the keyboard section reads as separate from
+     the hero above. The controls-to-keyboard gap below is intentionally
+     small so the layout switcher feels anchored to the keyboard. */
+  padding-top: 1.75rem;
 }
 
 .keyboard-controls {
-  margin-bottom: 2rem;
+  /* Controls belong to the keyboard, not the hero — make the gap to the
+     keyboard much smaller than the gap to the hero subtitle above. */
+  margin-bottom: 0.5rem;
 }
 
 .layout-switcher {

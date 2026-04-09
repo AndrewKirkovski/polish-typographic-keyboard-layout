@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 798.608 181.8" width="798.608" height="181.8" style="background:#FFFFFF">
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="5" refX="7" refY="2.5" orient="auto">
+    <polygon points="0 0, 8 2.5, 0 5" fill="#47474A" stroke="#47474A" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.5, 8 5" fill="#47474A" stroke="#47474A" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+</defs>
+<polyline class="edge" data-from="JSON" data-to="C" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="161.237,90.9 209.237,90.9" fill="none" stroke="#939394" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="C" data-to="DLL" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="341.589,90.9 389.589,90.9" fill="none" stroke="#939394" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="DLL" data-to="NSIS" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="561.954,90.9 585.954,90.9 585.954,58.45 609.954,58.45" fill="none" stroke="#939394" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="DLL" data-to="ZIP" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="561.954,90.9 585.954,90.9 585.954,123.350 609.954,123.350" fill="none" stroke="#939394" stroke-width="1" marker-end="url(#arrowhead)" />
+<g class="node" data-id="JSON" data-label="Layout JSON" data-shape="rounded">
+  <rect x="40" y="72.45" width="121.237" height="36.900" rx="6" ry="6" fill="#e8f1ff" stroke="#3a7fd4" stroke-width="0.75" />
+  <text x="100.618" y="90.9" text-anchor="middle" font-size="13" font-weight="500" fill="#1e3a72" dy="4.55">Layout JSON</text>
+</g>
+<g class="node" data-id="C" data-label="build_kbd_c.py" data-shape="rectangle">
+  <rect x="209.237" y="72.45" width="132.352" height="36.900" rx="0" ry="0" fill="#fef0ee" stroke="#d4403a" stroke-width="0.75" />
+  <text x="275.413" y="90.9" text-anchor="middle" font-size="13" font-weight="500" fill="#7a1d18" dy="4.55">build_kbd_c.py</text>
+</g>
+<g class="node" data-id="DLL" data-label="compile_kbd.py → DLL" data-shape="rectangle">
+  <rect x="389.589" y="72.45" width="172.365" height="36.900" rx="0" ry="0" fill="#fef0ee" stroke="#d4403a" stroke-width="0.75" />
+  <text x="475.772" y="90.9" text-anchor="middle" font-size="13" font-weight="500" fill="#7a1d18" dy="4.55">compile_kbd.py → DLL</text>
+</g>
+<g class="node" data-id="NSIS" data-label="NSIS .exe installer" data-shape="stadium">
+  <rect x="609.954" y="40" width="148.654" height="36.900" rx="18.450" ry="18.450" fill="#e8faee" stroke="#22a35a" stroke-width="0.75" />
+  <text x="684.281" y="58.45" text-anchor="middle" font-size="13" font-weight="500" fill="#0f4d28" dy="4.55">NSIS .exe installer</text>
+</g>
+<g class="node" data-id="ZIP" data-label="zip + install.ps1" data-shape="stadium">
+  <rect x="609.954" y="104.9" width="126.424" height="36.900" rx="18.450" ry="18.450" fill="#e8faee" stroke="#22a35a" stroke-width="0.75" />
+  <text x="673.166" y="123.350" text-anchor="middle" font-size="13" font-weight="500" fill="#0f4d28" dy="4.55">zip + install.ps1</text>
+</g>
+</svg>

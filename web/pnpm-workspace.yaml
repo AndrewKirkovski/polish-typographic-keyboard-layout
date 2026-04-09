@@ -1,0 +1,20 @@
+# pnpm settings for the web/ workspace.
+#
+# `minimum-release-age=2d` (in .npmrc) blocks any package version younger
+# than 2 days from being installed — supply-chain hardening against just-
+# published malicious releases. Some maintained-but-stable packages happen
+# to be far older than 2 days; pnpm 10's resolver still rejects them
+# without an explicit exclude. List those here.
+minimumReleaseAgeExclude:
+  # Vue 3 wrapper around Floating UI (the gold-standard tooltip / popover
+  # positioner — used by Vuetify, Naive UI, Headless UI). Last release
+  # 2024-01-30, mature and intentionally low-churn.
+  - floating-vue
+  # Transitive dep of floating-vue@5.2.2. The pinned version (~1.1.1)
+  # has malformed publish-date metadata in the npm registry ("Invalid
+  # Date"), which crashes pnpm 10's minimum-release-age check even
+  # though the package is from 2023.
+  - '@floating-ui/dom'
+  - '@floating-ui/core'
+  - '@floating-ui/utils'
+  - vue-resize

@@ -1,0 +1,21 @@
+{
+  "name": "kirkouski-typographic-assets",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Asset generation pipeline: macOS .icns icons + favicons + OG image + README diagrams. Run on demand; outputs are committed. Version is intentionally `0.0.0` because the project version lives in the repo-root VERSION file (this private workspace package is never published).",
+  "type": "module",
+  "scripts": {
+    "build": "node src/build.mjs all",
+    "build:icons": "node src/build.mjs icons",
+    "build:web": "node src/build.mjs web",
+    "build:diagrams": "node src/build.mjs diagrams",
+    "build:og": "node src/build.mjs og",
+    "build:svg": "node src/build.mjs icons --svg-only"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "beautiful-mermaid": "^1.1.3",
+    "opentype.js": "^1.3.4",
+    "playwright": "^1.49.0"
+  }
+}

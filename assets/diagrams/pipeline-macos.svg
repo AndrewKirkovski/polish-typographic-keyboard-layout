@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 843.81 181.8" width="843.81" height="181.8" style="background:#FFFFFF">
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="5" refX="7" refY="2.5" orient="auto">
+    <polygon points="0 0, 8 2.5, 0 5" fill="#47474A" stroke="#47474A" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.5, 8 5" fill="#47474A" stroke="#47474A" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+</defs>
+<polyline class="edge" data-from="JSON" data-to="KL" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="179.761,58.45 225.539,58.45" fill="none" stroke="#939394" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="KL" data-to="BUNDLE" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="378.639,58.45 405.973,58.45 405.973,90.9 428.861,90.9" fill="none" stroke="#939394" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="ICNS" data-to="BUNDLE" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="383.085,123.350 405.973,123.350 405.973,90.9 428.861,90.9" fill="none" stroke="#939394" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="BUNDLE" data-to="PKG" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="610.119,90.9 634.119,90.9 634.119,58.45 658.119,58.45" fill="none" stroke="#939394" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="BUNDLE" data-to="ZIP" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="610.119,90.9 634.119,90.9 634.119,123.350 658.119,123.350" fill="none" stroke="#939394" stroke-width="1" marker-end="url(#arrowhead)" />
+<g class="node" data-id="JSON" data-label="Full layout JSON" data-shape="rounded">
+  <rect x="40" y="40" width="139.761" height="36.900" rx="6" ry="6" fill="#e8f1ff" stroke="#3a7fd4" stroke-width="0.75" />
+  <text x="109.880" y="58.45" text-anchor="middle" font-size="13" font-weight="500" fill="#1e3a72" dy="4.55">Full layout JSON</text>
+</g>
+<g class="node" data-id="KL" data-label="build_keylayout.py" data-shape="rectangle">
+  <rect x="225.539" y="40" width="153.1" height="36.900" rx="0" ry="0" fill="#fef0ee" stroke="#d4403a" stroke-width="0.75" />
+  <text x="302.089" y="58.45" text-anchor="middle" font-size="13" font-weight="500" fill="#7a1d18" dy="4.55">build_keylayout.py</text>
+</g>
+<g class="node" data-id="ICNS" data-label="assets/icons/*.icns" data-shape="rounded">
+  <rect x="225.539" y="104.9" width="157.546" height="36.900" rx="6" ry="6" fill="#e8f1ff" stroke="#3a7fd4" stroke-width="0.75" />
+  <text x="304.312" y="123.350" text-anchor="middle" font-size="13" font-weight="500" fill="#1e3a72" dy="4.55">assets/icons/*.icns</text>
+</g>
+<g class="node" data-id="BUNDLE" data-label="build_macos_bundle.py" data-shape="rectangle">
+  <rect x="428.861" y="72.45" width="181.257" height="36.900" rx="0" ry="0" fill="#fef0ee" stroke="#d4403a" stroke-width="0.75" />
+  <text x="519.491" y="90.9" text-anchor="middle" font-size="13" font-weight="500" fill="#7a1d18" dy="4.55">build_macos_bundle.py</text>
+</g>
+<g class="node" data-id="PKG" data-label=".pkg (macOS only)" data-shape="stadium">
+  <rect x="658.119" y="40" width="145.69" height="36.900" rx="18.450" ry="18.450" fill="#e8faee" stroke="#22a35a" stroke-width="0.75" />
+  <text x="730.964" y="58.45" text-anchor="middle" font-size="13" font-weight="500" fill="#0f4d28" dy="4.55">.pkg (macOS only)</text>
+</g>
+<g class="node" data-id="ZIP" data-label="zip" data-shape="stadium">
+  <rect x="658.119" y="104.9" width="60" height="36.900" rx="18.450" ry="18.450" fill="#e8faee" stroke="#22a35a" stroke-width="0.75" />
+  <text x="688.119" y="123.350" text-anchor="middle" font-size="13" font-weight="500" fill="#0f4d28" dy="4.55">zip</text>
+</g>
+</svg>

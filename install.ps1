@@ -332,7 +332,12 @@ if ($HardCleanup) {
     }
     Invoke-HardCleanup
     Write-Host ""
-    Write-Host "Done. Restart your computer." -ForegroundColor Green
+    Write-Host "  *** REBOOT REQUIRED ***" -ForegroundColor Red -BackgroundColor Black
+    Write-Host "  You MUST restart your computer before using the new layout." -ForegroundColor Yellow
+    Write-Host "  Your PC is fine to keep using right now — just don't switch to" -ForegroundColor Yellow
+    Write-Host "  the Kirkouski Typographic layout until after the reboot, or" -ForegroundColor Yellow
+    Write-Host "  Windows Explorer will crash (it still holds the old keyboard" -ForegroundColor Yellow
+    Write-Host "  state in memory until restart)." -ForegroundColor Yellow
     Write-Host ""
     Read-Host "Press Enter to close"
     exit
@@ -346,7 +351,12 @@ if ($Uninstall) {
         Invoke-Uninstall -Target $target
         Write-Host ""
     }
-    Write-Host "Done. Restart your computer." -ForegroundColor Green
+    Write-Host "  *** REBOOT REQUIRED ***" -ForegroundColor Red -BackgroundColor Black
+    Write-Host "  You MUST restart your computer before using the new layout." -ForegroundColor Yellow
+    Write-Host "  Your PC is fine to keep using right now — just don't switch to" -ForegroundColor Yellow
+    Write-Host "  the Kirkouski Typographic layout until after the reboot, or" -ForegroundColor Yellow
+    Write-Host "  Windows Explorer will crash (it still holds the old keyboard" -ForegroundColor Yellow
+    Write-Host "  state in memory until restart)." -ForegroundColor Yellow
     Write-Host ""
     Read-Host "Press Enter to close"
     exit
@@ -496,11 +506,16 @@ switch ($selectedAction) {
 # -- Final message ------------------------------------------------------
 if ($selectedAction -in @("install", "install_all", "reinstall", "uninstall", "hard_cleanup")) {
     Write-Host ""
-    Write-Host "  Restart your computer for changes to take effect." -ForegroundColor Yellow
+    Write-Host "  *** REBOOT REQUIRED ***" -ForegroundColor Red -BackgroundColor Black
+    Write-Host "  You MUST restart your computer before using the new layout." -ForegroundColor Yellow
+    Write-Host "  Your PC is fine to keep using right now — just don't switch to" -ForegroundColor Yellow
+    Write-Host "  the Kirkouski Typographic layout until after the reboot, or" -ForegroundColor Yellow
+    Write-Host "  Windows Explorer will crash (it still holds the old keyboard" -ForegroundColor Yellow
+    Write-Host "  state in memory until restart)." -ForegroundColor Yellow
 
     if ($selectedAction -in @("install", "install_all", "reinstall")) {
         Write-Host ""
-        Write-Host "  After restart:" -ForegroundColor DarkGray
+        Write-Host "  After the reboot:" -ForegroundColor DarkGray
         Write-Host "    Settings > Time & Language > Language & Region > Keyboard" -ForegroundColor DarkGray
         Write-Host "    Add the new Kirkouski Typographic layout" -ForegroundColor DarkGray
         Write-Host ""

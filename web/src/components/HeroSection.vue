@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
+const version = `v${__APP_VERSION__}`
 </script>
 
 <template>
@@ -9,7 +10,7 @@ const { t } = useI18n()
       <div class="hero-content">
         <div class="hero-top">
           <div>
-            <p class="hero-eyebrow">v0.2</p>
+            <p class="hero-eyebrow">{{ version }}</p>
             <h1 class="hero-title">
               <span class="hero-title-line">Kirkouski</span>
               <span class="hero-title-line accent">Typographic</span>
@@ -36,7 +37,10 @@ const { t } = useI18n()
 
 <style scoped>
 .hero {
-  padding: 3rem 0 1rem;
+  /* User feedback: hero felt top-heavy. Reduced top padding (3 → 2) and
+     bumped bottom (1 → 2) so the title and subtitle sit closer to the
+     vertical centre of the visible-above-the-fold area. */
+  padding: 2rem 0 2rem;
   position: relative;
   overflow: hidden;
 }

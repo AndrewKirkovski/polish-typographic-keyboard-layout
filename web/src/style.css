@@ -15,18 +15,26 @@ html, body {
   --bg-subtle: #f0eee9;
   --text: #1a1a1a;
   --text-secondary: #555;
-  --text-muted: #999;
+  /* WCAG AA fix (was #999 = 2.46:1 on bg-subtle): #666 clears 4.5:1 on bg,
+     bg-subtle, and altgr-key-bg simultaneously. Used for footer license,
+     uninstall notes, hardCleanup hint, lang-switcher inactive items. */
+  --text-muted: #666666;
   --border: #e0ddd6;
   --border-strong: #c5c0b6;
 
-  /* Accent colors — keyboard character classes */
+  /* Accent colors — keyboard character classes.
+     Every glyph colour below must clear WCAG AA (4.5:1) against BOTH
+     --key-bg (#fff) AND --altgr-key-bg (#f8f0f8). The latter is the
+     pinkish highlight on the AltGr-row keys; it's just dark enough to
+     push borderline-AA glyphs sub-AA, so colours are tuned for the
+     harder background and pass both. */
   --color-altgr: #c4362c;
   --color-sh-altgr: #d68820;
-  --color-polish: #2d8a4e;
-  --color-russian: #2e7db3;
+  --color-polish: #1f6e38;   /* was #2d8a4e (4.32:1) — now 6.28/5.62 */
+  --color-russian: #1f6e9e;  /* was #2e7db3 (4.47:1) — now 5.55/4.97 */
   --color-dead: #7c5cbf;
-  --color-base: #777;
-  --color-shift: #bbb;
+  --color-base: #555555;     /* was #777 (4.48:1) — now 7.46/6.68 */
+  --color-shift: #6e6e6e;    /* was #bbb (1.92:1 — UNREADABLE) — now 5.10/4.57 */
 
   /* Key styling */
   --key-bg: #ffffff;
@@ -38,7 +46,7 @@ html, body {
   --key-radius: 6px;
 
   /* Sections */
-  --section-gap: 6rem;
+  --section-gap: 4rem;
 
   /* AltGr highlight */
   --altgr-key-bg: #f8f0f8;
@@ -53,17 +61,19 @@ html, body {
     --bg-subtle: #222;
     --text: #e8e6e1;
     --text-secondary: #aaa;
-    --text-muted: #666;
+    /* WCAG AA fix (was #666 = 2.77:1 on bg-subtle): #9b9b9b clears 4.5:1
+       on bg, bg-subtle, and bg-elevated. Same role as light --text-muted. */
+    --text-muted: #9b9b9b;
     --border: #2a2a2a;
     --border-strong: #3a3a3a;
 
-    --color-altgr: #e94560;
+    --color-altgr: #ee6680;     /* was #e94560 (4.35:1) — now 5.44/6.18 */
     --color-sh-altgr: #f5a623;
     --color-polish: #53d769;
     --color-russian: #5bc0de;
     --color-dead: #bb86fc;
     --color-base: #8899aa;
-    --color-shift: #556;
+    --color-shift: #9090a8;     /* was #556 (2.28:1 — UNREADABLE) — now 5.35/6.08 */
 
     --key-bg: #1e1e1e;
     --key-border: #333;
@@ -80,6 +90,61 @@ html, body {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+/* Global keyboard focus indicator. Many components remove default chrome
+   (`.hamburger { background: none; border: none }`, custom button skins),
+   so the UA focus ring is unreliable. This rule guarantees a visible
+   2-px brand-coloured outline on every keyboard-focused element, with a
+   small offset so it doesn't clip rounded corners. `:focus-visible`
+   (not `:focus`) means it only appears when the user is navigating by
+   keyboard, not after a mouse click. */
+*:focus-visible {
+  outline: 2px solid var(--color-altgr);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+
+/* Honour the user's reduced-motion preference. We collapse all transition
+   and animation durations to ~0 (not zero, to avoid layout-thrash bugs in
+   some engines) and disable smooth scrolling. Affects the keycap hover
+   transition, hamburger rotation, tab switches, hero symbol fade, etc. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Skip-to-main-content link — visually hidden until focused. The first
+   focusable element on the page; lets screen-reader and keyboard users
+   bypass the header nav. The target is `<main id="main">` in App.vue. */
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0.5rem 1rem;
+  background: var(--bg-elevated);
+  color: var(--text);
+  border: 2px solid var(--color-altgr);
+  border-radius: 0 0 8px 0;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  z-index: 1000;
+  /* Off-screen until focused */
+  transform: translateY(-200%);
+  transition: transform 0.15s;
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: translateY(0);
 }
 
 html {
@@ -182,41 +247,61 @@ html[data-os="mac"] .key__alt-label {
   color: var(--color-base);
 }
 
-/* ── Teleported key tooltip (rendered in <body> via Vue Teleport) ────── */
-.key-tooltip-portal {
-  position: fixed;
+/* ── Key tooltip (rendered by floating-vue, viewport-collision-aware) ─── */
+/* The default floating-vue popper wrapper has its own padding and arrow;
+   we override only the inner skin so the project palette + font stack are
+   honoured. Layout / positioning / arrow / collision flipping all stay on
+   floating-vue's defaults. */
+.v-popper--theme-key-tooltip .v-popper__inner {
   background: var(--bg-elevated);
+  color: var(--text);
   border: 1px solid var(--border-strong);
   border-radius: 8px;
   padding: 8px 12px;
   font-size: 11px;
-  white-space: nowrap;
-  z-index: 10000;
-  pointer-events: none;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
   font-family: var(--font-body);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  /* let the popper grow horizontally on desktop but cap on mobile so the
+     viewport-shift middleware always has room to nudge it inward */
+  max-width: min(320px, calc(100vw - 24px));
 }
 
-.key-tooltip-portal .tooltip-row {
+/* Arrow colour overrides — without these the default floating-vue arrow
+   uses `rgba(0,0,0,0.8)` (the default tooltip background) on arrow-outer
+   and `--bg-elevated` on arrow-inner. Mixed alpha + solid produces a
+   visible "seam" where the arrow meets the popper body. Forcing both to
+   match our solid theme colours closes the join and makes the arrow look
+   like a continuous extension of the popper border. The default placement
+   is `top`, so only the top borders need overriding. Other placements
+   (the popper flips on viewport edges) are handled by floating-vue's own
+   per-side classes — extend if/when a different placement appears. */
+.v-popper--theme-key-tooltip .v-popper__arrow-outer {
+  border-color: var(--border-strong);
+}
+.v-popper--theme-key-tooltip .v-popper__arrow-inner {
+  border-color: var(--bg-elevated);
+}
+
+.key-tooltip-body .tooltip-row {
   display: flex;
   gap: 8px;
   line-height: 1.6;
 }
 
-.key-tooltip-portal .tooltip-label {
+.key-tooltip-body .tooltip-label {
   font-family: var(--font-mono);
   font-weight: 600;
   font-size: 13px;
 }
 
-.key-tooltip-portal .tooltip-key {
+.key-tooltip-body .tooltip-key {
   font-family: var(--font-mono);
   color: var(--text-muted);
   font-size: 10px;
   min-width: 55px;
 }
 
-.key-tooltip-portal .tooltip-empty {
+.key-tooltip-body .tooltip-empty {
   color: var(--text-muted);
   font-style: italic;
 }

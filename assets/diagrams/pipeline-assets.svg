@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1029.349 246.700" width="1029.349" height="246.700" style="background:#FFFFFF">
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="5" refX="7" refY="2.5" orient="auto">
+    <polygon points="0 0, 8 2.5, 0 5" fill="#47474A" stroke="#47474A" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.5, 8 5" fill="#47474A" stroke="#47474A" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+</defs>
+<polyline class="edge" data-from="TTF" data-to="GLYPH" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="216.811,123.35 264.811,123.35" fill="none" stroke="#939394" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="GLYPH" data-to="SVG" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="429.027,123.35 477.027,123.35" fill="none" stroke="#939394" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="SVG" data-to="PNG" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="624.199,123.35 653.200,123.35 653.200,90.899 682.202,90.899" fill="none" stroke="#939394" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="PNG" data-to="ICNS" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="812.331,90.899 831.329,90.899 831.329,58.449 850.328,58.449" fill="none" stroke="#939394" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="PNG" data-to="ICO" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="812.331,90.899 831.329,90.899 831.329,123.350 850.328,123.350" fill="none" stroke="#939394" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="SVG" data-to="FSVG" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="624.199,123.35 653.200,123.35 653.200,155.8 682.202,155.8" fill="none" stroke="#939394" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="OGT" data-to="PW" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="267.200,188.25 315.200,188.25" fill="none" stroke="#939394" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="PW" data-to="OG" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="476.451,188.25 524.451,188.25" fill="none" stroke="#939394" stroke-width="1" marker-end="url(#arrowhead)" />
+<g class="node" data-id="TTF" data-label="DMSerifDisplay-Italic.ttf" data-shape="rounded">
+  <rect x="40" y="104.899" width="176.811" height="36.900" rx="6" ry="6" fill="#e8f1ff" stroke="#3a7fd4" stroke-width="0.75" />
+  <text x="128.405" y="123.35" text-anchor="middle" font-size="13" font-weight="500" fill="#1e3a72" dy="4.55">DMSerifDisplay-Italic.ttf</text>
+</g>
+<g class="node" data-id="GLYPH" data-label="opentype.js → 'K' path" data-shape="rectangle">
+  <rect x="264.811" y="104.899" width="164.215" height="36.900" rx="0" ry="0" fill="#fef0ee" stroke="#d4403a" stroke-width="0.75" />
+  <text x="346.919" y="123.35" text-anchor="middle" font-size="13" font-weight="500" fill="#7a1d18" dy="4.55">opentype.js → &#39;K&#39; path</text>
+</g>
+<g class="node" data-id="SVG" data-label="build-icon-svg.mjs" data-shape="rectangle">
+  <rect x="477.027" y="104.899" width="147.172" height="36.900" rx="0" ry="0" fill="#fef0ee" stroke="#d4403a" stroke-width="0.75" />
+  <text x="550.612" y="123.35" text-anchor="middle" font-size="13" font-weight="500" fill="#7a1d18" dy="4.55">build-icon-svg.mjs</text>
+</g>
+<g class="node" data-id="PNG" data-label="resvg-js → PNG" data-shape="rectangle">
+  <rect x="682.202" y="72.449" width="130.129" height="36.900" rx="0" ry="0" fill="#fef0ee" stroke="#d4403a" stroke-width="0.75" />
+  <text x="747.267" y="90.899" text-anchor="middle" font-size="13" font-weight="500" fill="#7a1d18" dy="4.55">resvg-js → PNG</text>
+</g>
+<g class="node" data-id="ICNS" data-label="macOS .icns × 3" data-shape="stadium">
+  <rect x="850.328" y="39.999" width="133.093" height="36.900" rx="18.450" ry="18.450" fill="#e8faee" stroke="#22a35a" stroke-width="0.75" />
+  <text x="916.874" y="58.449" text-anchor="middle" font-size="13" font-weight="500" fill="#0f4d28" dy="4.55">macOS .icns × 3</text>
+</g>
+<g class="node" data-id="ICO" data-label="favicon.ico / .png" data-shape="stadium">
+  <rect x="850.328" y="104.9" width="139.021" height="36.900" rx="18.450" ry="18.450" fill="#e8faee" stroke="#22a35a" stroke-width="0.75" />
+  <text x="919.838" y="123.350" text-anchor="middle" font-size="13" font-weight="500" fill="#0f4d28" dy="4.55">favicon.ico / .png</text>
+</g>
+<g class="node" data-id="FSVG" data-label="favicon.svg" data-shape="stadium">
+  <rect x="682.202" y="137.35" width="110.122" height="36.900" rx="18.450" ry="18.450" fill="#e8faee" stroke="#22a35a" stroke-width="0.75" />
+  <text x="737.263" y="155.8" text-anchor="middle" font-size="13" font-weight="500" fill="#0f4d28" dy="4.55">favicon.svg</text>
+</g>
+<g class="node" data-id="OGT" data-label="og-template.html" data-shape="rounded">
+  <rect x="134.107" y="169.8" width="133.093" height="36.900" rx="6" ry="6" fill="#e8f1ff" stroke="#3a7fd4" stroke-width="0.75" />
+  <text x="200.653" y="188.25" text-anchor="middle" font-size="13" font-weight="500" fill="#1e3a72" dy="4.55">og-template.html</text>
+</g>
+<g class="node" data-id="PW" data-label="Playwright 1200×630" data-shape="rectangle">
+  <rect x="315.200" y="169.8" width="161.251" height="36.900" rx="0" ry="0" fill="#fef0ee" stroke="#d4403a" stroke-width="0.75" />
+  <text x="395.825" y="188.25" text-anchor="middle" font-size="13" font-weight="500" fill="#7a1d18" dy="4.55">Playwright 1200×630</text>
+</g>
+<g class="node" data-id="OG" data-label="og-image.png" data-shape="stadium">
+  <rect x="524.451" y="169.8" width="119.755" height="36.900" rx="18.450" ry="18.450" fill="#e8faee" stroke="#22a35a" stroke-width="0.75" />
+  <text x="584.328" y="188.25" text-anchor="middle" font-size="13" font-weight="500" fill="#0f4d28" dy="4.55">og-image.png</text>
+</g>
+</svg>

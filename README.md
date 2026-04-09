@@ -1,4 +1,4 @@
-# Kirkouski Typographic Keyboard Layout v0.2
+# Kirkouski Typographic Keyboard Layout
 
 > **[Interactive Layout Preview & Downloads](https://polish-typographic-keyboard-layout.pages.dev/)** — explore the layout, download installers, and read installation guides.
 
@@ -43,9 +43,10 @@ Same as Polish Typographic, but registered under the English (US) locale. Use th
 1. Download `pltypo.dll` (or `rutypo.dll`, or `ustypo.dll` for English system language) and `install.ps1` from the latest release
 2. Place both files in the same folder
 3. Right-click `install.ps1` > **Run with PowerShell** (it will auto-elevate to admin)
-4. Restart, then go to **Settings > Time & Language > Language & Region > Keyboard** and add the new layout
+4. **🛑 REBOOT YOUR COMPUTER before using the new layout.** Your PC is fine to keep using right now — just don't switch to the Kirkouski Typographic layout until after a restart. If you do, Windows Explorer will crash because it still holds the old keyboard state in memory. The DLL is registered but cannot take effect until the next boot.
+5. After reboot, go to **Settings > Time & Language > Language & Region > Keyboard** and add the new layout
 
-**Uninstall:** Run `.\install.ps1 -Uninstall` and restart. Use `-Layout polish`, `-Layout russian`, or `-Layout us` to uninstall selectively.
+**Uninstall:** Run `.\install.ps1 -Uninstall`, then **🛑 REBOOT** (same reason — required to release the DLL). Use `-Layout polish`, `-Layout russian`, or `-Layout us` to uninstall selectively.
 
 **Apply to login screen & new users:** After installing and switching to the new layout, open `intl.cpl` (Win+R > `intl.cpl`) > **Administrative** tab > **Copy settings** > check both **"Welcome screen and system accounts"** and **"New user accounts"** > OK. This ensures the login screen and any new user accounts use your layout instead of the default.
 
@@ -55,11 +56,20 @@ Same as Polish Typographic, but registered under the English (US) locale. Use th
 
 ### macOS
 
-1. Copy `dist/polish_typographic.keylayout` (or `russian_typographic.keylayout`) to `~/Library/Keyboard Layouts/` (current user) or `/Library/Keyboard Layouts/` (all users — requires `sudo`)
-2. Log out and back in
-3. **System Settings > Keyboard > Input Sources > + > Add** the new layout
+The recommended path is the **`Kirkouski Typographic.bundle`** that ships in the macOS zip — it has proper icons, localized names, and lands in the right language category instead of "Others".
 
-**For the login screen:** Install to `/Library/Keyboard Layouts/` (system-wide) instead of `~/Library/Keyboard Layouts/` (user-only). The login screen only sees system-wide layouts.
+1. Download `kirkouski-typographic-vX.Y-macos.zip` from the latest release and unzip it
+2. Move `Kirkouski Typographic.bundle` into `~/Library/Keyboard Layouts/` (current user) or `/Library/Keyboard Layouts/` (all users — needs `sudo`)
+3. **Clear the quarantine xattr** that macOS adds to anything downloaded via a browser — without this the bundle may silently fail to load:
+   ```bash
+   xattr -dr com.apple.quarantine ~/Library/Keyboard\ Layouts/Kirkouski\ Typographic.bundle
+   ```
+4. **Log out and log back in** (a full logout — not just the lock screen). macOS only re-scans the keyboard layout directory at login.
+5. **System Settings > Keyboard > Input Sources > + > Polish / Russian** — pick the **Kirkouski Typographic** entries.
+
+**Login screen on macOS Sequoia (15+):** Sequoia only loads keyboard layouts from `/Library/Keyboard Layouts/` for the login screen — `~/Library/…` is ignored at the lock screen even though it works after login. If you need the layout at the login screen, install system-wide with `sudo`.
+
+**Manual / loose `.keylayout` install:** the zip also contains `polish-typographic-kirkouski-vX.Y.keylayout` and `russian-typographic-kirkouski-vX.Y.keylayout` as a fallback. Drop them into `~/Library/Keyboard Layouts/` if you want the legacy install style — but the bundle is the supported path.
 
 ## Building from Source
 
@@ -71,7 +81,7 @@ Same as Polish Typographic, but registered under the English (US) locale. Use th
 | Visual Studio Build Tools | Windows DLL compilation | [visualstudio.microsoft.com](https://visualstudio.microsoft.com/visual-cpp-build-tools/) |
 | Windows SDK | Headers for kbd.h | Included with VS Build Tools |
 | NSIS 3.x | Windows .exe installer | `winget install NSIS.NSIS` |
-| Node.js 18+ / pnpm | Web frontend (optional) | [nodejs.org](https://nodejs.org/) |
+| Node.js 18+ / pnpm | Web frontend + asset pipeline | [nodejs.org](https://nodejs.org/) |
 
 When installing VS Build Tools, select the **"Desktop development with C++"** workload. This provides `cl.exe`, `link.exe`, `rc.exe`, and the Windows SDK.
 
@@ -86,9 +96,10 @@ No external Python packages are required — the toolchain uses only the Python 
 python build.py
 
 # Build specific platform
-python build.py windows          # DLLs + install.ps1
-python build.py macos            # .keylayout files
+python build.py windows          # DLLs + install.ps1 + NSIS .exe
+python build.py macos            # .keylayout files + .bundle
 python build.py klc              # .klc files (for MSKLC)
+python build.py assets           # icons, web favicons, OG image (needs pnpm)
 
 # Build specific layout
 python build.py windows polish
@@ -96,41 +107,47 @@ python build.py windows us
 python build.py macos russian
 ```
 
+The `assets` target shells out to `pnpm --dir scripts/assets build`. Outputs (icons, favicons, OG image) are committed to the repo, so this only needs to run when fonts, colours, the OG template, or `VERSION` change.
+
 ### What the pipeline does
 
-```
-              build_kbd_c.py     compile_kbd.py        NSIS
-Windows:  JSON ────────────> C ──────────────> DLL ──────────> setup.exe
-                                                 \
-                                                  └──> zip (DLLs + install.ps1)
+**Windows** — JSON layout → C source → MSVC-compiled DLL → NSIS installer + manual ZIP:
 
-macOS:    JSON (full) ──> build_keylayout.py ──> .keylayout ──> .pkg (macOS only)
-                                                       \
-                                                        └──> zip
-```
+![Windows pipeline](assets/diagrams/pipeline-windows.svg)
+
+**macOS** — Layout JSON + committed `.icns` icons → `.keylayout` → `.bundle` → `.pkg` (macOS-only) + ZIP:
+
+![macOS pipeline](assets/diagrams/pipeline-macos.svg)
+
+**Assets pipeline (Node)** — One source font becomes a vector SVG, then rasterizes into every icon variant the project needs. Playwright handles the OG image separately because the template is HTML, not SVG:
+
+![Assets pipeline](assets/diagrams/pipeline-assets.svg)
 
 ### Output
 
-`python build.py` produces everything in `dist/`:
+`python build.py` produces everything in `dist/` (where `vX.Y` is the value in the repo-root `VERSION` file):
 
 | File | Description |
 |------|-------------|
-| `kirkouski-typographic-v0.2-windows-setup.exe` | NSIS installer (Add/Remove Programs, UAC) |
-| `kirkouski-typographic-v0.2-windows.zip` | DLLs + install.ps1 for manual install |
-| `kirkouski-typographic-v0.2-macos.zip` | .keylayout files for manual install |
-| `kirkouski-typographic-v0.2-macos.pkg` | macOS installer (built on macOS only) |
-| `windows-v0.2/` | Loose Windows files |
-| `macos-v0.2/` | Loose macOS files |
+| `kirkouski-typographic-vX.Y-windows-setup.exe` | NSIS installer (Add/Remove Programs, UAC) |
+| `kirkouski-typographic-vX.Y-windows.zip` | DLLs + install.ps1 for manual install |
+| `kirkouski-typographic-vX.Y-macos.zip` | `.bundle` (primary) + loose `.keylayout` files (fallback) |
+| `kirkouski-typographic-vX.Y-macos.pkg` | macOS installer (built on macOS only) |
+| `windows-vX.Y/` | Loose Windows files |
+| `macos-vX.Y/Kirkouski Typographic.bundle/` | macOS bundle — primary install artifact |
+| `macos-vX.Y/*.keylayout` | Loose macOS keylayout files (fallback) |
 
 ## Project Structure
 
 ```
+VERSION                 # Single source of truth — bumping this propagates everywhere
 build.py                # Build orchestrator (single entry point)
 build_kbd_c.py          # JSON -> C source generator (Windows DLL pipeline)
 compile_kbd.py          # MSVC compiler wrapper (C -> DLL)
 build_klc.py            # JSON -> KLC generator
-build_keylayout.py      # JSON -> keylayout generator (macOS)
-installer.nsi           # NSIS installer script
+build_keylayout.py      # JSON -> keylayout generator (macOS), overrides keyboard id+name
+build_macos_bundle.py   # Wrap .keylayout + .icns into Kirkouski Typographic.bundle
+installer.nsi           # NSIS installer script (reads VERSION via /DVERSION)
 install.ps1             # Windows PowerShell installer/uninstaller
 
 extract_base.py         # One-time: extract full layout from Birman originals
@@ -140,11 +157,17 @@ russian_typographic.json      # Russian layout definition (overlay)
 polish_typographic_full.json  # Complete macOS layout structure
 russian_typographic_full.json # Complete macOS layout structure
 
+assets/icons/           # Generated icon assets (committed; rebuilt by scripts/assets)
+scripts/assets/         # Node/Playwright pipeline for icons + favicons + OG image
+  ├── fonts/            #   DMSerifDisplay-Italic.ttf (OFL-1.1, committed)
+  ├── templates/        #   og-template.html
+  └── src/              #   build pipeline modules (variants, glyph extract, packers)
+
 visualizer.html         # Standalone keyboard layout viewer (legacy)
 web/                    # Vue 3 frontend app (visualizer, downloads, i18n)
 screenshots/            # Layout preview images
 dist/                   # Build outputs (organized by platform)
-build/                  # Intermediate C/obj files (gitignored)
+build/                  # Intermediate C/obj/bundle files (gitignored)
 ```
 
 ## Web Frontend
@@ -174,9 +197,9 @@ This is only needed if you modify the overlay JSONs and want to update the macOS
 
 ### Windows: Explorer crashes after install
 
-This is **expected** if you haven't rebooted yet. The new layout DLL is registered but Explorer still holds the old keyboard state. Simply restart your computer and the layout will work normally.
+🛑 **You activated the new layout before rebooting.** This is **expected** if you switched to the Kirkouski Typographic layout in Win+Space (or via Settings) without restarting first — see step 4 of the Windows install instructions above. The DLL is registered but Explorer still holds the old keyboard state and crashes the moment you try to use the freshly-registered layout. **Restart your computer** and the layout will work normally on next boot.
 
-If Explorer keeps crashing after reboot, run the hard cleanup:
+If Explorer keeps crashing **even after a full reboot**, run the hard cleanup:
 
 ```powershell
 .\install.ps1 -HardCleanup

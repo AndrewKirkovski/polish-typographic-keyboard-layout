@@ -4,8 +4,11 @@ import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
-const RELEASE_DL = 'https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/releases/download/v0.2'
-const RELEASE_PAGE = 'https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/releases/latest'
+// Single source of truth: vite injects __APP_VERSION__ from /VERSION at the
+// repo root, so bumping that file propagates here automatically.
+const VERSION = __APP_VERSION__
+const RELEASE_TAG = `v${VERSION}`
+const RELEASE_DL = `https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/releases/download/${RELEASE_TAG}`
 
 const detectedOS = computed(() => {
   if (typeof navigator === 'undefined') return 'windows'
@@ -15,12 +18,16 @@ const detectedOS = computed(() => {
 })
 
 const platforms = computed(() => {
+  const winInstaller = `kirkouski-typographic-v${VERSION}-windows-setup.exe`
+  const winZip = `kirkouski-typographic-v${VERSION}-windows.zip`
+  const macPkg = `kirkouski-typographic-v${VERSION}-macos.pkg`
+  const macZip = `kirkouski-typographic-v${VERSION}-macos.zip`
   const win = {
     id: 'windows',
     name: t('download.windows'),
     files: [
-      { label: t('download.installer'), file: 'kirkouski-typographic-v0.2-windows-setup.exe', url: `${RELEASE_DL}/kirkouski-typographic-v0.2-windows-setup.exe` },
-      { label: 'ZIP', file: 'kirkouski-typographic-v0.2-windows.zip', url: `${RELEASE_DL}/kirkouski-typographic-v0.2-windows.zip` },
+      { label: t('download.installer'), file: winInstaller, url: `${RELEASE_DL}/${winInstaller}` },
+      { label: 'ZIP', file: winZip, url: `${RELEASE_DL}/${winZip}` },
     ],
     primary: detectedOS.value === 'windows',
   }
@@ -28,8 +35,8 @@ const platforms = computed(() => {
     id: 'macos',
     name: t('download.macos'),
     files: [
-      { label: t('download.installer'), file: 'kirkouski-typographic-v0.2-macos.pkg', url: `${RELEASE_DL}/kirkouski-typographic-v0.2-macos.pkg` },
-      { label: 'ZIP', file: 'kirkouski-typographic-v0.2-macos.zip', url: `${RELEASE_DL}/kirkouski-typographic-v0.2-macos.zip` },
+      { label: t('download.installer'), file: macPkg, url: `${RELEASE_DL}/${macPkg}` },
+      { label: 'ZIP', file: macZip, url: `${RELEASE_DL}/${macZip}` },
     ],
     primary: detectedOS.value === 'macos',
   }
@@ -52,8 +59,8 @@ const platforms = computed(() => {
         >
           <div class="download-card__header">
             <span class="download-card__icon">
-              <iconify-icon v-if="platform.id === 'windows'" icon="mdi:microsoft-windows" width="22"></iconify-icon>
-              <iconify-icon v-else icon="mdi:apple" width="22"></iconify-icon>
+              <iconify-icon v-if="platform.id === 'windows'" icon="mdi:microsoft-windows" width="22" aria-hidden="true"></iconify-icon>
+              <iconify-icon v-else icon="mdi:apple" width="22" aria-hidden="true"></iconify-icon>
             </span>
             <h3>{{ platform.name }}</h3>
             <span v-if="platform.primary" class="badge">

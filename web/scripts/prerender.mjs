@@ -21,28 +21,31 @@ const LOCALES = [
   { code: 'ru', path: '/ru/', lang: 'ru', ogLocale: 'ru_RU' },
 ]
 
-// Translated meta content per locale
+// Translated meta content per locale. The descriptions lead with the
+// real differentiator (US+POL = type Polish on Windows without adding
+// Polish as a separate input language) instead of the generic "lots of
+// typographic symbols" framing.
 const META = {
   en: {
-    title: 'Kirkouski Typographic Keyboard Layout — Polish & Russian Typography Symbols via AltGr',
-    description: 'Custom keyboard layouts for Windows and macOS. Type em dashes, curly quotes, copyright symbols, euro signs, and 80+ typographic characters via AltGr on Polish and Russian keyboards.',
-    ogTitle: 'Kirkouski Typographic Keyboard Layout',
-    ogDescription: 'Polish & Russian keyboard layouts with 80+ typographic symbols via AltGr. Em dashes, curly quotes, copyright, euro, arrows, math symbols — all at your fingertips.',
-    twitterDescription: 'Polish & Russian keyboard layouts with typographic symbols via AltGr. For Windows and macOS.',
+    title: 'Kirkouski Typographic — Polish characters on AltGr without an extra input language',
+    description: 'Type Polish characters via AltGr without adding Polish as a separate input language on Windows. Plus em dashes, curly quotes, currency, arrows, math, and 80+ typographic symbols. Polish, Russian, and US+POL variants for Windows and macOS.',
+    ogTitle: 'Kirkouski Typographic — Polish characters without an extra input language',
+    ogDescription: 'Type Polish characters on Windows without adding Polish to your input languages — US+POL Typographic registers under English (US). Plus em dashes, curly quotes, math, and 80+ symbols on AltGr.',
+    twitterDescription: 'Type Polish characters on Windows without adding Polish to your input languages — US+POL Typographic registers under English (US). Plus em dashes, curly quotes, math, and 80+ symbols on AltGr.',
   },
   pl: {
-    title: 'Kirkouski Typographic — Polska typograficzna klawiatura z symbolami przez AltGr',
-    description: 'Układy klawiatury dla Windows i macOS. Pauzy, cudzysłowy, znaki copyright, symbole walut i 80+ znaków typograficznych przez AltGr na polskiej i rosyjskiej klawiaturze.',
-    ogTitle: 'Kirkouski Typographic — Typograficzna klawiatura',
-    ogDescription: 'Polska i rosyjska klawiatura z 80+ symbolami typograficznymi przez AltGr. Pauzy, cudzysłowy, copyright, euro, strzałki — wszystko pod ręką.',
-    twitterDescription: 'Polska i rosyjska klawiatura z symbolami typograficznymi przez AltGr. Dla Windows i macOS.',
+    title: 'Kirkouski Typographic — polskie znaki na AltGr bez dodatkowego języka wprowadzania',
+    description: 'Pisz polskie znaki przez AltGr bez dodawania polskiego jako osobnego języka wprowadzania w Windows. Dodatkowo pauzy, cudzysłowy, waluty, strzałki, znaki matematyczne i 80+ symboli typograficznych. Warianty polski, rosyjski i US+POL dla Windows i macOS.',
+    ogTitle: 'Kirkouski Typographic — polskie znaki bez dodatkowego języka wprowadzania',
+    ogDescription: 'Pisz polskie znaki w Windows bez dodawania polskiego do języków wprowadzania — układ US+POL Typographic rejestruje się pod angielskim (US). Plus pauzy, cudzysłowy, matematyka i 80+ symboli na AltGr.',
+    twitterDescription: 'Pisz polskie znaki w Windows bez dodawania polskiego do języków wprowadzania — układ US+POL Typographic rejestruje się pod angielskim (US). Plus pauzy, cudzysłowy, matematyka i 80+ symboli na AltGr.',
   },
   ru: {
-    title: 'Kirkouski Typographic — Типографская раскладка для польской и русской клавиатуры',
-    description: 'Раскладки клавиатуры для Windows и macOS. Тире, кавычки, знак копирайта, символы валют и 80+ типографских символов через AltGr на польской и русской клавиатуре.',
-    ogTitle: 'Kirkouski Typographic — Типографская раскладка',
-    ogDescription: 'Польская и русская раскладка с 80+ типографскими символами через AltGr. Тире, кавычки, copyright, евро, стрелки — всё под рукой.',
-    twitterDescription: 'Польская и русская раскладка с типографскими символами через AltGr. Для Windows и macOS.',
+    title: 'Kirkouski Typographic — польские символы на AltGr без отдельного языка ввода',
+    description: 'Печатай польские символы через AltGr без добавления польского как отдельного языка ввода в Windows. Плюс тире, кавычки, валюты, стрелки, математика и 80+ типографских символов. Польский, русский и US+POL для Windows и macOS.',
+    ogTitle: 'Kirkouski Typographic — польские символы без отдельного языка ввода',
+    ogDescription: 'Печатай польские символы в Windows без добавления польского в языки ввода — раскладка US+POL Typographic регистрируется под английским (US). Плюс тире, кавычки, математика и 80+ символов на AltGr.',
+    twitterDescription: 'Печатай польские символы в Windows без добавления польского в языки ввода — раскладка US+POL Typographic регистрируется под английским (US). Плюс тире, кавычки, математика и 80+ символов на AltGr.',
   },
 }
 

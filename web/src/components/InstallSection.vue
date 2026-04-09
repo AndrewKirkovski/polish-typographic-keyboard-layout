@@ -11,18 +11,28 @@ const activeTab = ref<'windows' | 'macos'>('windows')
     <div class="container">
       <h2 class="section-title">{{ t('install.title') }}</h2>
 
-      <div class="tabs">
+      <div class="tabs" role="tablist" :aria-label="t('install.title')">
         <button
+          id="tab-windows"
+          role="tab"
+          :aria-selected="activeTab === 'windows'"
+          :tabindex="activeTab === 'windows' ? 0 : -1"
+          aria-controls="panel-windows"
           :class="{ active: activeTab === 'windows' }"
           @click="activeTab = 'windows'"
         >{{ t('install.windows.tab') }}</button>
         <button
+          id="tab-macos"
+          role="tab"
+          :aria-selected="activeTab === 'macos'"
+          :tabindex="activeTab === 'macos' ? 0 : -1"
+          aria-controls="panel-macos"
           :class="{ active: activeTab === 'macos' }"
           @click="activeTab = 'macos'"
         >{{ t('install.macos.tab') }}</button>
       </div>
 
-      <div v-if="activeTab === 'windows'" class="install-steps">
+      <div v-if="activeTab === 'windows'" id="panel-windows" role="tabpanel" aria-labelledby="tab-windows" class="install-steps">
         <div class="step">
           <span class="step-num">1</span>
           <p>{{ t('install.windows.step1_exe') }}</p>
@@ -31,9 +41,12 @@ const activeTab = ref<'windows' | 'macos'>('windows')
           <span class="step-num">&mdash;</span>
           <p>{{ t('install.windows.step1_zip') }}</p>
         </div>
-        <div class="step">
-          <span class="step-num">2</span>
-          <p>{{ t('install.windows.step2') }}</p>
+        <div class="step step--warning">
+          <span class="step-num">
+            <iconify-icon icon="material-symbols:warning-rounded" aria-hidden="true"></iconify-icon>
+            <span class="step-num-text">2</span>
+          </span>
+          <p><strong>{{ t('install.windows.step2') }}</strong></p>
         </div>
         <div class="step">
           <span class="step-num">3</span>
@@ -50,25 +63,27 @@ const activeTab = ref<'windows' | 'macos'>('windows')
         </p>
       </div>
 
-      <div v-if="activeTab === 'macos'" class="install-steps">
+      <div v-if="activeTab === 'macos'" id="panel-macos" role="tabpanel" aria-labelledby="tab-macos" class="install-steps">
         <div class="step">
           <span class="step-num">1</span>
-          <p>{{ t('install.macos.step1_pkg') }}</p>
-        </div>
-        <div class="step step--alt">
-          <span class="step-num">&mdash;</span>
-          <p>{{ t('install.macos.step1_zip', {
+          <p>{{ t('install.macos.step1_install', {
             userPath: '~/Library/Keyboard Layouts/',
             systemPath: '/Library/Keyboard Layouts/'
           }) }}</p>
         </div>
-        <div class="step">
+        <div class="step step--command">
           <span class="step-num">2</span>
-          <p>{{ t('install.macos.step2') }}</p>
+          <p>{{ t('install.macos.step2_xattr', {
+            cmd: 'xattr -dr com.apple.quarantine ~/Library/Keyboard\\ Layouts/Kirkouski\\ Typographic.bundle'
+          }) }}</p>
         </div>
         <div class="step">
           <span class="step-num">3</span>
-          <p>{{ t('install.macos.step3') }}</p>
+          <p>{{ t('install.macos.step3_logout') }}</p>
+        </div>
+        <div class="step">
+          <span class="step-num">4</span>
+          <p>{{ t('install.macos.step4_pick') }}</p>
         </div>
       </div>
     </div>
@@ -133,6 +148,55 @@ const activeTab = ref<'windows' | 'macos'>('windows')
   color: var(--text-secondary);
   line-height: 1.5;
   padding-top: 0.15rem;
+}
+
+/* Warning step (Windows reboot requirement) — visually loud so users
+   don't skip it. The crash reports we get are 100% from people who
+   skipped this step. */
+.step--warning {
+  background: rgba(212, 64, 58, 0.06);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 0.5rem -1rem;
+  border: 1px solid rgba(212, 64, 58, 0.18);
+}
+
+.step--warning .step-num {
+  color: var(--color-altgr, #d4403a);
+  font-size: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.step--warning .step-num iconify-icon {
+  font-size: 1.75rem;
+}
+
+.step--warning .step-num-text {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+}
+
+.step--warning p {
+  color: var(--text);
+}
+
+.step--warning p strong {
+  font-weight: 600;
+}
+
+/* macOS shell-command step (xattr quarantine clear). Same prominence as a
+   numbered step, but the body text is monospace because it includes a
+   verbatim command the user must run. Not styled as `step--alt` because
+   it's mandatory, not optional. */
+.step--command p {
+  font-family: var(--font-mono, ui-monospace, 'JetBrains Mono', monospace);
+  font-size: 0.85rem;
+  background: var(--bg-subtle);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  word-break: break-all;
 }
 
 .info-note {

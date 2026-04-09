@@ -16,7 +16,15 @@ import os
 import shutil
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-VERSION = "0.2"
+
+
+def _read_version():
+    """Read project version from the repo-root VERSION file (single source of truth)."""
+    with open(os.path.join(SCRIPT_DIR, "VERSION"), encoding="utf-8") as f:
+        return f.read().strip()
+
+
+VERSION = _read_version()
 
 # Nice filenames for distribution (DLL names stay short for Windows registry)
 # Format: lang-variation-author-version
@@ -52,8 +60,40 @@ def build_windows(layouts):
 
 
 def build_macos(layouts):
-    """Build macOS .keylayout files."""
-    run(["build_keylayout.py"] + layouts, "Building macOS .keylayout files")
+    """Build macOS .keylayout files and wrap them into a .bundle.
+
+    The bundle wraps BOTH layouts in one artifact, so a partial
+    `python build.py macos polish` cannot produce a valid bundle on its own.
+    For partial builds we still rebuild every keylayout the bundle expects,
+    then wrap — that way the bundle is always coherent and we never ship a
+    stale copy of the layout the user didn't ask for.
+    """
+    run(["build_keylayout.py"], "Building macOS .keylayout files")
+    run(["build_macos_bundle.py"], "Wrapping into macOS .bundle")
+    if layouts:
+        print(f"  (note: macos build always rebuilds both layouts to keep the bundle coherent)")
+
+
+def build_assets():
+    """Run the JS asset pipeline (icons, web favicons, OG image).
+
+    Shells out to pnpm in scripts/assets/. Outputs are committed to the repo
+    so this only needs to run when fonts, colours, or the OG template change.
+    """
+    print(f"\n{'='*60}")
+    print("  Building assets (icons, favicons, OG image)")
+    print(f"{'='*60}\n")
+    pnpm = shutil.which("pnpm") or shutil.which("pnpm.cmd")
+    if not pnpm:
+        print("SKIP: pnpm not found on PATH. Install Node + pnpm to regenerate assets.")
+        return
+    result = subprocess.run(
+        [pnpm, "build"],
+        cwd=os.path.join(SCRIPT_DIR, "scripts", "assets"),
+    )
+    if result.returncode != 0:
+        print("\nFAILED: assets build")
+        sys.exit(result.returncode)
 
 
 def build_klc(layouts):
@@ -86,8 +126,11 @@ def build_nsis():
     print("  Building NSIS installer")
     print(f"{'='*60}\n")
 
+    # NSIS VIProductVersion needs four comma-separated parts. Pad short
+    # versions like "0.3" -> "0.3.0.0".
+    version_tuple = ".".join((VERSION.split(".") + ["0", "0", "0", "0"])[:4])
     result = subprocess.run(
-        [makensis, nsi_file],
+        [makensis, f"/DVERSION={VERSION}", f"/DVERSION_TUPLE={version_tuple}", nsi_file],
         cwd=SCRIPT_DIR,
     )
     if result.returncode != 0:
@@ -96,27 +139,36 @@ def build_nsis():
 
 
 def build_pkg():
-    """Build macOS .pkg installer (macOS only)."""
-    if sys.platform != "darwin":
+    """Build macOS .pkg installer (macOS only).
+
+    Wraps the .bundle (not loose .keylayout files) so PackageKit installs
+    a complete bundle with icons + Info.plist into ~/Library/Keyboard Layouts/.
+    `pkgbuild` is a macOS-only tool — silently skip on other platforms.
+    """
+    # Indirect through `str()` so static analysers don't narrow sys.platform
+    # to the host literal and mark the macOS body as unreachable.
+    current_platform: str = str(sys.platform)
+    if current_platform != "darwin":
         print("SKIP: .pkg can only be built on macOS")
         return
+    _build_pkg_darwin()
 
+
+def _build_pkg_darwin():
     dist_dir = os.path.join(SCRIPT_DIR, "dist")
-    mac_dir = os.path.join(dist_dir, f"macos-v{VERSION}")
     pkg_out = os.path.join(dist_dir, f"kirkouski-typographic-v{VERSION}-macos.pkg")
+    bundle_src = os.path.join(SCRIPT_DIR, "build", "macos", "Kirkouski Typographic.bundle")
+    if not os.path.isdir(bundle_src):
+        print(f"SKIP: bundle not built — run `python build.py macos` first ({bundle_src})")
+        return
 
-    # Create payload directory
-    payload = os.path.join(SCRIPT_DIR, "build", "pkg-payload", "Library", "Keyboard Layouts")
-    os.makedirs(payload, exist_ok=True)
-
-    for name in ["polish_typographic.keylayout", "russian_typographic.keylayout"]:
-        src = os.path.join(dist_dir, name)
-        if not os.path.isfile(src):
-            # Try the versioned folder
-            nice = NICE_NAMES.get(name.split("_")[0], name)
-            src = os.path.join(mac_dir, f"{nice}-v{VERSION}.keylayout")
-        if os.path.isfile(src):
-            shutil.copy2(src, os.path.join(payload, name))
+    # Stage payload: /Library/Keyboard Layouts/Kirkouski Typographic.bundle
+    payload_root = os.path.join(SCRIPT_DIR, "build", "pkg-payload")
+    payload_target = os.path.join(payload_root, "Library", "Keyboard Layouts", "Kirkouski Typographic.bundle")
+    if os.path.isdir(payload_root):
+        shutil.rmtree(payload_root)
+    os.makedirs(os.path.dirname(payload_target), exist_ok=True)
+    shutil.copytree(bundle_src, payload_target)
 
     print(f"\n{'='*60}")
     print("  Building macOS .pkg installer")
@@ -124,8 +176,8 @@ def build_pkg():
 
     result = subprocess.run([
         "pkgbuild",
-        "--root", os.path.join(SCRIPT_DIR, "build", "pkg-payload"),
-        "--identifier", "com.kirkouski.typographic",
+        "--root", payload_root,
+        "--identifier", "com.kirkouski.keyboardlayout.typographic",
         "--version", VERSION,
         "--install-location", "/",
         pkg_out,
@@ -135,8 +187,7 @@ def build_pkg():
         sys.exit(result.returncode)
     print(f"  -> {pkg_out}")
 
-    # Clean payload
-    shutil.rmtree(os.path.join(SCRIPT_DIR, "build", "pkg-payload"), ignore_errors=True)
+    shutil.rmtree(payload_root, ignore_errors=True)
 
 
 def build_zips():
@@ -168,14 +219,17 @@ def main():
             platforms.append("macos")
         elif arg == "klc":
             platforms.append("klc")
+        elif arg == "assets":
+            platforms.append("assets")
         elif arg in ("polish", "russian", "us"):
             layouts.append(arg)
         else:
             print(f"Unknown argument: {arg}")
-            print("Usage: python build.py [windows|macos|klc] [polish|russian|us]")
+            print("Usage: python build.py [windows|macos|klc|assets] [polish|russian|us]")
             print("")
-            print("Builds DLLs, keylayouts, NSIS installer, .pkg (macOS only), and zip archives.")
-            print("Prerequisites: Python 3.10+, MSVC Build Tools (windows), NSIS (windows installer)")
+            print("Builds DLLs, keylayouts + .bundle, NSIS installer, .pkg (macOS only), and zip archives.")
+            print("`assets` (re)generates icons, favicons, and OG image via the scripts/assets pipeline.")
+            print("Prerequisites: Python 3.10+, MSVC Build Tools (windows), NSIS (windows installer), pnpm (assets)")
             sys.exit(1)
 
     if not platforms:
@@ -188,6 +242,8 @@ def main():
             build_macos(layouts)
         elif platform == "klc":
             build_klc(layouts)
+        elif platform == "assets":
+            build_assets()
 
     # Organize dist with nice filenames
     dist_dir = os.path.join(SCRIPT_DIR, "dist")
@@ -206,7 +262,9 @@ def main():
     print(f"{'='*60}")
     print(f"\nOutputs in dist/:")
     if os.path.isdir(dist_dir):
-        for root, dirs, files in os.walk(dist_dir):
+        for walk_entry in os.walk(dist_dir):
+            root = walk_entry[0]
+            files = walk_entry[2]
             level = root.replace(dist_dir, "").count(os.sep)
             indent = "  " + "  " * level
             if root != dist_dir:
@@ -238,11 +296,21 @@ def organize_dist(dist_dir, platforms):
     if "macos" in platforms:
         mac_dir = os.path.join(dist_dir, f"macos-v{VERSION}")
         os.makedirs(mac_dir, exist_ok=True)
+        # Loose .keylayout files (legacy fallback for users who want to install
+        # without the bundle, e.g. into a non-standard location).
         for layout in NICE_NAMES:
             nice = NICE_NAMES[layout]
             src = os.path.join(dist_dir, f"{layout}_typographic.keylayout")
             if os.path.isfile(src):
                 shutil.move(src, os.path.join(mac_dir, f"{nice}-v{VERSION}.keylayout"))
+        # The .bundle is the primary install artifact — copy (not move) so
+        # build/ keeps a clean source for the .pkg builder.
+        bundle_src = os.path.join(SCRIPT_DIR, "build", "macos", "Kirkouski Typographic.bundle")
+        if os.path.isdir(bundle_src):
+            bundle_dst = os.path.join(mac_dir, "Kirkouski Typographic.bundle")
+            if os.path.isdir(bundle_dst):
+                shutil.rmtree(bundle_dst)
+            shutil.copytree(bundle_src, bundle_dst)
 
     # Clean any remaining loose files in dist/ root
     for f in os.listdir(dist_dir):

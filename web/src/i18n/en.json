@@ -2,17 +2,22 @@
   "nav": {
     "keyboard": "Keyboard",
     "download": "Download",
-    "about": "About"
+    "about": "About",
+    "menu": "Menu"
+  },
+  "a11y": {
+    "skipToMain": "Skip to main content"
   },
   "hero": {
     "title": "Kirkouski Typographic",
-    "subtitle": "Typography symbols at your fingertips — for Polish and Russian keyboards. Works with English system language too",
+    "subtitle": "Typographic symbols on AltGr. For Polish, Russian, and English keyboards.",
     "scroll": "Explore the layout"
   },
   "keyboard": {
     "title": "Layout Explorer",
     "polish": "Polish Typographic",
     "russian": "Russian Typographic",
+    "layoutSwitcher": "Layout",
     "legend": {
       "base": "Base",
       "shift": "Shift",
@@ -32,6 +37,27 @@
       "none": "No AltGr mapping"
     }
   },
+  "why": {
+    "title": "Why this exists",
+    "windows": {
+      "title": "Fewer input languages",
+      "problem": "On Windows, every keyboard layout is tied to an input language. To type Polish characters you have to add Polish as an input language; to type Russian you add Russian. The Win+Space switcher then cycles through everything you've added — and the more languages, the worse the toggle.",
+      "case1": "{en} + Polish typing = 2 input languages with the standard Polish layout. With US+POL, just {en} (1 input language).",
+      "case2": "{en} + {ru} + Polish typing = 3 input languages with the standard Polish layout. With US+POL, only {en} + {ru} (2 input languages).",
+      "solution": "The US+POL Typographic layout registers under English (US) instead of Polish — Polish characters live on AltGr, English stays your system language, and the Win+Space cycle stays short."
+    },
+    "typography": {
+      "title": "Typography on the keyboard",
+      "lead": "Real typographic characters at your fingertips, not Unicode-picker excavations:",
+      "dimensions": "Dimensions: {good} instead of {bad}",
+      "dashes": "Em dashes: {good} instead of {bad}",
+      "quotes": "Curly quotes: {good} instead of {bad}",
+      "quotesGood": "“like this”",
+      "quotesBad": "\"like this\"",
+      "symbols": "Euro, pound, copyright, arrows, math symbols — all on AltGr",
+      "note": "No compose key, no autocorrect rule to maintain, no copy-pasting from Character Map."
+    }
+  },
   "download": {
     "title": "Download",
     "subtitle": "Get the layout for your system",
@@ -49,26 +75,25 @@
       "tab": "Windows",
       "step1_exe": "Download and run the .exe installer — it handles everything automatically",
       "step1_zip": "Or download the .zip, extract, right-click install.ps1 and select \"Run with PowerShell\"",
-      "step2": "Restart your computer",
-      "step3": "Go to Settings > Time & Language > Language & Region > Keyboard and add the new layout",
+      "step2": "RESTART YOUR COMPUTER before using the new layout. Your PC is fine to keep using right now — just don't switch to the Kirkouski Typographic layout in Win+Space until after a reboot. If you do, Windows Explorer will crash (it still holds the old keyboard state in memory until restart).",
+      "step3": "After the reboot, go to Settings > Time & Language > Language & Region > Keyboard and add the new layout",
       "loginScreen": "To apply to login screen: Win+R > intl.cpl > Administrative > Copy settings > check both boxes",
-      "uninstall": "To uninstall, run install.ps1 again — it detects the install and offers uninstall interactively.",
-      "hardCleanup": "If Explorer crashes: run {cmd} to remove all traces."
+      "uninstall": "To uninstall, run install.ps1 again — it detects the install and offers uninstall interactively. A reboot is required after uninstall too.",
+      "hardCleanup": "If Explorer crashes after a reboot (rare): run {cmd} to remove all traces."
     },
     "macos": {
       "tab": "macOS",
-      "step1_pkg": "Download and run the .pkg installer",
-      "step1_zip": "Or download the .zip and copy .keylayout files to {userPath} (current user) or {systemPath} (all users)",
-      "step2": "Log out and log back in",
-      "step3": "Open System Settings > Keyboard > Input Sources and add the layout"
+      "step1_install": "Download the .zip, unzip, and move Kirkouski Typographic.bundle to {userPath} (current user) or {systemPath} (all users)",
+      "step2_xattr": "Clear the quarantine xattr — without this, macOS may silently refuse to load the bundle: {cmd}",
+      "step3_logout": "Log out and log back in (a full logout, not just the lock screen)",
+      "step4_pick": "Open System Settings > Keyboard > Input Sources > + and add the Polish/Russian Kirkouski Typographic layouts"
     }
   },
   "about": {
-    "title": "About",
-    "description": "This project extends standard keyboard layouts with typographic symbols accessible via AltGr (Right Alt). Em dashes, curly quotes, copyright signs, currency symbols, and more — all without switching layouts or memorizing Unicode codes. The US+POL variant lets you keep English as your Windows system language while having all Polish and typographic characters available.",
-    "based": "Based on {link} by Ilya Birman.",
+    "title": "Based on",
+    "based": "{link} by Ilya Birman.",
     "birmanLink": "Typography Keyboard Layout",
-    "license": "Open source under MIT License.",
+    "license": "Open source under the MIT License.",
     "github": "View on GitHub",
     "support": "Support the author",
     "starOnGithub": "Star on GitHub",

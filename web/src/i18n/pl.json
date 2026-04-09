@@ -2,17 +2,22 @@
   "nav": {
     "keyboard": "Klawiatura",
     "download": "Pobierz",
-    "about": "O projekcie"
+    "about": "O projekcie",
+    "menu": "Menu"
+  },
+  "a11y": {
+    "skipToMain": "Przejdź do treści"
   },
   "hero": {
     "title": "Kirkouski Typographic",
-    "subtitle": "Znaki typograficzne na wyciągnięciu ręki — dla polskiej i rosyjskiej klawiatury. Działa też z angielskim językiem systemu",
+    "subtitle": "Znaki typograficzne na AltGr. Dla polskich, rosyjskich i angielskich klawiatur.",
     "scroll": "Zobacz układ"
   },
   "keyboard": {
     "title": "Eksplorator układu",
     "polish": "Polski Typograficzny",
     "russian": "Rosyjski Typograficzny",
+    "layoutSwitcher": "Układ",
     "legend": {
       "base": "Bazowy",
       "shift": "Shift",
@@ -32,6 +37,27 @@
       "none": "Brak mapowania AltGr"
     }
   },
+  "why": {
+    "title": "Po co to powstało",
+    "windows": {
+      "title": "Mniej języków wprowadzania",
+      "problem": "W Windowsie każdy układ klawiatury jest przypisany do języka wprowadzania. Żeby pisać polskie znaki, trzeba dodać polski jako język wprowadzania; żeby pisać po rosyjsku — rosyjski. Przełącznik Win+Space cykluje przez wszystkie dodane języki — im więcej, tym gorsze przełączanie.",
+      "case1": "{en} + pisanie po polsku = 2 języki wprowadzania ze standardowym polskim. Z US+POL — tylko {en} (1 język).",
+      "case2": "{en} + {ru} + pisanie po polsku = 3 języki wprowadzania ze standardowym polskim. Z US+POL — tylko {en} + {ru} (2 języki).",
+      "solution": "Układ US+POL Typographic rejestruje się pod angielskim (US) zamiast polskim — polskie znaki są na AltGr, angielski zostaje językiem systemu, a cykl Win+Space pozostaje krótki."
+    },
+    "typography": {
+      "title": "Typografia prosto z klawiatury",
+      "lead": "Prawdziwe znaki typograficzne pod ręką, bez wykopalisk w Tablicy znaków:",
+      "dimensions": "Wymiary: {good} zamiast {bad}",
+      "dashes": "Pauzy: {good} zamiast {bad}",
+      "quotes": "Cudzysłowy drukarskie: {good} zamiast {bad}",
+      "quotesGood": "„tak”",
+      "quotesBad": "\"tak\"",
+      "symbols": "Euro, funt, copyright, strzałki, znaki matematyczne — wszystko na AltGr",
+      "note": "Bez compose key, bez reguł autokorekty, bez wklejania z Tablicy znaków."
+    }
+  },
   "download": {
     "title": "Pobierz",
     "subtitle": "Pobierz układ dla swojego systemu",
@@ -49,24 +75,23 @@
       "tab": "Windows",
       "step1_exe": "Pobierz i uruchom instalator .exe — wszystko zrobi automatycznie",
       "step1_zip": "Lub pobierz .zip, rozpakuj, kliknij prawym na install.ps1 i wybierz \"Uruchom w PowerShell\"",
-      "step2": "Uruchom ponownie komputer",
-      "step3": "Przejdź do Ustawienia > Czas i język > Język i region > Klawiatura i dodaj nowy układ",
+      "step2": "URUCHOM PONOWNIE KOMPUTER przed użyciem nowego układu. Komputera można dalej spokojnie używać — po prostu nie przełączaj się w Win+Space na układ Kirkouski Typographic, dopóki nie zrestartujesz. Jeśli przełączysz, Eksplorator Windows się zawiesi (do restartu trzyma w pamięci stary stan klawiatury).",
+      "step3": "Po restarcie przejdź do Ustawienia > Czas i język > Język i region > Klawiatura i dodaj nowy układ",
       "loginScreen": "Ekran logowania: Win+R > intl.cpl > Administracyjne > Kopiuj ustawienia > zaznacz obie opcje",
-      "uninstall": "Aby odinstalować, uruchom install.ps1 ponownie — wykryje instalację i zaproponuje odinstalowanie.",
-      "hardCleanup": "Jeśli Eksplorator się zawiesza: uruchom {cmd} aby usunąć wszystkie ślady."
+      "uninstall": "Aby odinstalować, uruchom install.ps1 ponownie — wykryje instalację i zaproponuje odinstalowanie. Po odinstalowaniu również wymagany jest restart.",
+      "hardCleanup": "Jeśli Eksplorator zawiesza się po restarcie (rzadko): uruchom {cmd} aby usunąć wszystkie ślady."
     },
     "macos": {
       "tab": "macOS",
-      "step1_pkg": "Pobierz i uruchom instalator .pkg",
-      "step1_zip": "Lub pobierz .zip i skopiuj pliki .keylayout do {userPath} (bieżący użytkownik) lub {systemPath} (wszyscy użytkownicy)",
-      "step2": "Wyloguj się i zaloguj ponownie",
-      "step3": "Otwórz Ustawienia systemowe > Klawiatura > Źródła wprowadzania i dodaj układ"
+      "step1_install": "Pobierz .zip, rozpakuj i przenieś Kirkouski Typographic.bundle do {userPath} (bieżący użytkownik) lub {systemPath} (wszyscy użytkownicy)",
+      "step2_xattr": "Wyczyść atrybut kwarantanny — bez tego macOS może po cichu odmówić załadowania bundle'a: {cmd}",
+      "step3_logout": "Wyloguj się i zaloguj ponownie (pełne wylogowanie, nie tylko ekran blokady)",
+      "step4_pick": "Otwórz Ustawienia systemowe > Klawiatura > Źródła wprowadzania > + i dodaj układy Kirkouski Typographic"
     }
   },
   "about": {
-    "title": "O projekcie",
-    "description": "Ten projekt rozszerza standardowe układy klawiatury o znaki typograficzne dostępne przez AltGr (prawy Alt). Pauzy, cudzysłowy, znaki copyright, symbole walut i wiele więcej — bez przełączania układów i zapamiętywania kodów Unicode. Wariant US+POL pozwala zachować angielski jako język systemu Windows, mając jednocześnie dostęp do wszystkich i polskich, i typograficznych znaków.",
-    "based": "Na podstawie {link} autorstwa Ilyi Birmana.",
+    "title": "Na podstawie",
+    "based": "{link} autorstwa Ilyi Birmana.",
     "birmanLink": "Typograficznego układu klawiatury",
     "license": "Open source na licencji MIT.",
     "github": "Zobacz na GitHub",

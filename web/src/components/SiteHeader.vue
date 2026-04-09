@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t, locale } = useI18n()
@@ -38,7 +38,7 @@ function closeMenu() {
         <span class="logo-mark">&mdash;</span>
         <span class="logo-text">Kirkouski</span>
       </a>
-      <nav class="nav" :class="{ open: menuOpen }">
+      <nav id="site-nav" class="nav" :class="{ open: menuOpen }">
         <a href="#keyboard" @click="closeMenu">{{ t('nav.keyboard') }}</a>
         <a href="#download" @click="closeMenu">{{ t('nav.download') }}</a>
         <a href="#about" @click="closeMenu">{{ t('nav.about') }}</a>
@@ -48,6 +48,7 @@ function closeMenu() {
             :key="lang.code"
             :href="langHref(lang)"
             :class="{ active: locale === lang.code }"
+            :aria-current="locale === lang.code ? 'page' : undefined"
             @click="switchLang($event, lang)"
           >
             {{ lang.label }}
@@ -60,12 +61,20 @@ function closeMenu() {
           :key="lang.code"
           :href="langHref(lang)"
           :class="{ active: locale === lang.code }"
+          :aria-current="locale === lang.code ? 'page' : undefined"
           @click="switchLang($event, lang)"
         >
           {{ lang.label }}
         </a>
       </div>
-      <button class="hamburger" :class="{ open: menuOpen }" @click="menuOpen = !menuOpen" aria-label="Menu">
+      <button
+        class="hamburger"
+        :class="{ open: menuOpen }"
+        :aria-expanded="menuOpen"
+        aria-controls="site-nav"
+        :aria-label="t('nav.menu')"
+        @click="menuOpen = !menuOpen"
+      >
         <span /><span /><span />
       </button>
     </div>
@@ -111,7 +120,10 @@ function closeMenu() {
   margin-left: auto;
 }
 
-.nav a {
+/* Scope to direct children only so the lang-switcher (which lives inside
+   .nav on mobile) keeps its pill styling instead of inheriting nav-link
+   padding + border-bottom. */
+.nav > a {
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--text-secondary);
@@ -120,7 +132,7 @@ function closeMenu() {
   transition: color 0.15s;
 }
 
-.nav a:hover {
+.nav > a:hover {
   color: var(--text);
   opacity: 1;
 }
@@ -156,12 +168,18 @@ function closeMenu() {
   color: var(--text-secondary);
 }
 
-/* Hamburger button — hidden on desktop */
+/* Hamburger button — hidden on desktop. WCAG 2.5.5 (AAA) requires
+   touch targets ≥ 44×44 px on mobile; padding bumped from 4px so the
+   total tap area clears 44×44. */
 .hamburger {
   display: none;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 5px;
-  padding: 4px;
+  padding: 12px;
+  min-width: 44px;
+  min-height: 44px;
   margin-left: auto;
   background: none;
   border: none;
@@ -208,13 +226,32 @@ function closeMenu() {
 
   .nav.open { display: flex; }
 
-  .nav a {
+  /* Same direct-child scope on mobile so the lang-switcher pill isn't
+     stretched to full width with a divider line below it. */
+  .nav > a {
     padding: 0.75rem 0;
     border-bottom: 1px solid var(--border);
   }
 
-  .nav a:last-of-type {
+  .nav > a:last-of-type {
     border-bottom: none;
+  }
+
+  /* Mobile lang-switcher: give it breathing room from the last nav link
+     and align it to the start (left) of the mobile menu so it reads as
+     a self-contained control rather than a stretched row. Pills get
+     larger padding on mobile to clear the 44×44 touch target minimum. */
+  .lang-switcher--mobile {
+    align-self: flex-start;
+    margin-top: 0.75rem;
+  }
+  .lang-switcher--mobile a {
+    padding: 12px 16px;
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 </style>

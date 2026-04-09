@@ -17,6 +17,18 @@ import os
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+
+def _read_version():
+    """Read project version from the repo-root VERSION file."""
+    with open(os.path.join(SCRIPT_DIR, "VERSION"), encoding="utf-8") as f:
+        return f.read().strip()
+
+
+VERSION = _read_version()
+# VERSIONINFO wants four comma-separated ints — pad short versions with zeros.
+_VER_PARTS = (VERSION.split(".") + ["0", "0", "0", "0"])[:4]
+VERSION_TUPLE = ",".join(_VER_PARTS)
+
 # ── Key mapping: key_id → (scancode_hex, VK_name, is_letter) ──────────────
 KEY_MAP = {
     "`":  ("29", "OEM_3",      False),
@@ -595,8 +607,8 @@ BEGIN
 END
 
 1 VERSIONINFO
-FILEVERSION     0,2,0,0
-PRODUCTVERSION  0,2,0,0
+FILEVERSION     {VERSION_TUPLE}
+PRODUCTVERSION  {VERSION_TUPLE}
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
 FILEFLAGS       0
 FILEOS          VOS_NT_WINDOWS32
@@ -609,12 +621,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName",      "Andrew Kirkouski"
             VALUE "FileDescription",  "{config['description']} Keyboard Layout"
-            VALUE "FileVersion",      "0.2"
-            VALUE "InternalName",     "{config['kbd_name']} (0.2)"
+            VALUE "FileVersion",      "{VERSION}"
+            VALUE "InternalName",     "{config['kbd_name']} ({VERSION})"
             VALUE "ProductName",      "{config['description']}"
             VALUE "LegalCopyright",   "\\251 2025\\x20142026 Andrew Kirkouski"
             VALUE "OriginalFilename", "{config['kbd_name']}"
-            VALUE "ProductVersion",   "0.2"
+            VALUE "ProductVersion",   "{VERSION}"
         END
     END
     BLOCK "VarFileInfo"

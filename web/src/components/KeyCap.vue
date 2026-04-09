@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+// floating-vue's `VTooltip` symbol is the directive object — the component
+// equivalent is exported as `Tooltip` (we alias to keep the local name).
+import { Tooltip as VTooltip } from 'floating-vue'
 import type { KeyDef } from '../composables/keyboardData'
 import type { LayoutData } from '../composables/useLayout'
 import { parseEntry } from '../composables/useLayout'
@@ -11,41 +14,6 @@ const props = defineProps<{
   keyDef: KeyDef
   layout: LayoutData | null
 }>()
-
-const keyEl = ref<HTMLElement | null>(null)
-const showTooltip = ref(false)
-const tooltipStyle = ref<Record<string, string>>({})
-
-function updateTooltip() {
-  if (!keyEl.value) return
-  const rect = keyEl.value.getBoundingClientRect()
-  const tooltipHeight = 80
-  const above = rect.top > tooltipHeight + 12
-
-  if (above) {
-    tooltipStyle.value = {
-      left: `${rect.left + rect.width / 2}px`,
-      top: `${rect.top - 8}px`,
-      transform: 'translate(-50%, -100%)',
-    }
-  } else {
-    tooltipStyle.value = {
-      left: `${rect.left + rect.width / 2}px`,
-      top: `${rect.bottom + 8}px`,
-      transform: 'translate(-50%, 0)',
-    }
-  }
-}
-
-function onEnter() {
-  if (props.keyDef.isModifier) return
-  updateTooltip()
-  showTooltip.value = true
-}
-
-function onLeave() {
-  showTooltip.value = false
-}
 
 const baseChar = computed(() => {
   if (!props.layout || props.keyDef.isModifier) return props.keyDef.base
@@ -91,60 +59,65 @@ const isAltGrKey = computed(() => props.keyDef.id === '_ra')
 </script>
 
 <template>
-  <div
-    ref="keyEl"
-    class="key"
-    :class="{
-      'key--modifier': keyDef.isModifier,
-      'key--altgr': isAltGrKey,
-    }"
-    :style="{ width: keyWidth }"
-    @mouseenter="onEnter"
-    @mouseleave="onLeave"
+  <VTooltip
+    theme="key-tooltip"
+    :disabled="keyDef.isModifier"
+    :auto-hide="true"
   >
-    <!-- Base char (bottom-left) -->
-    <span class="key__base">{{ baseChar }}</span>
+    <div
+      class="key"
+      :class="{
+        'key--modifier': keyDef.isModifier,
+        'key--altgr': isAltGrKey,
+      }"
+      :style="{ width: keyWidth }"
+      :tabindex="keyDef.isModifier ? -1 : 0"
+      :role="keyDef.isModifier ? undefined : 'button'"
+      :aria-label="keyDef.isModifier ? undefined : (shiftChar || baseChar)"
+    >
+      <!-- Base char (bottom-left) -->
+      <span class="key__base">{{ baseChar }}</span>
 
-    <!-- Shift char (top-left) -->
-    <span v-if="shiftChar && !keyDef.isModifier" class="key__shift">
-      {{ shiftChar }}
-    </span>
+      <!-- Shift char (top-left) -->
+      <span v-if="shiftChar && !keyDef.isModifier" class="key__shift">
+        {{ shiftChar }}
+      </span>
 
-    <!-- Platform-alternate label for modifiers (Mac symbols) -->
-    <span v-if="keyDef.isModifier && keyDef.altLabel" class="key__alt-label">
-      {{ keyDef.altLabel }}
-    </span>
+      <!-- Platform-alternate label for modifiers (Mac symbols) -->
+      <span v-if="keyDef.isModifier && keyDef.altLabel" class="key__alt-label">
+        {{ keyDef.altLabel }}
+      </span>
 
-    <!-- AltGr char (bottom-right) -->
-    <span v-if="altgrInfo" class="key__altgr" :class="colorClass(altgrInfo)">
-      {{ altgrInfo.display }}
-    </span>
+      <!-- AltGr char (bottom-right) -->
+      <span v-if="altgrInfo" class="key__altgr" :class="colorClass(altgrInfo)">
+        {{ altgrInfo.display }}
+      </span>
 
-    <!-- Shift+AltGr char (top-right) -->
-    <span v-if="shAltgrInfo" class="key__sh-altgr" :class="colorClass(shAltgrInfo)">
-      {{ shAltgrInfo.display }}
-    </span>
-  </div>
-
-  <!-- Teleported tooltip — renders in document body, never clipped -->
-  <Teleport to="body">
-    <div v-if="showTooltip && !keyDef.isModifier" class="key-tooltip-portal" :style="tooltipStyle">
-      <div class="tooltip-row">
-        <span class="tooltip-label">{{ shiftChar || baseChar }}</span>
-      </div>
-      <div v-if="altgrInfo" class="tooltip-row">
-        <span class="tooltip-key"><span class="os-win">AltGr</span><span class="os-mac">⌥</span></span>
-        <span>{{ altgrInfo.display }} &mdash; {{ altgrInfo.name }}</span>
-      </div>
-      <div v-if="shAltgrInfo" class="tooltip-row">
-        <span class="tooltip-key"><span class="os-win">Sh+AltGr</span><span class="os-mac">⇧⌥</span></span>
-        <span>{{ shAltgrInfo.display }} &mdash; {{ shAltgrInfo.name }}</span>
-      </div>
-      <div v-if="!altgrInfo && !shAltgrInfo" class="tooltip-row tooltip-empty">
-        {{ t('keyboard.tooltip.none') }}
-      </div>
+      <!-- Shift+AltGr char (top-right) -->
+      <span v-if="shAltgrInfo" class="key__sh-altgr" :class="colorClass(shAltgrInfo)">
+        {{ shAltgrInfo.display }}
+      </span>
     </div>
-  </Teleport>
+
+    <template #popper>
+      <div class="key-tooltip-body">
+        <div class="tooltip-row">
+          <span class="tooltip-label">{{ shiftChar || baseChar }}</span>
+        </div>
+        <div v-if="altgrInfo" class="tooltip-row">
+          <span class="tooltip-key"><span class="os-win">AltGr</span><span class="os-mac">⌥</span></span>
+          <span>{{ altgrInfo.display }} &mdash; {{ altgrInfo.name }}</span>
+        </div>
+        <div v-if="shAltgrInfo" class="tooltip-row">
+          <span class="tooltip-key"><span class="os-win">Sh+AltGr</span><span class="os-mac">⇧⌥</span></span>
+          <span>{{ shAltgrInfo.display }} &mdash; {{ shAltgrInfo.name }}</span>
+        </div>
+        <div v-if="!altgrInfo && !shAltgrInfo" class="tooltip-row tooltip-empty">
+          {{ t('keyboard.tooltip.none') }}
+        </div>
+      </div>
+    </template>
+  </VTooltip>
 </template>
 
 <style scoped>
@@ -241,5 +214,7 @@ const isAltGrKey = computed(() => props.keyDef.id === '_ra')
 .color-russian { color: var(--color-russian); }
 .color-dead { color: var(--color-dead); }
 
-/* Old tooltip styles removed — tooltip now uses Teleport (see style.css) */
+/* Tooltip body skin lives in style.css under .v-popper--theme-key-tooltip
+   and .key-tooltip-body — the popper is teleported to <body> by floating-vue,
+   so scoped styles here would not reach it. */
 </style>

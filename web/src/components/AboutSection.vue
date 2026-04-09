@@ -40,10 +40,12 @@ const shareLinks = computed(() => [
   },
 ])
 
-const canNativeShare = ref(false)
-if (typeof navigator !== 'undefined' && navigator.share) {
-  canNativeShare.value = true
-}
+// `navigator.share` is `((data?: ShareData) => Promise<void>) | undefined` in
+// older lib.dom.d.ts versions but always-defined in modern ones — TS narrows
+// it to "always truthy" and warns. Test for the property explicitly via `in`.
+const canNativeShare = ref(
+  typeof navigator !== 'undefined' && 'share' in navigator,
+)
 
 async function nativeShare() {
   try {
@@ -70,7 +72,6 @@ async function copyLink() {
     <div class="container">
       <h2 class="section-title">{{ t('about.title') }}</h2>
       <div class="about-content">
-        <p>{{ t('about.description') }}</p>
         <p>
           {{ basedParts.before }}
           <a href="https://ilyabirman.ru/typography-layout/" target="_blank" rel="noopener">
@@ -98,13 +99,13 @@ async function copyLink() {
             rel="noopener"
             class="action-btn action-btn--kofi"
           >
-            <iconify-icon icon="simple-icons:kofi" width="20"></iconify-icon>
+            <iconify-icon icon="simple-icons:kofi" width="20" aria-hidden="true"></iconify-icon>
             {{ t('about.support') }}
           </a>
         </div>
 
         <p class="star-hint">
-          <iconify-icon icon="mdi:star-outline" width="14"></iconify-icon>
+          <iconify-icon icon="mdi:star-outline" width="14" aria-hidden="true"></iconify-icon>
           {{ t('about.starHint') }}
         </p>
 
@@ -115,27 +116,30 @@ async function copyLink() {
               v-if="canNativeShare"
               class="share-btn share-btn--native"
               :title="t('share.title')"
+              :aria-label="t('share.title')"
               @click="nativeShare"
             >
-              <iconify-icon icon="mdi:share-variant" width="18"></iconify-icon>
+              <iconify-icon icon="mdi:share-variant" width="18" aria-hidden="true"></iconify-icon>
             </button>
             <a
               v-for="link in shareLinks"
               :key="link.id"
               :href="link.url"
               :title="link.label"
+              :aria-label="link.label"
               target="_blank"
               rel="noopener noreferrer"
               class="share-btn"
             >
-              <iconify-icon :icon="link.icon" width="18"></iconify-icon>
+              <iconify-icon :icon="link.icon" width="18" aria-hidden="true"></iconify-icon>
             </a>
             <button
               class="share-btn"
               :title="copied ? t('share.copied') : t('share.copyLink')"
+              :aria-label="copied ? t('share.copied') : t('share.copyLink')"
               @click="copyLink"
             >
-              <iconify-icon :icon="copied ? 'mdi:check' : 'mdi:link-variant'" width="18"></iconify-icon>
+              <iconify-icon :icon="copied ? 'mdi:check' : 'mdi:link-variant'" width="18" aria-hidden="true"></iconify-icon>
             </button>
           </div>
         </div>

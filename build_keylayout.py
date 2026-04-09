@@ -24,6 +24,17 @@ LAYOUTS = {
     "russian": "russian_typographic_full.json",
 }
 
+# Unique negative keyboard ids per layout. The source JSON files inherit ids
+# from the upstream Birman keylayouts (-9876, -31553) which causes a silent
+# collision in macOS — if the user has Birman installed, our layouts get
+# dropped because macOS caches layouts by id. We override here so the JSON
+# stays an unmodified mirror of the Birman base while our build owns the id
+# namespace. Range chosen to be far from common third-party ids.
+KEYBOARD_IDS = {
+    "polish": "-19876",
+    "russian": "-19877",
+}
+
 
 def esc_attr(text):
     """Escape XML attribute value."""
@@ -62,14 +73,22 @@ def esc_output(text):
     return "".join(result)
 
 
-def serialize_keylayout(data):
-    """Serialize full keylayout data dict to XML 1.1 string."""
+def serialize_keylayout(data, override_id=None, override_name=None):
+    """Serialize full keylayout data dict to XML 1.1 string.
+
+    `override_id` / `override_name` let the caller bypass the values stored
+    in the source JSON. Used to break the id collision with Birman and to
+    keep the human-readable name in lockstep with the project version.
+    """
     lines = []
     lines.append('<?xml version="1.1" encoding="UTF-8"?>')
     lines.append('<!DOCTYPE keyboard SYSTEM "file://localhost/System/Library/DTDs/KeyboardLayout.dtd">')
 
-    attrs = (f'group="{data["keyboard_group"]}" id="{data["keyboard_id"]}"'
-             f' name="{esc_attr(data["keyboard_name"])}"'
+    keyboard_id = override_id if override_id is not None else data["keyboard_id"]
+    keyboard_name = override_name if override_name is not None else data["keyboard_name"]
+
+    attrs = (f'group="{data["keyboard_group"]}" id="{keyboard_id}"'
+             f' name="{esc_attr(keyboard_name)}"'
              f' maxout="{data["keyboard_maxout"]}"')
     lines.append(f'<keyboard {attrs}>')
 
@@ -127,7 +146,7 @@ def serialize_keylayout(data):
                     parts.append(f'through="{esc_attr(when["through"])}"')
                 if "multiplier" in when:
                     parts.append(f'multiplier="{esc_attr(when["multiplier"])}"')
-                lines.append(f'\t\t\t<when {" ".join(parts)}"/>')
+                lines.append(f'\t\t\t<when {" ".join(parts)}/>')
             lines.append('\t\t</action>')
         lines.append('\t</actions>')
 
@@ -141,6 +160,37 @@ def serialize_keylayout(data):
 
     lines.append('</keyboard>')
     return "\n".join(lines)
+
+
+# Display name shown in System Settings → Keyboard → Input Sources. Kept in
+# sync with the .icns filename and the KLInfo_ key in the bundle Info.plist;
+# any drift here breaks discovery. The em-dash is U+2013 EN DASH (NOT a
+# regular hyphen) — must match build_macos_bundle.LAYOUTS byte-for-byte.
+KEYBOARD_NAMES = {
+    "polish": "Polish – Kirkouski Typographic",
+    "russian": "Russian – Kirkouski Typographic",
+}
+
+
+def validate_xml(xml: str, label: str) -> None:
+    """Verify the generated keylayout is well-formed XML.
+
+    A regex bug shipped malformed `<when state="..." next="...""/>` (stray quote)
+    in v0.1/v0.2 — silently breaking every dead key on macOS. This catch keeps
+    that class of bug from ever shipping again. We use ElementTree's parser
+    against a sanitized version (XML 1.1 control-char refs would otherwise trip
+    the strict XML 1.0 parser, but the structure is what we care about).
+    """
+    import re
+    import xml.etree.ElementTree as ET
+
+    sanitized = re.sub(r"&#x[0-9A-Fa-f]+;", "?", xml)
+    sanitized = sanitized.replace('<?xml version="1.1"', '<?xml version="1.0"')
+    try:
+        ET.fromstring(sanitized)
+    except ET.ParseError as e:
+        print(f"FAIL: {label} is not well-formed XML: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 def main():
@@ -162,12 +212,17 @@ def main():
         with open(json_file, encoding="utf-8") as f:
             data = json.load(f)
 
-        xml = serialize_keylayout(data)
+        xml = serialize_keylayout(
+            data,
+            override_id=KEYBOARD_IDS[target],
+            override_name=KEYBOARD_NAMES[target],
+        )
+        validate_xml(xml, f"{target}.keylayout")
         out_name = os.path.splitext(LAYOUTS[target])[0].replace("_full", "")
         out_path = os.path.join(SCRIPT_DIR, "dist", f"{out_name}.keylayout")
         with open(out_path, "w", encoding="utf-8") as f:
             f.write(xml)
-        print(f"  -> {out_path} ({xml.count(chr(10))+1} lines)")
+        print(f"  -> {out_path} (id={KEYBOARD_IDS[target]}, {xml.count(chr(10))+1} lines)")
 
     print("Done.")
 
