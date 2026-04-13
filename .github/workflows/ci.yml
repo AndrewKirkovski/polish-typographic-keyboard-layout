@@ -26,11 +26,27 @@ jobs:
       - name: Build KLC files
         run: python build_klc.py
 
+      - name: Install Inno Setup
+        run: choco install innosetup -y --no-progress
+
+      - name: Build Inno Setup installer
+        run: |
+          $version = (Get-Content VERSION).Trim()
+          # Organize DLLs into expected directory
+          $winDir = "dist/windows-v$version"
+          New-Item -ItemType Directory -Force -Path $winDir | Out-Null
+          Copy-Item dist/pltypo.dll $winDir/
+          Copy-Item dist/rutypo.dll $winDir/
+          Copy-Item dist/ustypo.dll $winDir/
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DVERSION=$version installer.iss
+
       - name: Verify outputs
         run: |
+          $version = (Get-Content VERSION).Trim()
           if (!(Test-Path "dist/pltypo.dll")) { throw "pltypo.dll not found" }
           if (!(Test-Path "dist/rutypo.dll")) { throw "rutypo.dll not found" }
           if (!(Test-Path "dist/pltypo.klc")) { throw "pltypo.klc not found" }
+          if (!(Test-Path "dist/kirkouski-typographic-v$version-windows-setup.exe")) { throw "Inno Setup exe not found" }
           Write-Host "All Windows outputs verified"
 
       - uses: pnpm/action-setup@v4
@@ -61,8 +77,15 @@ jobs:
       - name: Build macOS keylayouts
         run: python build_keylayout.py
 
+      - name: Build macOS bundle
+        run: python build_macos_bundle.py
+
+      - name: Validate keylayouts
+        run: python validate_keylayout.py dist/polish_typographic.keylayout dist/russian_typographic.keylayout
+
       - name: Verify outputs
         run: |
           test -f dist/polish_typographic.keylayout || (echo "Polish keylayout missing" && exit 1)
           test -f dist/russian_typographic.keylayout || (echo "Russian keylayout missing" && exit 1)
+          test -d "build/macos/Kirkouski Typographic.bundle" || (echo "macOS bundle missing" && exit 1)
           echo "All macOS outputs verified"
