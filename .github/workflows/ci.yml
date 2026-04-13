@@ -40,14 +40,21 @@ jobs:
           Copy-Item dist/ustypo.dll $winDir/
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DVERSION=$version installer.iss
 
+      - name: Validate keylayouts (JSON)
+        run: python validate_keylayout.py polish_typographic_full.json russian_typographic_full.json
+
       - name: Verify outputs
         run: |
           $version = (Get-Content VERSION).Trim()
-          if (!(Test-Path "dist/pltypo.dll")) { throw "pltypo.dll not found" }
-          if (!(Test-Path "dist/rutypo.dll")) { throw "rutypo.dll not found" }
-          if (!(Test-Path "dist/pltypo.klc")) { throw "pltypo.klc not found" }
-          if (!(Test-Path "dist/kirkouski-typographic-v$version-windows-setup.exe")) { throw "Inno Setup exe not found" }
-          Write-Host "All Windows outputs verified"
+          $expected = @(
+            "dist/pltypo.dll", "dist/rutypo.dll", "dist/ustypo.dll",
+            "dist/pltypo.klc", "dist/rutypo.klc", "dist/ustypo.klc",
+            "dist/kirkouski-typographic-v$version-windows-setup.exe"
+          )
+          foreach ($f in $expected) {
+            if (!(Test-Path $f)) { throw "$f not found" }
+          }
+          Write-Host "All Windows outputs verified ($($expected.Count) files)"
 
       - uses: pnpm/action-setup@v4
         with:

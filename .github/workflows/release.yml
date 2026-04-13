@@ -12,7 +12,7 @@ on:
         default: '0.1'
 
 jobs:
-  # ── Windows: DLLs + NSIS installer + zip ─────────────────────────────
+  # ── Windows: DLLs + Inno Setup installer + zip ──────────────────────
   build-windows:
     runs-on: windows-latest
     steps:
@@ -22,13 +22,13 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install NSIS
-        run: choco install nsis -y
+      - name: Install Inno Setup
+        run: choco install innosetup -y --no-progress
 
       - name: Install MSVC Build Tools
         uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Build Windows (DLLs + KLC + NSIS installer + zip)
+      - name: Build Windows (DLLs + KLC + Inno Setup installer + zip)
         run: python build.py windows klc
 
       - name: List outputs
