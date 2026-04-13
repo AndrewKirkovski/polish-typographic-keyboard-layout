@@ -42,15 +42,16 @@ Same as Polish Typographic, but registered under the English (US) locale. Use th
 
 ### Windows
 
-1. Download `pltypo.dll` (or `rutypo.dll`, or `ustypo.dll` for English system language) and `install.ps1` from the latest release
-2. Place both files in the same folder
-3. Right-click `install.ps1` > **Run with PowerShell** (it will auto-elevate to admin)
-4. **🛑 REBOOT YOUR COMPUTER before using the new layout.** Your PC is fine to keep using right now — just don't switch to the Kirkouski Typographic layout until after a restart. If you do, Windows Explorer will crash because it still holds the old keyboard state in memory. The DLL is registered but cannot take effect until the next boot.
-5. After reboot, go to **Settings > Time & Language > Language & Region > Keyboard** and add the new layout
+1. Download the `.exe` installer from the [latest release](https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/releases/latest) and run it
+2. Choose which layouts to install (Polish, Russian, US+POL)
+3. The installer will copy DLLs, register the layouts, and **prompt for a reboot** — the layout won't appear until after restart
+4. After reboot, go to **Settings > Time & Language > Language & Region > Keyboard** and add the new layout
 
-**Uninstall:** Run `.\install.ps1 -Uninstall`, then **🛑 REBOOT** (same reason — required to release the DLL). Use `-Layout polish`, `-Layout russian`, or `-Layout us` to uninstall selectively.
+**Manual install (ZIP):** Download the `.zip`, extract, right-click `install.ps1` > **Run with PowerShell**. Reboot before using.
 
-**Apply to login screen & new users:** After installing and switching to the new layout, open `intl.cpl` (Win+R > `intl.cpl`) > **Administrative** tab > **Copy settings** > check both **"Welcome screen and system accounts"** and **"New user accounts"** > OK. This ensures the login screen and any new user accounts use your layout instead of the default.
+**Uninstall:** Open **Settings > Apps > Installed Apps**, find **Kirkouski Typographic**, click Uninstall. Reboot required.
+
+**Apply to login screen & new users:** After installing, open `intl.cpl` (Win+R > `intl.cpl`) > **Administrative** tab > **Copy settings** > check both **"Welcome screen and system accounts"** and **"New user accounts"** > OK.
 
 **Broken install?** Run `.\install.ps1 -HardCleanup` to remove all traces (registry, DLLs, preload entries).
 

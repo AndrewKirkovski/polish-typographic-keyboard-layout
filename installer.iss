@@ -33,6 +33,7 @@ VersionInfoCopyright=(c) 2026 Andrew Kirkouski. MIT License.
 VersionInfoDescription=Keyboard layout installer
 LicenseFile=LICENSE
 InfoAfterFile=
+SetupIconFile=web\public\favicon.ico
 UninstallDisplayName=Kirkouski Typographic Keyboard Layout
 
 [Languages]

@@ -77,12 +77,12 @@
     "title": "Instalacja",
     "windows": {
       "tab": "Windows",
-      "step1_exe": "Pobierz i uruchom instalator .exe — wszystko zrobi automatycznie",
-      "step1_zip": "Lub pobierz .zip, rozpakuj, kliknij prawym na install.ps1 i wybierz \"Uruchom w PowerShell\"",
-      "step2": "URUCHOM PONOWNIE KOMPUTER przed użyciem nowego układu. Komputera można dalej spokojnie używać — po prostu nie przełączaj się w Win+Space na układ Kirkouski Typographic, dopóki nie zrestartujesz. Jeśli przełączysz, Eksplorator Windows się zawiesi (do restartu trzyma w pamięci stary stan klawiatury).",
+      "step1_exe": "Pobierz i uruchom instalator .exe — wszystko zrobi automatycznie i poprosi o restart",
+      "step1_zip": "Lub pobierz .zip do ręcznej instalacji: rozpakuj, kliknij prawym na install.ps1 i wybierz \"Uruchom w PowerShell\"",
+      "step2": "URUCHOM PONOWNIE KOMPUTER przed użyciem nowego układu. Instalator sam o to poprosi. Nie przełączaj się na układ Kirkouski Typographic w Win+Space przed restartem — Eksplorator się zawiesi jeśli DLL nie został jeszcze załadowany.",
       "step3": "Po restarcie przejdź do Ustawienia > Czas i język > Język i region > Klawiatura i dodaj nowy układ",
       "loginScreen": "Ekran logowania: Win+R > intl.cpl > Administracyjne > Kopiuj ustawienia > zaznacz obie opcje",
-      "uninstall": "Aby odinstalować, uruchom install.ps1 ponownie — wykryje instalację i zaproponuje odinstalowanie. Po odinstalowaniu również wymagany jest restart.",
+      "uninstall": "Aby odinstalować: Ustawienia > Aplikacje > Zainstalowane aplikacje, znajdź Kirkouski Typographic i kliknij Odinstaluj. Po odinstalowaniu również wymagany jest restart.",
       "hardCleanup": "Jeśli Eksplorator zawiesza się po restarcie (rzadko): uruchom {cmd} aby usunąć wszystkie ślady."
     },
     "macos": {
