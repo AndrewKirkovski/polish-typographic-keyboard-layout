@@ -1,5 +1,5 @@
 {
-  "keyboard_name": "Polish Typographic by Kirkouski v0.3",
+  "keyboard_name": "Polish Typographic by Kirkouski v0.4",
   "keyboard_group": "126",
   "keyboard_id": "-9876",
   "keyboard_maxout": "3",
@@ -1219,9 +1219,6 @@
           "33": {
             "output": "["
           },
-          "34": {
-            "output": "і"
-          },
           "35": {
             "output": "′"
           },
@@ -1499,6 +1496,9 @@
           "15": {
             "action": "ring"
           },
+          "16": {
+            "action": ""
+          },
           "17": {
             "output": "#"
           },
@@ -1544,14 +1544,8 @@
           "31": {
             "output": "Ó"
           },
-          "32": {
-            "action": ""
-          },
           "33": {
             "output": "{"
-          },
-          "34": {
-            "output": "І"
           },
           "35": {
             "output": "″"
@@ -1830,6 +1824,9 @@
           "15": {
             "output": "®"
           },
+          "16": {
+            "action": ""
+          },
           "17": {
             "output": "†"
           },
@@ -1875,14 +1872,8 @@
           "31": {
             "output": "Ó"
           },
-          "32": {
-            "action": ""
-          },
           "33": {
             "output": "“"
-          },
-          "34": {
-            "output": "ˆ"
           },
           "35": {
             "output": "∏"

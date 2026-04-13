@@ -1,5 +1,5 @@
 {
-  "keyboard_name": "Russian Typographic by Kirkouski v0.3",
+  "keyboard_name": "Russian Typographic by Kirkouski v0.4",
   "keyboard_group": "126",
   "keyboard_id": "-31553",
   "keyboard_maxout": "3",
@@ -1132,6 +1132,9 @@
           "0": {
             "output": "₽"
           },
+          "1": {
+            "output": "і"
+          },
           "2": {
             "output": "°"
           },
@@ -1159,11 +1162,14 @@
           "13": {
             "output": "✓"
           },
+          "14": {
+            "output": "ў"
+          },
           "15": {
             "output": "®"
           },
           "16": {
-            "output": "ѣ"
+            "output": "₴"
           },
           "17": {
             "output": "™"
@@ -1208,16 +1214,16 @@
             "output": "]"
           },
           "31": {
-            "output": "ѳ"
+            "output": "ї"
           },
           "32": {
-            "output": "ѵ"
+            "output": "ґ"
           },
           "33": {
             "output": "["
           },
           "34": {
-            "output": "і"
+            "output": "є"
           },
           "35": {
             "output": "′"
@@ -1442,6 +1448,9 @@
       },
       "4": {
         "keys": {
+          "1": {
+            "output": "І"
+          },
           "2": {
             "output": "⌀"
           },
@@ -1470,13 +1479,13 @@
             "output": "⌃"
           },
           "14": {
-            "output": "Ѵ"
+            "output": "Ў"
           },
           "15": {
             "action": "ring"
           },
           "16": {
-            "output": "Ѣ"
+            "action": ""
           },
           "17": {
             "output": "#"
@@ -1521,16 +1530,16 @@
             "output": "}"
           },
           "31": {
-            "output": "Ѳ"
+            "output": "Ї"
           },
           "32": {
-            "action": ""
+            "output": "Ґ"
           },
           "33": {
             "output": "{"
           },
           "34": {
-            "output": "І"
+            "output": "Є"
           },
           "35": {
             "output": "″"
@@ -1755,6 +1764,9 @@
       },
       "5": {
         "keys": {
+          "1": {
+            "output": "І"
+          },
           "2": {
             "output": "Î"
           },
@@ -1783,13 +1795,13 @@
             "output": "∑"
           },
           "14": {
-            "output": "Ѵ"
+            "output": "Ў"
           },
           "15": {
             "output": "®"
           },
           "16": {
-            "output": "Ѣ"
+            "action": ""
           },
           "17": {
             "output": "†"
@@ -1834,16 +1846,16 @@
             "output": "‘"
           },
           "31": {
-            "output": "Ѳ"
+            "output": "Ї"
           },
           "32": {
-            "action": ""
+            "output": "Ґ"
           },
           "33": {
             "output": "“"
           },
           "34": {
-            "output": "І"
+            "output": "Є"
           },
           "35": {
             "output": "∏"
