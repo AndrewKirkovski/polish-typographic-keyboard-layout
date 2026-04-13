@@ -138,6 +138,39 @@ def build_nsis():
         sys.exit(result.returncode)
 
 
+def build_inno():
+    """Build Inno Setup Windows installer (.exe)."""
+    iss_file = os.path.join(SCRIPT_DIR, "installer.iss")
+    if not os.path.isfile(iss_file):
+        print("SKIP: installer.iss not found")
+        return
+
+    iscc = None
+    for path in [
+        os.path.join(os.environ.get("ProgramFiles(x86)", ""), "Inno Setup 6", "ISCC.exe"),
+        os.path.join(os.environ.get("ProgramFiles", ""), "Inno Setup 6", "ISCC.exe"),
+    ]:
+        if os.path.isfile(path):
+            iscc = path
+            break
+
+    if not iscc:
+        print("SKIP: Inno Setup 6 not installed. Download from https://jrsoftware.org/isdl.php")
+        return
+
+    print(f"\n{'='*60}")
+    print("  Building Inno Setup installer")
+    print(f"{'='*60}\n")
+
+    result = subprocess.run(
+        [iscc, f"/DVERSION={VERSION}", iss_file],
+        cwd=SCRIPT_DIR,
+    )
+    if result.returncode != 0:
+        print("\nFAILED: Inno Setup compilation")
+        sys.exit(result.returncode)
+
+
 def build_pkg():
     """Build macOS .pkg installer (macOS only).
 
@@ -251,6 +284,7 @@ def main():
 
     # Build installers and zips
     if "windows" in platforms:
+        build_inno()
         build_nsis()
     if "macos" in platforms:
         build_pkg()
