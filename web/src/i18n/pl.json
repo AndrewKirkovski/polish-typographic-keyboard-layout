@@ -82,7 +82,7 @@
       "step2": "URUCHOM PONOWNIE KOMPUTER przed użyciem nowego układu. Instalator sam o to poprosi. Nie przełączaj się na układ Kirkouski Typographic w Win+Space przed restartem — Eksplorator się zawiesi jeśli DLL nie został jeszcze załadowany.",
       "step3": "Po restarcie przejdź do Ustawienia > Czas i język > Język i region > Klawiatura i dodaj nowy układ",
       "loginScreen": "Ekran logowania: Win+R > intl.cpl > Administracyjne > Kopiuj ustawienia > zaznacz obie opcje",
-      "uninstall": "Aby odinstalować: Ustawienia > Aplikacje > Zainstalowane aplikacje, znajdź Kirkouski Typographic i kliknij Odinstaluj. Po odinstalowaniu również wymagany jest restart.",
+      "uninstall": "Aby odinstalować: Ustawienia > Aplikacje > Zainstalowane aplikacje, znajdź Kirkouski Typographic i kliknij Odinstaluj. Dla instalacji z ZIP uruchom install.ps1 ponownie — wykryje instalację i zaproponuje usunięcie. Po każdej metodzie wymagany restart.",
       "hardCleanup": "Jeśli Eksplorator zawiesza się po restarcie (rzadko): uruchom {cmd} aby usunąć wszystkie ślady."
     },
     "macos": {

@@ -82,7 +82,7 @@
       "step2": "RESTART YOUR COMPUTER before using the new layout. The installer will prompt you. Don't switch to the Kirkouski Typographic layout in Win+Space until after the reboot — Explorer will crash if the DLL isn't loaded yet.",
       "step3": "After the reboot, go to Settings > Time & Language > Language & Region > Keyboard and add the new layout",
       "loginScreen": "To apply to login screen: Win+R > intl.cpl > Administrative > Copy settings > check both boxes",
-      "uninstall": "To uninstall: open Settings > Apps > Installed Apps, find Kirkouski Typographic, and click Uninstall. A reboot is required after uninstall too.",
+      "uninstall": "To uninstall: open Settings > Apps > Installed Apps, find Kirkouski Typographic, and click Uninstall. For ZIP installs, run install.ps1 again — it detects the install and offers removal. Reboot required after either method.",
       "hardCleanup": "If Explorer crashes after a reboot (rare): run {cmd} to remove all traces."
     },
     "macos": {
