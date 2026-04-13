@@ -49,11 +49,11 @@ Name: "us"; Description: "US+POL Typographic (Polish characters under English US
 
 [Files]
 Source: "dist\windows-v{#VERSION}\pltypo.dll"; DestDir: "{sys}"; Components: polish; \
-  Flags: ignoreversion restartreplace uninsrestartdelete 64bit
+  Flags: restartreplace uninsrestartdelete 64bit
 Source: "dist\windows-v{#VERSION}\rutypo.dll"; DestDir: "{sys}"; Components: russian; \
-  Flags: ignoreversion restartreplace uninsrestartdelete 64bit
+  Flags: restartreplace uninsrestartdelete 64bit
 Source: "dist\windows-v{#VERSION}\ustypo.dll"; DestDir: "{sys}"; Components: us; \
-  Flags: ignoreversion restartreplace uninsrestartdelete 64bit
+  Flags: restartreplace uninsrestartdelete 64bit
 
 [Code]
 const
@@ -120,7 +120,7 @@ end;
 function FindNextLayoutId: String;
 var
   Subkeys: TArrayOfString;
-  I, Id, UsedCount: Integer;
+  I, Id: Integer;
   IdStr: String;
   UsedIds: array[0..4095] of Boolean;
 begin
@@ -315,7 +315,7 @@ begin
     InitLayouts;
     for I := 0 to 2 do
     begin
-      if IsComponentSelected(Layouts[I].ComponentName) then
+      if WizardIsComponentSelected(Layouts[I].ComponentName) then
         InstallLayout(I);
     end;
   end;
