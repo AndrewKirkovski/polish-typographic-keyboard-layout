@@ -76,6 +76,7 @@ async function copyLink() {
           </a>
           {{ basedParts.after }}
         </p>
+        <p>{{ t('about.baseline') }}</p>
         <p>{{ t('about.license') }}</p>
 
         <div class="about-actions">

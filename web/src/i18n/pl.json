@@ -14,7 +14,7 @@
   },
   "hero": {
     "title": "Kirkouski Typographic",
-    "subtitle": "Znaki typograficzne na AltGr. Dla polskich, rosyjskich i angielskich klawiatur.",
+    "subtitle": "Półpauzy, cudzysłowy drukarskie, polskie ogonki (ą ć ę ł ń ó ś ź ż) i ponad 80 znaków typograficznych — wszystko na AltGr.",
     "scroll": "Zobacz układ"
   },
   "keyboard": {
@@ -97,6 +97,7 @@
     "title": "Na podstawie",
     "based": "{link} autorstwa Ilyi Birmana.",
     "birmanLink": "Typograficznego układu klawiatury",
+    "baseline": "Oparty na polskiej klawiaturze programisty QWERTY i rosyjskim ЙЦУКЕН — te same symbole w tych samych pozycjach we wszystkich wariantach.",
     "license": "Open source na licencji MIT.",
     "github": "Zobacz na GitHub",
     "support": "Wesprzyj autora",
@@ -111,6 +112,35 @@
     "reddit": "Udostępnij na Reddit",
     "copyLink": "Kopiuj link",
     "copied": "Skopiowano!"
+  },
+  "faq": {
+    "title": "FAQ",
+    "items": [
+      {
+        "q": "Jak wpisać półpauzę (myślnik) na klawiaturze w Windows?",
+        "a": "Naciśnij AltGr + - (minus). Układ Kirkouski Typographic umieszcza półpauzę (—), pauzę (–) i inne znaki typograficzne bezpośrednio na AltGr — bez kodów Alt."
+      },
+      {
+        "q": "Jak pisać po polsku na klawiaturze US English bez zmiany układu?",
+        "a": "Zainstaluj wariant US+POL Typographic. Rejestruje się jako English (US), więc Win+Space pozostaje krótki — polskie ogonki (ą ć ę ł ń ó ś ź ż) są na AltGr."
+      },
+      {
+        "q": "Czy to działa z polską klawiaturą programisty QWERTY?",
+        "a": "Tak. Polski wariant jest oparty na standardowym układzie polskiej klawiatury programisty QWERTY — wszystkie klawisze bazowe i shift są identyczne. Znaki typograficzne są dodane tylko na warstwach AltGr i Shift+AltGr."
+      },
+      {
+        "q": "Czy to doda nowy język wprowadzania do Win+Space?",
+        "a": "Wariant US+POL nie dodaje — rejestruje się pod English (US). Warianty polski i rosyjski dodają swoje języki, ponieważ Windows tego wymaga."
+      },
+      {
+        "q": "Czy to działa na macOS?",
+        "a": "Tak. Pobierz plik .bundle, umieść go w ~/Library/Keyboard Layouts/, usuń atrybut kwarantanny i wyloguj się/zaloguj ponownie. Na macOS układy klawiatury nie są powiązane z językiem systemu."
+      },
+      {
+        "q": "Czym różni się to od układu typograficznego Birmana?",
+        "a": "Ten układ dodaje polskie znaki diakrytyczne (ą ć ę ł ń ó ś ź ż) na AltGr i przesuwa niektóre symbole dla lepszej spójności polsko-rosyjskiej. Pozycje znaków typograficznych są kompatybilne z układem Birmana."
+      }
+    ]
   },
   "theme": {
     "light": "Jasny",

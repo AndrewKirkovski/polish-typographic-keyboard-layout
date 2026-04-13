@@ -14,7 +14,7 @@
   },
   "hero": {
     "title": "Kirkouski Typographic",
-    "subtitle": "Typographic symbols on AltGr. For Polish, Russian, and English keyboards.",
+    "subtitle": "Em dashes, curly quotes, Polish ogonki (ą ć ę ł ń ó ś ź ż), and 80+ typographic symbols — all on AltGr.",
     "scroll": "Explore the layout"
   },
   "keyboard": {
@@ -97,6 +97,7 @@
     "title": "Based on",
     "based": "{link} by Ilya Birman.",
     "birmanLink": "Typography Keyboard Layout",
+    "baseline": "Built on Polish Programmers QWERTY and Russian ЙЦУКЕН — same symbols in the same positions across all variants.",
     "license": "Open source under the MIT License.",
     "github": "View on GitHub",
     "support": "Support the author",
@@ -111,6 +112,35 @@
     "reddit": "Share on Reddit",
     "copyLink": "Copy link",
     "copied": "Copied!"
+  },
+  "faq": {
+    "title": "FAQ",
+    "items": [
+      {
+        "q": "How do I type an em dash on a Polish keyboard in Windows?",
+        "a": "Press AltGr + - (minus key). The Kirkouski Typographic layout puts em dash (—), en dash (–), and other typographic symbols directly on AltGr — no Alt codes needed."
+      },
+      {
+        "q": "How do I type Polish characters on a US keyboard without switching layouts?",
+        "a": "Install the US+POL Typographic variant. It registers under English (US) so Win+Space stays clean — Polish ogonki (ą ć ę ł ń ó ś ź ż) are on AltGr."
+      },
+      {
+        "q": "Does this work with Polish Programmers QWERTY?",
+        "a": "Yes. The Polish variant is built on the standard Polish Programmers QWERTY layout — all base and shift keys are identical. Typographic symbols are added on AltGr and Shift+AltGr layers only."
+      },
+      {
+        "q": "Will this add a new input language to Win+Space?",
+        "a": "The US+POL variant does not — it registers under English (US). The standard Polish and Russian variants do add their respective input language, as Windows requires."
+      },
+      {
+        "q": "Does this work on macOS?",
+        "a": "Yes. Download the .bundle, place it in ~/Library/Keyboard Layouts/, clear the quarantine xattr, and log out/in. macOS keyboard layouts are not tied to system language."
+      },
+      {
+        "q": "What is the difference between this and Birman's Typography Layout?",
+        "a": "This layout adds Polish diacritics (ą ć ę ł ń ó ś ź ż) on AltGr and repositions some symbols for a more consistent Polish/Russian experience. The typographic symbol positions are compatible with Birman's layout."
+      }
+    ]
   },
   "theme": {
     "light": "Light",

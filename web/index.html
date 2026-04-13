@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Kirkouski Typographic — Polish characters on AltGr without an extra input language</title>
-    <meta name="description" content="Type Polish characters via AltGr without adding Polish as a separate input language on Windows. Plus em dashes, curly quotes, currency, arrows, math, and 80+ typographic symbols. Polish, Russian, and US+POL variants for Windows and macOS." />
-    <meta name="keywords" content="keyboard layout, typographic, typography, Polish keyboard, Russian keyboard, English keyboard, US keyboard Polish characters, AltGr, em dash, curly quotes, Windows keyboard layout, macOS keylayout, Birman, Kirkouski, typograficzna klawiatura, типографская раскладка" />
+    <meta name="description" content="Type em dashes, curly quotes, Polish ogonki (ą ć ę ł ń ó ś ź ż) and 80+ typographic symbols on Windows and macOS — without adding Polish or Russian as extra input languages. Birman-style Typography Layout for Polish Programmers QWERTY, Russian ЙЦУКЕН, and US English." />
+    <meta name="keywords" content="keyboard layout, typographic, typography, Polish keyboard, Russian keyboard, English keyboard, US keyboard Polish characters, AltGr, em dash, curly quotes, Windows keyboard layout, macOS keylayout, Birman, Kirkouski, ogonki, polskie znaki, półpauza, cudzysłów drukarski, typograficzny układ klawiatury, Polish Programmers layout, QWERTY Polish, Win+Space, длинное тире, ёлочки, неразрывный пробел, ЙЦУКЕН типографская, typograficzna klawiatura, типографская раскладка" />
     <meta name="author" content="Andrew Kirkouski" />
     <link rel="canonical" href="https://polish-typographic-keyboard-layout.pages.dev/" />
 
@@ -51,6 +51,39 @@
       "downloadUrl": "https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/releases/latest",
       "softwareVersion": "%VERSION%",
       "isBasedOn": { "@type": "SoftwareApplication", "name": "Ilya Birman Typography Layout", "url": "https://ilyabirman.ru/typography-layout/" }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do I type an em dash on a Polish keyboard in Windows?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Press AltGr + - (minus key). The Kirkouski Typographic layout puts em dash, en dash, and other typographic symbols directly on AltGr — no Alt codes needed." }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I type Polish characters on a US keyboard without switching layouts?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Install the US+POL Typographic variant. It registers under English (US) so Win+Space stays clean — Polish ogonki (ą ć ę ł ń ó ś ź ż) are on AltGr." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this work with Polish Programmers QWERTY?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. The Polish variant is built on the standard Polish Programmers QWERTY layout. Typographic symbols are added on AltGr and Shift+AltGr layers only." }
+        },
+        {
+          "@type": "Question",
+          "name": "Will this add a new input language to Win+Space?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The US+POL variant does not — it registers under English (US). The standard Polish and Russian variants do add their respective input language." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this work on macOS?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Download the .bundle, place it in ~/Library/Keyboard Layouts/, clear the quarantine xattr, and log out/in. macOS keyboard layouts are not tied to system language." }
+        }
+      ]
     }
     </script>
   </head>

@@ -1,5 +1,5 @@
-// Build an SVG string for one icon variant. The "K" glyph is baked in as a
-// vector path so the resulting SVG has zero font dependency at render time.
+// Build an SVG string for one icon variant. Glyphs are baked in as vector
+// paths so the resulting SVG has zero font dependency at render time.
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { extractGlyph } from './extract-glyph.mjs';
@@ -7,13 +7,12 @@ import { extractGlyph } from './extract-glyph.mjs';
 const __dir = dirname(fileURLToPath(import.meta.url));
 const FONT = resolve(__dir, '../fonts/DMSerifDisplay-Italic.ttf');
 
-// Canonical 1024×1024 user-unit space; resvg rescales when rasterising.
 const SIZE = 1024;
-const RADIUS = 192;     // 96 px @ 512 base, scaled 2×
-const LETTER_EM = 920;  // matches the original favicon ratio (340/512 ≈ 0.66 of canvas → ~680 at 1024;
-                        //   opentype.js em-square is larger than the visible cap height,
-                        //   so we tune down to ~0.9× to land at the same optical size)
+const RADIUS = 192;
+const LETTER_EM = 600;
 const LETTER_BASELINE_NUDGE = 20;
+const LETTER_GAP = 20;
+const ITALIC_SHIFT = -16;
 
 /**
  * @param {{ gradient: [string,string], letter: string }} variant
@@ -21,16 +20,35 @@ const LETTER_BASELINE_NUDGE = 20;
  */
 export function buildIconSvg(variant) {
   const [c1, c2] = variant.gradient;
-  const { d, bbox } = extractGlyph(FONT, variant.letter, LETTER_EM);
+  const chars = [...variant.letter];
 
-  // Centre the glyph optically inside the 1024 box. Italic glyphs lean right,
-  // so we shift left a touch from pure geometric centre. Round to 3 decimals
-  // so the committed SVG diffs stay clean if the glyph geometry shifts by an
-  // imperceptible fraction.
-  const glyphW = bbox.x2 - bbox.x1;
-  const glyphH = bbox.y2 - bbox.y1;
-  const tx = +((SIZE - glyphW) / 2 - bbox.x1 - 24).toFixed(3);
-  const ty = +((SIZE - glyphH) / 2 - bbox.y1 + LETTER_BASELINE_NUDGE).toFixed(3);
+  const glyphs = chars.map(ch => extractGlyph(FONT, ch, LETTER_EM));
+
+  let totalW = 0;
+  for (let i = 0; i < glyphs.length; i++) {
+    totalW += glyphs[i].advance;
+    if (i < glyphs.length - 1) totalW += LETTER_GAP;
+  }
+
+  let maxTop = Infinity, maxBottom = -Infinity;
+  for (const g of glyphs) {
+    if (g.bbox.y1 < maxTop) maxTop = g.bbox.y1;
+    if (g.bbox.y2 > maxBottom) maxBottom = g.bbox.y2;
+  }
+  const glyphH = maxBottom - maxTop;
+
+  const startX = (SIZE - totalW) / 2 + ITALIC_SHIFT;
+  const ty = +((SIZE - glyphH) / 2 - maxTop + LETTER_BASELINE_NUDGE).toFixed(3);
+
+  let paths = '';
+  let curX = startX;
+  for (let i = 0; i < glyphs.length; i++) {
+    const g = glyphs[i];
+    const gx = +(curX).toFixed(3);
+    paths += `\n      <path d="${g.d}" fill="#ffffff" transform="translate(${gx}, ${ty})"/>`;
+    curX += g.advance;
+    if (i < glyphs.length - 1) curX += LETTER_GAP;
+  }
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${SIZE}" height="${SIZE}" viewBox="0 0 ${SIZE} ${SIZE}">
   <defs>
@@ -42,8 +60,8 @@ export function buildIconSvg(variant) {
       <rect width="${SIZE}" height="${SIZE}" rx="${RADIUS}" ry="${RADIUS}"/>
     </clipPath>
     <filter id="letterShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="12"/>
-      <feOffset dx="0" dy="8"/>
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
+      <feOffset dx="0" dy="6"/>
       <feComponentTransfer><feFuncA type="linear" slope="0.18"/></feComponentTransfer>
       <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
@@ -52,8 +70,7 @@ export function buildIconSvg(variant) {
     <rect width="${SIZE}" height="${SIZE}" fill="url(#bg)"/>
     <rect width="${SIZE}" height="6" fill="rgba(255,255,255,0.18)"/>
     <rect y="${SIZE - 6}" width="${SIZE}" height="6" fill="rgba(0,0,0,0.12)"/>
-    <g transform="translate(${tx}, ${ty})" filter="url(#letterShadow)">
-      <path d="${d}" fill="#ffffff"/>
+    <g filter="url(#letterShadow)">${paths}
     </g>
   </g>
 </svg>

@@ -9,6 +9,7 @@ import KeyboardSection from './components/KeyboardSection.vue'
 import WhySection from './components/WhySection.vue'
 import DownloadSection from './components/DownloadSection.vue'
 import InstallSection from './components/InstallSection.vue'
+import FaqSection from './components/FaqSection.vue'
 import AboutSection from './components/AboutSection.vue'
 
 const { init } = useLayout()
@@ -79,6 +80,7 @@ onMounted(async () => {
       <HeroSection />
       <KeyboardSection />
       <WhySection />
+      <FaqSection />
       <DownloadSection />
       <InstallSection />
       <AboutSection />

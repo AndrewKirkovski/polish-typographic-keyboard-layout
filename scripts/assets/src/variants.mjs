@@ -3,17 +3,17 @@
 export const VARIANTS = {
   polish: {
     displayName: 'Polish – Kirkouski Typographic',
-    letter: 'K',
+    letter: 'PL',
     gradient: ['#d4403a', '#b82e28'],
   },
   russian: {
     displayName: 'Russian – Kirkouski Typographic',
-    letter: 'K',
+    letter: 'RU',
     gradient: ['#3a7fd4', '#2860b8'],
   },
   uspolish: {
     displayName: 'US+Polish – Kirkouski Typographic',
-    letter: 'K',
+    letter: 'US',
     gradient: ['#a02822', '#6f1814'],
   },
 };
@@ -30,7 +30,6 @@ export const ICNS_ENTRIES = [
   { type: 'ic08', size: 256 },   // 256×256
   { type: 'ic14', size: 512 },   // 256×256@2x
   { type: 'ic09', size: 512 },   // 512×512
-  { type: 'ic10', size: 1024 },  // 512×512@2x
 ];
 
 export const UNIQUE_ICNS_SIZES = [...new Set(ICNS_ENTRIES.map((e) => e.size))];
