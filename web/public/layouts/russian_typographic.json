@@ -77,7 +77,11 @@
         "name": "CHECK MARK",
         "source": "BI"
       },
-      "E": null,
+      "E": {
+        "char": "ў",
+        "name": "CYRILLIC SMALL LETTER SHORT U",
+        "source": "RU"
+      },
       "R": {
         "char": "®",
         "name": "REGISTERED SIGN",
@@ -89,23 +93,23 @@
         "source": "BI"
       },
       "Y": {
-        "char": "ѣ",
-        "name": "CYRILLIC SMALL LETTER YAT",
+        "char": "₴",
+        "name": "HRYVNIA SIGN",
         "source": "RU"
       },
       "U": {
-        "char": "ѵ",
-        "name": "CYRILLIC SMALL LETTER IZHITSA",
+        "char": "ґ",
+        "name": "CYRILLIC SMALL LETTER GHE WITH UPTURN",
         "source": "RU"
       },
       "I": {
-        "char": "і",
-        "name": "CYRILLIC SMALL LETTER BYELORUSSIAN-UKRAINIAN I",
+        "char": "є",
+        "name": "CYRILLIC SMALL LETTER UKRAINIAN IE",
         "source": "RU"
       },
       "O": {
-        "char": "ѳ",
-        "name": "CYRILLIC SMALL LETTER FITA",
+        "char": "ї",
+        "name": "CYRILLIC SMALL LETTER YI",
         "source": "RU"
       },
       "P": {
@@ -128,7 +132,11 @@
         "name": "RUBLE SIGN",
         "source": "RU"
       },
-      "S": null,
+      "S": {
+        "char": "і",
+        "name": "CYRILLIC SMALL LETTER BYELORUSSIAN-UKRAINIAN I",
+        "source": "RU"
+      },
       "D": {
         "char": "°",
         "name": "DEGREE SIGN",
@@ -287,8 +295,8 @@
         "source": "BI"
       },
       "E": {
-        "char": "Ѵ",
-        "name": "CYRILLIC CAPITAL LETTER IZHITSA",
+        "char": "Ў",
+        "name": "CYRILLIC CAPITAL LETTER SHORT U",
         "source": "RU"
       },
       "R": {
@@ -302,23 +310,23 @@
         "source": "BI"
       },
       "Y": {
-        "char": "Ѣ",
-        "name": "CYRILLIC CAPITAL LETTER YAT",
-        "source": "RU"
-      },
-      "U": {
         "char": "dk:breve",
         "name": "dead key: breve",
         "source": "MOVE"
       },
+      "U": {
+        "char": "Ґ",
+        "name": "CYRILLIC CAPITAL LETTER GHE WITH UPTURN",
+        "source": "RU"
+      },
       "I": {
-        "char": "І",
-        "name": "CYRILLIC CAPITAL LETTER BYELORUSSIAN-UKRAINIAN I",
+        "char": "Є",
+        "name": "CYRILLIC CAPITAL LETTER UKRAINIAN IE",
         "source": "RU"
       },
       "O": {
-        "char": "Ѳ",
-        "name": "CYRILLIC CAPITAL LETTER FITA",
+        "char": "Ї",
+        "name": "CYRILLIC CAPITAL LETTER YI",
         "source": "RU"
       },
       "P": {
@@ -337,7 +345,11 @@
         "source": "BI"
       },
       "A": null,
-      "S": null,
+      "S": {
+        "char": "І",
+        "name": "CYRILLIC CAPITAL LETTER BYELORUSSIAN-UKRAINIAN I",
+        "source": "RU"
+      },
       "D": {
         "char": "⌀",
         "name": "DIAMETER SIGN",

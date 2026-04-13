@@ -94,11 +94,7 @@
       },
       "Y": null,
       "U": null,
-      "I": {
-        "char": "і",
-        "name": "CYRILLIC SMALL LETTER BYELORUSSIAN-UKRAINIAN I",
-        "source": "BI"
-      },
+      "I": null,
       "O": {
         "char": "ó",
         "name": "LATIN SMALL LETTER O WITH ACUTE",
@@ -321,17 +317,13 @@
         "name": "NUMBER SIGN",
         "source": "BI"
       },
-      "Y": null,
-      "U": {
+      "Y": {
         "char": "dk:breve",
         "name": "dead key: breve",
         "source": "MOVE"
       },
-      "I": {
-        "char": "І",
-        "name": "CYRILLIC CAPITAL LETTER BYELORUSSIAN-UKRAINIAN I",
-        "source": "BI"
-      },
+      "U": null,
+      "I": null,
       "O": {
         "char": "Ó",
         "name": "LATIN CAPITAL LETTER O WITH ACUTE",
