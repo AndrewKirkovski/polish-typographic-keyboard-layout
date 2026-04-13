@@ -101,42 +101,6 @@ def build_klc(layouts):
     run(["build_klc.py"] + layouts, "Building .klc files for MSKLC")
 
 
-def build_nsis():
-    """Build NSIS Windows installer (.exe)."""
-    nsi_file = os.path.join(SCRIPT_DIR, "installer.nsi")
-    if not os.path.isfile(nsi_file):
-        print("SKIP: installer.nsi not found")
-        return
-
-    # Find makensis
-    makensis = None
-    for path in [
-        os.path.join(os.environ.get("ProgramFiles(x86)", ""), "NSIS", "makensis.exe"),
-        os.path.join(os.environ.get("ProgramFiles", ""), "NSIS", "makensis.exe"),
-    ]:
-        if os.path.isfile(path):
-            makensis = path
-            break
-
-    if not makensis:
-        print("SKIP: NSIS not installed. Install with: winget install NSIS.NSIS")
-        return
-
-    print(f"\n{'='*60}")
-    print("  Building NSIS installer")
-    print(f"{'='*60}\n")
-
-    # NSIS VIProductVersion needs four comma-separated parts. Pad short
-    # versions like "0.3" -> "0.3.0.0".
-    version_tuple = ".".join((VERSION.split(".") + ["0", "0", "0", "0"])[:4])
-    result = subprocess.run(
-        [makensis, f"/DVERSION={VERSION}", f"/DVERSION_TUPLE={version_tuple}", nsi_file],
-        cwd=SCRIPT_DIR,
-    )
-    if result.returncode != 0:
-        print("\nFAILED: NSIS compilation")
-        sys.exit(result.returncode)
-
 
 def build_inno():
     """Build Inno Setup Windows installer (.exe)."""
@@ -285,7 +249,6 @@ def main():
     # Build installers and zips
     if "windows" in platforms:
         build_inno()
-        build_nsis()
     if "macos" in platforms:
         build_pkg()
     build_zips()

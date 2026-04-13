@@ -82,12 +82,12 @@ The recommended path is the **`Kirkouski Typographic.bundle`** that ships in the
 | Python 3.10+ | All build scripts | [python.org](https://www.python.org/downloads/) |
 | Visual Studio Build Tools | Windows DLL compilation | [visualstudio.microsoft.com](https://visualstudio.microsoft.com/visual-cpp-build-tools/) |
 | Windows SDK | Headers for kbd.h | Included with VS Build Tools |
-| NSIS 3.x | Windows .exe installer | `winget install NSIS.NSIS` |
+| Inno Setup 6 | Windows .exe installer | `winget install JRSoftware.InnoSetup` |
 | Node.js 18+ / pnpm | Web frontend + asset pipeline | [nodejs.org](https://nodejs.org/) |
 
 When installing VS Build Tools, select the **"Desktop development with C++"** workload. This provides `cl.exe`, `link.exe`, `rc.exe`, and the Windows SDK.
 
-NSIS is optional — if not installed, `build.py` skips the .exe installer and produces only the zip.
+Inno Setup is optional — if not installed, `build.py` skips the .exe installer and produces only the zip.
 
 No external Python packages are required — the toolchain uses only the Python standard library.
 
@@ -153,7 +153,7 @@ build_kbd_c.py          # Full JSON → C source (Windows DLL pipeline)
 compile_kbd.py          # MSVC compiler wrapper (C → DLL)
 build_klc.py            # Full JSON → .klc (MSKLC legacy format)
 layout_adapter.py       # Shared module: full JSON → flat layers for Windows generators
-installer.nsi           # NSIS installer script (reads VERSION via /DVERSION)
+installer.iss           # Inno Setup installer (KLID/Layout Id allocation, restartreplace)
 install.ps1             # Windows PowerShell installer/uninstaller
 
 # Dev/QA tools
