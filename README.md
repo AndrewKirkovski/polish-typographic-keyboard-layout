@@ -99,7 +99,7 @@ No external Python packages are required — the toolchain uses only the Python 
 python build.py
 
 # Build specific platform
-python build.py windows          # DLLs + install.ps1 + NSIS .exe
+python build.py windows          # DLLs + install.ps1 + Inno Setup .exe
 python build.py macos            # .keylayout files + .bundle
 python build.py klc              # .klc files (for MSKLC)
 python build.py assets           # icons, web favicons, OG image (needs pnpm)
@@ -114,7 +114,7 @@ The `assets` target shells out to `pnpm --dir scripts/assets build`. Outputs (ic
 
 ### What the pipeline does
 
-**Windows** — JSON layout → C source → MSVC-compiled DLL → NSIS installer + manual ZIP:
+**Windows** — JSON layout → C source → MSVC-compiled DLL → Inno Setup installer + manual ZIP:
 
 ![Windows pipeline](assets/diagrams/pipeline-windows.svg)
 
@@ -132,7 +132,7 @@ The `assets` target shells out to `pnpm --dir scripts/assets build`. Outputs (ic
 
 | File | Description |
 |------|-------------|
-| `kirkouski-typographic-vX.Y-windows-setup.exe` | NSIS installer (Add/Remove Programs, UAC) |
+| `kirkouski-typographic-vX.Y-windows-setup.exe` | Inno Setup installer (Add/Remove Programs, UAC) |
 | `kirkouski-typographic-vX.Y-windows.zip` | DLLs + install.ps1 for manual install |
 | `kirkouski-typographic-vX.Y-macos.zip` | `.bundle` (primary) + loose `.keylayout` files (fallback) |
 | `kirkouski-typographic-vX.Y-macos.pkg` | macOS installer (built on macOS only) |

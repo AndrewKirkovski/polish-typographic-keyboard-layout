@@ -225,9 +225,9 @@ def main():
             print(f"Unknown argument: {arg}")
             print("Usage: python build.py [windows|macos|klc|assets] [polish|russian|us]")
             print("")
-            print("Builds DLLs, keylayouts + .bundle, NSIS installer, .pkg (macOS only), and zip archives.")
+            print("Builds DLLs, keylayouts + .bundle, Inno Setup installer, .pkg (macOS only), and zip archives.")
             print("`assets` (re)generates icons, favicons, and OG image via the scripts/assets pipeline.")
-            print("Prerequisites: Python 3.10+, MSVC Build Tools (windows), NSIS (windows installer), pnpm (assets)")
+            print("Prerequisites: Python 3.10+, MSVC Build Tools (windows), Inno Setup 6 (windows installer), pnpm (assets)")
             sys.exit(1)
 
     if not platforms:

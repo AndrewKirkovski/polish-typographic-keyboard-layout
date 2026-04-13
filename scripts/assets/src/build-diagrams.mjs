@@ -99,17 +99,17 @@ const DIAGRAMS = {
     JSON("Layout JSON")
     C["build_kbd_c.py"]
     DLL["compile_kbd.py → DLL"]
-    NSIS(["NSIS .exe installer"])
+    INNO(["Inno Setup .exe installer"])
     ZIP(["zip + install.ps1"])
 
     JSON --> C --> DLL
-    DLL --> NSIS
+    DLL --> INNO
     DLL --> ZIP
 
     style JSON ${SOURCE}
     style C ${PROCESS}
     style DLL ${PROCESS}
-    style NSIS ${OUTPUT}
+    style INNO ${OUTPUT}
     style ZIP ${OUTPUT}
 `,
 
