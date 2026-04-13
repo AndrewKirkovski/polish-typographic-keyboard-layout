@@ -2,6 +2,8 @@
 
 > **[Interactive Layout Preview & Downloads](https://polish-typographic-keyboard-layout.pages.dev/)** — explore the layout, download installers, and read installation guides.
 
+> **This project is in active development.** Versions 0.x may contain bugs or breaking changes between releases. If you encounter any issues, please [report them on GitHub Issues](../../issues).
+
 Custom keyboard layouts for **Windows** and **macOS** that add typographic symbols (em dash, curly quotes, copyright, euro, etc.) accessible via AltGr (Right Alt) on top of standard Polish Programmers and Russian ЙЦУКЕН layouts.
 
 **Want Polish typographic symbols but keep English as your system language?** The **US+POL Typographic** variant gives you the same layout registered under English (US), so you don't need to add Polish as an input language in Windows.
@@ -141,21 +143,30 @@ The `assets` target shells out to `pnpm --dir scripts/assets build`. Outputs (ic
 
 ```
 VERSION                 # Single source of truth — bumping this propagates everywhere
+
+# Build pipeline
 build.py                # Build orchestrator (single entry point)
-build_kbd_c.py          # JSON -> C source generator (Windows DLL pipeline)
-compile_kbd.py          # MSVC compiler wrapper (C -> DLL)
-build_klc.py            # JSON -> KLC generator
-build_keylayout.py      # JSON -> keylayout generator (macOS), overrides keyboard id+name
+extract_base.py         # Parse Birman keylayouts + apply overlay JSONs → *_full.json
+build_keylayout.py      # Full JSON → .keylayout XML (macOS)
 build_macos_bundle.py   # Wrap .keylayout + .icns into Kirkouski Typographic.bundle
+build_kbd_c.py          # Full JSON → C source (Windows DLL pipeline)
+compile_kbd.py          # MSVC compiler wrapper (C → DLL)
+build_klc.py            # Full JSON → .klc (MSKLC legacy format)
+layout_adapter.py       # Shared module: full JSON → flat layers for Windows generators
 installer.nsi           # NSIS installer script (reads VERSION via /DVERSION)
 install.ps1             # Windows PowerShell installer/uninstaller
 
-extract_base.py         # One-time: extract full layout from Birman originals
+# Dev/QA tools
+diff_keylayouts.py      # Compare two keylayouts, decode keycodes to key labels
+validate_keylayout.py   # Check for orphan dead keys, missing terminators, leaks
 
-polish_typographic.json       # Polish layout definition (overlay)
-russian_typographic.json      # Russian layout definition (overlay)
-polish_typographic_full.json  # Complete macOS layout structure
-russian_typographic_full.json # Complete macOS layout structure
+# Layout data — source of truth
+polish_typographic.json       # Polish overlay (what we change from Birman)
+russian_typographic.json      # Russian overlay (what we change from Birman)
+
+# Layout data — generated (regenerable via extract_base.py)
+polish_typographic_full.json  # Complete merged layout
+russian_typographic_full.json # Complete merged layout
 
 assets/icons/           # Generated icon assets (committed; rebuilt by scripts/assets)
 scripts/assets/         # Node/Playwright pipeline for icons + favicons + OG image
@@ -185,13 +196,40 @@ The app loads layout JSONs from the project root (via a Vite plugin in dev, copi
 
 ## Regenerating Full JSONs
 
-The `*_full.json` files contain the complete macOS keylayout structure extracted from the original Birman `.keylayout` files with our changes applied on top. To regenerate them:
+The `*_full.json` files contain the complete macOS keylayout structure — Birman's base layout with Kirkouski overlay changes merged in. After editing an overlay JSON (`polish_typographic.json` or `russian_typographic.json`), regenerate and validate:
 
-1. Download the original layouts from [ilyabirman.ru/typography-layout](https://ilyabirman.ru/typography-layout/)
-2. Place `English – Ilya Birman Typography.keylayout` and `Russian – Ilya Birman Typography.keylayout` in the project root
-3. Run: `python extract_base.py`
+```bash
+python extract_base.py                              # merge overlays → *_full.json + dist/*.keylayout
+python build_keylayout.py                           # rebuild .keylayout XML
+python validate_keylayout.py dist/*.keylayout       # check for dead key issues
+python diff_keylayouts.py <old.keylayout> <new.keylayout>  # review changes
+```
 
-This is only needed if you modify the overlay JSONs and want to update the macOS output.
+The original Birman `.keylayout` files must be present in the project root (they are committed to the repo).
+
+## Dev Tools
+
+### Diff
+
+Compare two keylayout files (XML or full JSON) and list all differences with decoded key labels:
+
+```bash
+python diff_keylayouts.py old.keylayout new.keylayout           # full diff
+python diff_keylayouts.py old.keylayout new.keylayout --layer 3  # altgr only
+python diff_keylayouts.py old.keylayout new.keylayout --keys-only # skip actions
+python diff_keylayouts.py old.json new.json --json               # JSON output
+```
+
+### Validator
+
+Check keylayout files for issues that would cause silent failures on macOS:
+
+```bash
+python validate_keylayout.py dist/*.keylayout
+python validate_keylayout.py dist/*.keylayout --errors-only
+```
+
+Checks: orphan dead key states (fatal on macOS), missing terminators, multi-character output leaks, undefined action references, unused actions.
 
 ## Troubleshooting
 

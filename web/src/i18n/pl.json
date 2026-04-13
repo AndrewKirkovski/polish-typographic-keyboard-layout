@@ -8,6 +8,10 @@
   "a11y": {
     "skipToMain": "Przejdź do treści"
   },
+  "banner": {
+    "development": "Projekt jest aktywnie rozwijany. Wersje 0.x mogą być niestabilne.",
+    "issues": "Zgłoś problem na GitHubie"
+  },
   "hero": {
     "title": "Kirkouski Typographic",
     "subtitle": "Znaki typograficzne na AltGr. Dla polskich, rosyjskich i angielskich klawiatur.",

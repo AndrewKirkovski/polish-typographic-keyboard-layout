@@ -48,7 +48,15 @@ def esc_attr(text):
 
 
 def esc_output(text):
-    """Escape output value, converting PUA placeholders and control chars back to &#x refs."""
+    """Escape output value for a .keylayout attribute.
+
+    IMPORTANT — Apple's keylayout parser does NOT honour the standard XML
+    named entities `&lt;` / `&gt;` / `&amp;` / `&quot;` inside attribute
+    values. Emitting them produces keys that silently don't type at all
+    (verified against Birman's Typography Layout on macOS 26 — Birman uses
+    numeric refs exclusively and all its keys work; we used named entities
+    and `<`/`>` broke). Every escape here MUST be a numeric char ref.
+    """
     if not text:
         return ""
     result = []
@@ -60,14 +68,8 @@ def esc_output(text):
         elif cp < 0x20 or cp == 0x7F:
             # Control chars (including TAB, CR, LF) — encode as &#x refs
             result.append(f"&#x{cp:04X};")
-        elif ch == "&":
-            result.append("&amp;")
-        elif ch == "<":
-            result.append("&lt;")
-        elif ch == ">":
-            result.append("&gt;")
-        elif ch == '"':
-            result.append("&quot;")
+        elif ch in ("&", "<", ">", '"'):
+            result.append(f"&#x{cp:04X};")
         else:
             result.append(ch)
     return "".join(result)

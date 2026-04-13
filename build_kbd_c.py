@@ -1,7 +1,8 @@
-"""Generate Windows keyboard layout C source files from layout JSON definitions.
+"""Generate Windows keyboard layout C source files from *_full.json definitions.
 
-Produces .c, .rc, and .def files that can be compiled with MSVC into a keyboard
-layout DLL — no MSKLC dependency needed.
+Reads the merged full JSON layouts (produced by extract_base.py) and generates
+.c, .rc, and .def files that can be compiled with MSVC into a keyboard layout
+DLL — no MSKLC dependency needed.
 
 Usage:
     python build_kbd_c.py                # generates all layouts
@@ -14,6 +15,8 @@ Output goes to build/<kbd_name>.c, build/<kbd_name>.rc, build/<kbd_name>.def
 import json
 import sys
 import os
+
+from layout_adapter import KEY_MAP, extract_layers_from_full_json
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -29,137 +32,10 @@ VERSION = _read_version()
 _VER_PARTS = (VERSION.split(".") + ["0", "0", "0", "0"])[:4]
 VERSION_TUPLE = ",".join(_VER_PARTS)
 
-# ── Key mapping: key_id → (scancode_hex, VK_name, is_letter) ──────────────
-KEY_MAP = {
-    "`":  ("29", "OEM_3",      False),
-    "1":  ("02", "1",           False),
-    "2":  ("03", "2",           False),
-    "3":  ("04", "3",           False),
-    "4":  ("05", "4",           False),
-    "5":  ("06", "5",           False),
-    "6":  ("07", "6",           False),
-    "7":  ("08", "7",           False),
-    "8":  ("09", "8",           False),
-    "9":  ("0a", "9",           False),
-    "0":  ("0b", "0",           False),
-    "-":  ("0c", "OEM_MINUS",   False),
-    "=":  ("0d", "OEM_PLUS",    False),
-    "Q":  ("10", "Q",           True),
-    "W":  ("11", "W",           True),
-    "E":  ("12", "E",           True),
-    "R":  ("13", "R",           True),
-    "T":  ("14", "T",           True),
-    "Y":  ("15", "Y",           True),
-    "U":  ("16", "U",           True),
-    "I":  ("17", "I",           True),
-    "O":  ("18", "O",           True),
-    "P":  ("19", "P",           True),
-    "[":  ("1a", "OEM_4",       False),
-    "]":  ("1b", "OEM_6",       False),
-    "A":  ("1e", "A",           True),
-    "S":  ("1f", "S",           True),
-    "D":  ("20", "D",           True),
-    "F":  ("21", "F",           True),
-    "G":  ("22", "G",           True),
-    "H":  ("23", "H",           True),
-    "J":  ("24", "J",           True),
-    "K":  ("25", "K",           True),
-    "L":  ("26", "L",           True),
-    ";":  ("27", "OEM_1",       False),
-    "'":  ("28", "OEM_7",       False),
-    "\\": ("2b", "OEM_5",       False),
-    "Z":  ("2c", "Z",           True),
-    "X":  ("2d", "X",           True),
-    "C":  ("2e", "C",           True),
-    "V":  ("2f", "V",           True),
-    "B":  ("30", "B",           True),
-    "N":  ("31", "N",           True),
-    "M":  ("32", "M",           True),
-    ",":  ("33", "OEM_COMMA",   False),
-    ".":  ("34", "OEM_PERIOD",  False),
-    "/":  ("35", "OEM_2",       False),
-}
-
-# Dead key char hex values (used for WCH_DEAD continuation rows and DEADTRANS)
-DEAD_KEY_CHARS = {
-    "grave":        0x0060,
-    "acute":        0x00B4,
-    "acute-2":      0x00B4,
-    "circumflex":   0x005E,
-    "tilde":        0x02DC,
-    "diaeresis":    0x00A8,
-    "ring":         0x02DA,
-    "cedilla":      0x00B8,
-    "caron":        0x02C7,
-    "breve":        0x02D8,
-    "double-acute": 0x02DD,
-}
-
-# Dead key compositions: dk_char_code → [(base_char, result_char), ...]
-DEAD_KEY_COMPOSITIONS = {
-    0x0060: [  # grave
-        (0x0061, 0x00E0), (0x0065, 0x00E8), (0x0069, 0x00EC), (0x006F, 0x00F2), (0x0075, 0x00F9),
-        (0x0041, 0x00C0), (0x0045, 0x00C8), (0x0049, 0x00CC), (0x004F, 0x00D2), (0x0055, 0x00D9),
-        (0x0020, 0x0060),
-    ],
-    0x00B4: [  # acute
-        (0x0061, 0x00E1), (0x0065, 0x00E9), (0x0069, 0x00ED), (0x006F, 0x00F3), (0x0075, 0x00FA),
-        (0x0063, 0x0107), (0x006C, 0x013A), (0x006E, 0x0144), (0x0072, 0x0155), (0x0073, 0x015B),
-        (0x007A, 0x017A), (0x0079, 0x00FD),
-        (0x0041, 0x00C1), (0x0045, 0x00C9), (0x0049, 0x00CD), (0x004F, 0x00D3), (0x0055, 0x00DA),
-        (0x0043, 0x0106), (0x004C, 0x0139), (0x004E, 0x0143), (0x0052, 0x0154), (0x0053, 0x015A),
-        (0x005A, 0x0179), (0x0059, 0x00DD),
-        (0x0020, 0x00B4),
-    ],
-    0x005E: [  # circumflex
-        (0x0061, 0x00E2), (0x0065, 0x00EA), (0x0069, 0x00EE), (0x006F, 0x00F4), (0x0075, 0x00FB),
-        (0x0041, 0x00C2), (0x0045, 0x00CA), (0x0049, 0x00CE), (0x004F, 0x00D4), (0x0055, 0x00DB),
-        (0x0020, 0x005E),
-    ],
-    0x02DC: [  # tilde
-        (0x0061, 0x00E3), (0x006E, 0x00F1), (0x006F, 0x00F5),
-        (0x0041, 0x00C3), (0x004E, 0x00D1), (0x004F, 0x00D5),
-        (0x0020, 0x02DC),
-    ],
-    0x00A8: [  # diaeresis
-        (0x0061, 0x00E4), (0x0065, 0x00EB), (0x0069, 0x00EF), (0x006F, 0x00F6), (0x0075, 0x00FC),
-        (0x0041, 0x00C4), (0x0045, 0x00CB), (0x0049, 0x00CF), (0x004F, 0x00D6), (0x0055, 0x00DC),
-        (0x0079, 0x00FF), (0x0059, 0x0178),
-        (0x0020, 0x00A8),
-    ],
-    0x02DA: [  # ring
-        (0x0061, 0x00E5), (0x0075, 0x016F),
-        (0x0041, 0x00C5), (0x0055, 0x016E),
-        (0x0020, 0x02DA),
-    ],
-    0x00B8: [  # cedilla
-        (0x0063, 0x00E7), (0x0073, 0x015F),
-        (0x0043, 0x00C7), (0x0053, 0x015E),
-        (0x0020, 0x00B8),
-    ],
-    0x02C7: [  # caron
-        (0x0063, 0x010D), (0x0073, 0x0161), (0x007A, 0x017E), (0x0072, 0x0159), (0x006E, 0x0148),
-        (0x0043, 0x010C), (0x0053, 0x0160), (0x005A, 0x017D), (0x0052, 0x0158), (0x004E, 0x0147),
-        (0x0064, 0x010F), (0x0065, 0x011B), (0x0074, 0x0165),
-        (0x0044, 0x010E), (0x0045, 0x011A), (0x0054, 0x0164),
-        (0x0020, 0x02C7),
-    ],
-    0x02D8: [  # breve
-        (0x0061, 0x0103), (0x0067, 0x011F),
-        (0x0041, 0x0102), (0x0047, 0x011E),
-        (0x0020, 0x02D8),
-    ],
-    0x02DD: [  # double-acute
-        (0x006F, 0x0151), (0x0075, 0x0171),
-        (0x004F, 0x0150), (0x0055, 0x0170),
-        (0x0020, 0x02DD),
-    ],
-}
-
 # Layout configs
 LAYOUTS = {
     "polish": {
-        "json": "polish_typographic.json",
+        "json": "polish_typographic_full.json",
         "kbd_name": "pltypo",
         "description": "Polish Typographic by Kirkouski",
         "locale_id": "0415",
@@ -167,7 +43,7 @@ LAYOUTS = {
         "res_id_lang": 101,
     },
     "russian": {
-        "json": "russian_typographic.json",
+        "json": "russian_typographic_full.json",
         "kbd_name": "rutypo",
         "description": "Russian Typographic by Kirkouski",
         "locale_id": "0419",
@@ -175,7 +51,7 @@ LAYOUTS = {
         "res_id_lang": 101,
     },
     "us": {
-        "json": "polish_typographic.json",
+        "json": "polish_typographic_full.json",
         "kbd_name": "ustypo",
         "description": "US+POL Typographic by Kirkouski",
         "locale_id": "0409",
@@ -246,7 +122,7 @@ def wch(ch):
     return "WCH_NONE"
 
 
-def parse_char(entry, dead_keys_used):
+def parse_char(entry, dead_keys_used, dead_key_chars):
     """Parse a JSON char entry. Returns (wch_value, is_dead, dead_char_code)."""
     if entry is None:
         return "WCH_NONE", False, 0
@@ -255,13 +131,12 @@ def parse_char(entry, dead_keys_used):
         return "WCH_NONE", False, 0
     if ch.startswith("dk:") or ch.startswith("act:"):
         dk_name = ch.removeprefix("dk:").removeprefix("act:").strip()
-        dk_code = DEAD_KEY_CHARS.get(dk_name)
+        dk_code = dead_key_chars.get(dk_name)
         if dk_code:
             dead_keys_used.add(dk_code)
             return "WCH_DEAD", True, dk_code
         return "WCH_NONE", False, 0
     if len(ch) > 1:
-        # Ligature — handled separately
         return "WCH_LGTR", False, 0
     return wch(ch), False, 0
 
@@ -270,19 +145,21 @@ def build_c_source(config):
     """Generate the C source for a keyboard layout DLL."""
     json_path = os.path.join(SCRIPT_DIR, config["json"])
     with open(json_path, encoding="utf-8") as f:
-        layout = json.load(f)
+        full_data = json.load(f)
 
-    base = layout["layers"].get("base", {})
-    shift = layout["layers"].get("shift", {})
-    altgr = layout["layers"].get("altgr", {})
-    sh_altgr = layout["layers"].get("shift_altgr", {})
+    layers = extract_layers_from_full_json(full_data)
+    base = layers["base"]
+    shift = layers["shift"]
+    altgr = layers["altgr"]
+    sh_altgr = layers["shift_altgr"]
+    dead_key_chars = layers["dead_key_chars"]
+    dead_key_compositions = layers["dead_key_compositions"]
 
     dead_keys_used = set()
     ligatures = []  # (vk_name, mod_index, [chars])
 
-    # Classify keys into VK_TO_WCHARS groups (5 modifier columns: base, shift, ctrl, altgr, sh_altgr)
-    wchar5_keys = []  # base, shift, ctrl, altgr, sh_altgr
-    wchar3_keys = []  # base, shift, ctrl only
+    wchar5_keys = []
+    wchar3_keys = []
 
     for key_id, (sc, vk, is_letter) in KEY_MAP.items():
         base_ch = base.get(key_id, "")
@@ -290,9 +167,8 @@ def build_c_source(config):
         ag_entry = altgr.get(key_id)
         sag_entry = sh_altgr.get(key_id)
 
-        # Parse AltGr and Shift+AltGr
-        ag_val, ag_dead, ag_dk_code = parse_char(ag_entry, dead_keys_used)
-        sag_val, sag_dead, sag_dk_code = parse_char(sag_entry, dead_keys_used)
+        ag_val, ag_dead, ag_dk_code = parse_char(ag_entry, dead_keys_used, dead_key_chars)
+        sag_val, sag_dead, sag_dk_code = parse_char(sag_entry, dead_keys_used, dead_key_chars)
 
         has_altgr = ag_val != "WCH_NONE" or sag_val != "WCH_NONE"
 
@@ -532,7 +408,7 @@ def build_c_source(config):
         w("/* Dead key compositions */")
         w("static DEADKEY dead_keys[] = {")
         for dk_code in sorted(dead_keys_used):
-            compositions = DEAD_KEY_COMPOSITIONS.get(dk_code, [])
+            compositions = dead_key_compositions.get(dk_code, [])
             for base_ch, result_ch in compositions:
                 w(f"    DEADTRANS(0x{base_ch:04X}, 0x{dk_code:04X}, 0x{result_ch:04X}, 0x0000),")
         w("    {0, 0, 0}")

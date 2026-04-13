@@ -1,9 +1,8 @@
-"""Extract full keylayout structure from original Birman files into JSON.
+"""Extract full keylayout structure from original Birman files and apply overlays.
 
-One-time script. Reads the original .keylayout, dumps the COMPLETE structure
-(all keyMaps, all actions, all dead keys, terminators, secondary keyMapSets)
-into a JSON file. Then applies our overlay changes (relocated symbols, Polish
-diacritics, etc.) to produce the final source JSONs.
+Reads the original Birman .keylayout files, parses the complete structure
+(all keyMaps, actions, dead keys, terminators, secondary keyMapSets), then
+applies the Kirkouski overlay JSONs to produce the merged *_full.json files.
 
 Usage:
     python extract_base.py
@@ -249,10 +248,8 @@ def apply_overlay(full_data, overlay_json_path, layout_name):
             continue
         km = key_maps.get("3", {}).get("keys", {})
         if entry is None:
-            # Clear this key — output the base character
-            base_char = base.get(key_id, "")
-            if base_char:
-                km[mac_code] = {"output": base_char}
+            km.pop(mac_code, None)
+            continue
         else:
             char = entry.get("char", "")
             if char.startswith("dk:"):
@@ -274,9 +271,8 @@ def apply_overlay(full_data, overlay_json_path, layout_name):
             continue
         km = key_maps.get("4", {}).get("keys", {})
         if entry is None:
-            shift_char = shift.get(key_id, "")
-            if shift_char:
-                km[mac_code] = {"output": shift_char}
+            km.pop(mac_code, None)
+            continue
         else:
             char = entry.get("char", "")
             if char.startswith("dk:"):
@@ -290,31 +286,28 @@ def apply_overlay(full_data, overlay_json_path, layout_name):
             elif char:
                 km[mac_code] = {"output": char}
 
-    # Apply caps+option (index 5) — only update keys we changed in option (index 3)
-    # The original Birman caps+option layer already has correct uppercase handling
-    # for unchanged keys. We only need to patch the keys we modified.
+    # Apply caps+option (index 5) — only for Kirkouski-specific overrides.
+    # Birman's km=5 is an independent Latin-typographic layer (Å Î Ï Ó etc.),
+    # NOT a mirror of shift+option. Preserve it for "BI"-sourced entries.
+    # Null entries → remove from km=5 (intentionally unassigned).
     if "5" in key_maps:
         km5 = key_maps["5"].get("keys", {})
-        for key_id, entry in altgr.items():
+        for key_id, entry in sh_altgr.items():
             mac_code = KEY_TO_MAC_CODE.get(key_id)
             if not mac_code:
                 continue
             if entry is None:
-                # Cleared key — output uppercase base char
-                shift_char = shift.get(key_id, "")
-                if isinstance(shift_char, str) and shift_char:
-                    km5[mac_code] = {"output": shift_char}
-            else:
-                char = entry.get("char", "")
-                if char and char.upper() != char and len(char) == 1:
-                    # Has uppercase variant — use it
-                    km5[mac_code] = {"output": char.upper()}
-                elif char.startswith("dk:") or char.startswith("act:"):
-                    dk_name = char.replace("dk:", "").replace("act:", "").strip()
-                    action_id = _ensure_dead_key_action(data, dk_name)
-                    km5[mac_code] = {"action": action_id}
-                elif char:
-                    km5[mac_code] = {"output": char}
+                km5.pop(mac_code, None)
+                continue
+            if entry.get("source") == "BI":
+                continue
+            char = entry.get("char", "")
+            if char.startswith("dk:") or char.startswith("act:"):
+                dk_name = char.replace("dk:", "").replace("act:", "").strip()
+                action_id = _ensure_dead_key_action(data, dk_name)
+                km5[mac_code] = {"action": action_id}
+            elif char:
+                km5[mac_code] = {"output": char}
 
     return data
 
@@ -341,124 +334,6 @@ def _ensure_dead_key_action(data, dk_name):
     return action_id
 
 
-def serialize_keylayout(data):
-    """Serialize the full keylayout data back to XML 1.1 string."""
-    lines = []
-    lines.append('<?xml version="1.1" encoding="UTF-8"?>')
-    lines.append('<!DOCTYPE keyboard SYSTEM "file://localhost/System/Library/DTDs/KeyboardLayout.dtd">')
-
-    attrs = f'group="{data["keyboard_group"]}" id="{data["keyboard_id"]}"'
-    attrs += f' name="{esc_attr(data["keyboard_name"])}" maxout="{data["keyboard_maxout"]}"'
-    lines.append(f'<keyboard {attrs}>')
-
-    # Layouts
-    lines.append('\t<layouts>')
-    for layout in data["layouts"]:
-        lines.append(f'\t\t<layout first="{layout["first"]}" last="{layout["last"]}"'
-                     f' mapSet="{layout["mapSet"]}" modifiers="{layout["modifiers"]}"/>')
-    lines.append('\t</layouts>')
-
-    # Modifier maps
-    for mm_id, mm_data in data["modifier_map"].items():
-        lines.append(f'\t<modifierMap id="{mm_id}" defaultIndex="{mm_data["defaultIndex"]}">')
-        for select in mm_data["selects"]:
-            lines.append(f'\t\t<keyMapSelect mapIndex="{select["mapIndex"]}">')
-            for mod_keys in select["modifiers"]:
-                lines.append(f'\t\t\t<modifier keys="{mod_keys}"/>')
-            lines.append(f'\t\t</keyMapSelect>')
-        lines.append(f'\t</modifierMap>')
-
-    # Key map sets
-    for kms_id in sorted(data["key_map_sets"].keys()):
-        key_maps = data["key_map_sets"][kms_id]
-        lines.append(f'\t<keyMapSet id="{kms_id}">')
-        for idx in sorted(key_maps.keys(), key=int):
-            km_data = key_maps[idx]
-            attrs = f'index="{idx}"'
-            if "baseMapSet" in km_data:
-                attrs += f' baseMapSet="{km_data["baseMapSet"]}" baseIndex="{km_data["baseIndex"]}"'
-            lines.append(f'\t\t<keyMap {attrs}>')
-            for code in sorted(km_data["keys"].keys(), key=int):
-                entry = km_data["keys"][code]
-                if "output" in entry:
-                    out = esc_output(entry["output"])
-                    lines.append(f'\t\t\t<key code="{code}" output="{out}"/>')
-                elif "action" in entry:
-                    lines.append(f'\t\t\t<key code="{code}" action="{esc_attr(entry["action"])}"/>')
-            lines.append(f'\t\t</keyMap>')
-        lines.append(f'\t</keyMapSet>')
-
-    # Actions
-    if data["actions"]:
-        lines.append('\t<actions>')
-        for action_id in sorted(data["actions"].keys()):
-            whens = data["actions"][action_id]
-            lines.append(f'\t\t<action id="{esc_attr(action_id)}">')
-            for when in whens:
-                attrs_parts = []
-                if "state" in when:
-                    attrs_parts.append(f'state="{esc_attr(when["state"])}"')
-                if "next" in when:
-                    attrs_parts.append(f'next="{esc_attr(when["next"])}"')
-                if "output" in when:
-                    attrs_parts.append(f'output="{esc_output(when["output"])}"')
-                if "through" in when:
-                    attrs_parts.append(f'through="{esc_attr(when["through"])}"')
-                if "multiplier" in when:
-                    attrs_parts.append(f'multiplier="{esc_attr(when["multiplier"])}"')
-                lines.append(f'\t\t\t<when {" ".join(attrs_parts)}/>')
-            lines.append(f'\t\t</action>')
-        lines.append('\t</actions>')
-
-    # Terminators
-    if data["terminators"]:
-        lines.append('\t<terminators>')
-        for term in data["terminators"]:
-            out = esc_output(term["output"])
-            lines.append(f'\t\t<when state="{esc_attr(term["state"])}" output="{out}"/>')
-        lines.append('\t</terminators>')
-
-    lines.append('</keyboard>')
-    return "\n".join(lines)
-
-
-def esc_attr(text):
-    """Escape XML attribute value."""
-    if not text:
-        return ""
-    return (text
-        .replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;")
-        .replace('"', "&quot;"))
-
-
-def esc_output(text):
-    """Escape output value, converting PUA placeholders and control chars back to &#x refs."""
-    if not text:
-        return ""
-    result = []
-    for ch in text:
-        cp = ord(ch)
-        # PUA placeholder for control chars (set during parsing)
-        if 0xE000 <= cp <= 0xE07F:
-            orig_cp = cp - 0xE000
-            result.append(f"&#x{orig_cp:04X};")
-        elif cp < 0x20 or cp == 0x7F:
-            # Control chars (TAB, CR, LF, etc.) — encode as &#x refs
-            result.append(f"&#x{cp:04X};")
-        elif ch == "&":
-            result.append("&amp;")
-        elif ch == "<":
-            result.append("&lt;")
-        elif ch == ">":
-            result.append("&gt;")
-        elif ch == '"':
-            result.append("&quot;")
-        else:
-            result.append(ch)
-    return "".join(result)
-
 
 def main():
     import glob
@@ -473,8 +348,14 @@ def main():
     en_keylayout = en_matches[0]
     ru_keylayout = ru_matches[0]
 
-    pl_overlay = os.path.join(SCRIPT_DIR, ".local", "merged_layout.json")
-    ru_overlay = os.path.join(SCRIPT_DIR, ".local", "russian_merged_layout.json")
+    # Canonical overlay sources live at repo root and are tracked in git.
+    # We used to read from stale v0.1 copies in .local/ which meant every
+    # v0.2/v0.3 release shipped v0.1-era overlay content (including the
+    # `dk:acute-2` orphan in Russian that silently broke registration on
+    # macOS, and never picked up the complete base/shift Cyrillic layers
+    # added to the canonical files later).
+    pl_overlay = os.path.join(SCRIPT_DIR, "polish_typographic.json")
+    ru_overlay = os.path.join(SCRIPT_DIR, "russian_typographic.json")
 
     for path in [pl_overlay, ru_overlay]:
         if not os.path.exists(path):
@@ -509,21 +390,6 @@ def main():
     with open(ru_json_path, "w", encoding="utf-8") as f:
         json.dump(ru_data, f, ensure_ascii=False, indent=2)
     print(f"Saved: {ru_json_path}", file=sys.stderr)
-
-    # Also generate .keylayout files directly
-    os.makedirs(os.path.join(SCRIPT_DIR, "dist"), exist_ok=True)
-
-    pl_keylayout = serialize_keylayout(pl_data)
-    pl_out = os.path.join(SCRIPT_DIR, "dist", "polish_typographic.keylayout")
-    with open(pl_out, "w", encoding="utf-8") as f:
-        f.write(pl_keylayout)
-    print(f"Built: {pl_out} ({pl_keylayout.count(chr(10))+1} lines)", file=sys.stderr)
-
-    ru_keylayout_out = serialize_keylayout(ru_data)
-    ru_out = os.path.join(SCRIPT_DIR, "dist", "russian_typographic.keylayout")
-    with open(ru_out, "w", encoding="utf-8") as f:
-        f.write(ru_keylayout_out)
-    print(f"Built: {ru_out} ({ru_keylayout_out.count(chr(10))+1} lines)", file=sys.stderr)
 
     print("Done.", file=sys.stderr)
 

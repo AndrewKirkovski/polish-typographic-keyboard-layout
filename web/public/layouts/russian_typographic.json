@@ -170,7 +170,11 @@
         "name": "RIGHT SINGLE QUOTATION MARK",
         "source": "BI"
       },
-      "\\": null,
+      "\\": {
+        "char": "ё",
+        "name": "CYRILLIC SMALL LETTER IO",
+        "source": "KI"
+      },
       "Z": null,
       "X": null,
       "C": null,
@@ -375,7 +379,11 @@
         "name": "dead key: tilde",
         "source": "MOVE"
       },
-      "\\": null,
+      "\\": {
+        "char": "Ё",
+        "name": "CYRILLIC CAPITAL LETTER IO",
+        "source": "KI"
+      },
       "Z": null,
       "X": null,
       "C": null,
@@ -406,8 +414,8 @@
         "source": "BI"
       },
       "/": {
-        "char": "dk:acute-2",
-        "name": "dead key: acute-2",
+        "char": "dk:acute",
+        "name": "dead key: acute",
         "source": "BI"
       }
     },

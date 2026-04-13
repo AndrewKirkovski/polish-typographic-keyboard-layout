@@ -272,7 +272,7 @@
             "action": "5"
           },
           "50": {
-            "output": "\\"
+            "output": "`"
           },
           "51": {
             "output": ""
@@ -1171,9 +1171,6 @@
           "15": {
             "output": "®"
           },
-          "16": {
-            "output": "ѣ"
-          },
           "17": {
             "output": "™"
           },
@@ -1219,9 +1216,6 @@
           "31": {
             "output": "ó"
           },
-          "32": {
-            "output": "ѵ"
-          },
           "33": {
             "output": "["
           },
@@ -1250,7 +1244,7 @@
             "output": "‘"
           },
           "42": {
-            "output": ""
+            "output": "`"
           },
           "43": {
             "output": "«"
@@ -1505,9 +1499,6 @@
           "15": {
             "action": "ring"
           },
-          "16": {
-            "output": "Ѣ"
-          },
           "17": {
             "output": "#"
           },
@@ -1584,7 +1575,7 @@
             "action": "ˆ"
           },
           "42": {
-            "output": ""
+            "output": "~"
           },
           "43": {
             "output": "„"
@@ -1798,16 +1789,16 @@
             "output": "Ś"
           },
           "2": {
-            "output": "°"
+            "output": "Î"
           },
           "3": {
-            "output": "£"
+            "output": "¢"
           },
           "4": {
-            "output": "„"
+            "output": "Ó"
           },
           "5": {
-            "output": "·"
+            "action": "cedilla"
           },
           "6": {
             "output": "Ż"
@@ -1819,19 +1810,19 @@
             "output": "Ć"
           },
           "9": {
-            "output": "↓"
+            "output": "√"
           },
           "10": {
             "output": "§"
           },
           "11": {
-            "output": "SS"
+            "output": "ı"
           },
           "12": {
-            "output": "©"
+            "output": "≈"
           },
           "13": {
-            "output": "✓"
+            "output": "∑"
           },
           "14": {
             "output": "Ę"
@@ -1839,65 +1830,62 @@
           "15": {
             "output": "®"
           },
-          "16": {
-            "output": "Á"
-          },
           "17": {
-            "output": "™"
+            "output": "†"
           },
           "18": {
-            "output": "¹"
+            "output": "¡"
           },
           "19": {
-            "output": "²"
+            "output": "™"
           },
           "20": {
-            "output": "³"
+            "output": "£"
           },
           "21": {
-            "output": "$"
+            "output": "¢"
           },
           "22": {
-            "output": "↑"
+            "output": "§"
           },
           "23": {
-            "output": "€"
+            "output": "‰"
           },
           "24": {
             "output": "≠"
           },
           "25": {
-            "output": "←"
+            "output": "ª"
           },
           "26": {
-            "output": "§"
+            "output": "¶"
           },
           "27": {
-            "output": "—"
+            "output": "–"
           },
           "28": {
-            "output": "×"
+            "output": "∞"
           },
           "29": {
-            "output": "→"
+            "output": "º"
           },
           "30": {
-            "output": "]"
+            "output": "‘"
           },
           "31": {
             "output": "Ó"
           },
           "32": {
-            "output": "¨"
+            "action": ""
           },
           "33": {
-            "output": "["
+            "output": "“"
           },
           "34": {
-            "output": "І"
+            "output": "ˆ"
           },
           "35": {
-            "output": "′"
+            "output": "∏"
           },
           "36": {
             "output": "\r"
@@ -1906,34 +1894,34 @@
             "output": "Ł"
           },
           "38": {
-            "output": "“"
-          },
-          "39": {
-            "output": "’"
-          },
-          "40": {
-            "output": "”"
-          },
-          "41": {
             "output": "‘"
           },
+          "39": {
+            "action": " 5"
+          },
+          "40": {
+            "output": "’"
+          },
+          "41": {
+            "output": "…"
+          },
           "42": {
-            "output": "«"
+            "output": "~"
           },
           "43": {
-            "output": "«"
+            "output": "≤"
           },
           "44": {
-            "output": "…"
+            "output": "÷"
           },
           "45": {
             "output": "Ń"
           },
           "46": {
-            "output": "−"
+            "output": "Â"
           },
           "47": {
-            "output": "»"
+            "output": "≥"
           },
           "48": {
             "output": "\t"

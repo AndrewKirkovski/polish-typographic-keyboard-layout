@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { detectOS } from '../composables/useOS'
 
 const { t } = useI18n()
-const activeTab = ref<'windows' | 'macos'>('windows')
+// Default the tab to the visitor's actual OS. Synchronous detection so the
+// first render lands on the correct panel — no flash of Windows content for
+// mac users.
+const activeTab = ref<'windows' | 'macos'>(detectOS())
 </script>
 
 <template>

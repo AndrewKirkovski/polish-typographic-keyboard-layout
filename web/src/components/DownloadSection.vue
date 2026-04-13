@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { detectOS } from '../composables/useOS'
 
 const { t } = useI18n()
 
@@ -10,14 +11,10 @@ const VERSION = __APP_VERSION__
 const RELEASE_TAG = `v${VERSION}`
 const RELEASE_DL = `https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/releases/download/${RELEASE_TAG}`
 
-// `data-os` is set on `<html>` by App.vue's onMounted hook (richer regex
-// than this component had, catches iOS too). Reading from there avoids the
-// drift risk of two different OS-detection regexes living in the codebase.
-// SSR fallback: assume Windows (the larger user base).
-const detectedOS = computed(() => {
-  if (typeof document === 'undefined') return 'windows'
-  return document.documentElement.dataset.os === 'mac' ? 'macos' : 'windows'
-})
+// Synchronous OS detection — runs during <script setup> so the very first
+// render reflects the real OS. (Earlier version read `dataset.os` which was
+// only set in App.vue's onMounted, losing the race on first paint.)
+const detectedOS = detectOS()
 
 const platforms = computed(() => {
   const winInstaller = `kirkouski-typographic-v${VERSION}-windows-setup.exe`
@@ -31,7 +28,7 @@ const platforms = computed(() => {
       { label: t('download.installer'), file: winInstaller, url: `${RELEASE_DL}/${winInstaller}` },
       { label: 'ZIP', file: winZip, url: `${RELEASE_DL}/${winZip}` },
     ],
-    primary: detectedOS.value === 'windows',
+    primary: detectedOS === 'windows',
   }
   const mac = {
     id: 'macos',
@@ -40,9 +37,9 @@ const platforms = computed(() => {
       { label: t('download.installer'), file: macPkg, url: `${RELEASE_DL}/${macPkg}` },
       { label: 'ZIP', file: macZip, url: `${RELEASE_DL}/${macZip}` },
     ],
-    primary: detectedOS.value === 'macos',
+    primary: detectedOS === 'macos',
   }
-  return detectedOS.value === 'windows' ? [win, mac] : [mac, win]
+  return detectedOS === 'windows' ? [win, mac] : [mac, win]
 })
 </script>
 
@@ -72,7 +69,7 @@ const platforms = computed(() => {
           <ul class="download-card__files">
             <li v-for="file in platform.files" :key="file.file">
               <a :href="file.url" target="_blank" rel="noopener">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                   <path d="M7 1v8M3 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                   <path d="M1 11v1.5h12V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>

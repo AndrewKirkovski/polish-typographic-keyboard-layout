@@ -1,7 +1,7 @@
-"""Generate Windows .klc keyboard layout files from layout JSON definitions.
+"""Generate Windows .klc keyboard layout files from *_full.json definitions.
 
-Reads the simple overlay JSONs (polish_typographic.json, russian_typographic.json)
-and generates .klc files compatible with MSKLC / kbdutool.exe.
+Reads the merged full JSON layouts (produced by extract_base.py) and generates
+.klc files compatible with MSKLC / kbdutool.exe.
 
 Usage:
     python build_klc.py                    # builds all layouts
@@ -21,58 +21,9 @@ import json
 import sys
 import os
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+from layout_adapter import KEY_MAP, extract_layers_from_full_json
 
-# Key ID -> (scancode_hex, VK_name, is_letter)
-KEY_MAP = {
-    "`":  ("29", "OEM_3",      False),
-    "1":  ("02", "1",           False),
-    "2":  ("03", "2",           False),
-    "3":  ("04", "3",           False),
-    "4":  ("05", "4",           False),
-    "5":  ("06", "5",           False),
-    "6":  ("07", "6",           False),
-    "7":  ("08", "7",           False),
-    "8":  ("09", "8",           False),
-    "9":  ("0a", "9",           False),
-    "0":  ("0b", "0",           False),
-    "-":  ("0c", "OEM_MINUS",   False),
-    "=":  ("0d", "OEM_PLUS",    False),
-    "Q":  ("10", "Q",           True),
-    "W":  ("11", "W",           True),
-    "E":  ("12", "E",           True),
-    "R":  ("13", "R",           True),
-    "T":  ("14", "T",           True),
-    "Y":  ("15", "Y",           True),
-    "U":  ("16", "U",           True),
-    "I":  ("17", "I",           True),
-    "O":  ("18", "O",           True),
-    "P":  ("19", "P",           True),
-    "[":  ("1a", "OEM_4",       False),
-    "]":  ("1b", "OEM_6",       False),
-    "A":  ("1e", "A",           True),
-    "S":  ("1f", "S",           True),
-    "D":  ("20", "D",           True),
-    "F":  ("21", "F",           True),
-    "G":  ("22", "G",           True),
-    "H":  ("23", "H",           True),
-    "J":  ("24", "J",           True),
-    "K":  ("25", "K",           True),
-    "L":  ("26", "L",           True),
-    ";":  ("27", "OEM_1",       False),
-    "'":  ("28", "OEM_7",       False),
-    "\\": ("2b", "OEM_5",       False),
-    "Z":  ("2c", "Z",           True),
-    "X":  ("2d", "X",           True),
-    "C":  ("2e", "C",           True),
-    "V":  ("2f", "V",           True),
-    "B":  ("30", "B",           True),
-    "N":  ("31", "N",           True),
-    "M":  ("32", "M",           True),
-    ",":  ("33", "OEM_COMMA",   False),
-    ".":  ("34", "OEM_PERIOD",  False),
-    "/":  ("35", "OEM_2",       False),
-}
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Scan code order for LAYOUT section
 SC_ORDER = [
@@ -86,86 +37,10 @@ SC_ORDER = [
     "53",  # Numpad decimal
 ]
 
-# Dead key name -> Unicode hex of the dead key character
-DEAD_KEY_CHARS = {
-    "grave":        "0060",
-    "acute":        "00b4",
-    "acute-2":      "00b4",
-    "circumflex":   "005e",
-    "tilde":        "02dc",
-    "diaeresis":    "00a8",
-    "ring":         "02da",
-    "cedilla":      "00b8",
-    "caron":        "02c7",
-    "breve":        "02d8",
-    "double-acute": "02dd",
-}
-
-# Dead key compositions: dk_char_hex -> [(base_hex, result_hex), ...]
-DEAD_KEY_COMPOSITIONS = {
-    "0060": [  # grave
-        ("0061", "00e0"), ("0065", "00e8"), ("0069", "00ec"), ("006f", "00f2"), ("0075", "00f9"),
-        ("0041", "00c0"), ("0045", "00c8"), ("0049", "00cc"), ("004f", "00d2"), ("0055", "00d9"),
-        ("0020", "0060"),
-    ],
-    "00b4": [  # acute
-        ("0061", "00e1"), ("0065", "00e9"), ("0069", "00ed"), ("006f", "00f3"), ("0075", "00fa"),
-        ("0063", "0107"), ("006c", "013a"), ("006e", "0144"), ("0072", "0155"), ("0073", "015b"),
-        ("007a", "017a"), ("0079", "00fd"),
-        ("0041", "00c1"), ("0045", "00c9"), ("0049", "00cd"), ("004f", "00d3"), ("0055", "00da"),
-        ("0043", "0106"), ("004c", "0139"), ("004e", "0143"), ("0052", "0154"), ("0053", "015a"),
-        ("005a", "0179"), ("0059", "00dd"),
-        ("0020", "00b4"),
-    ],
-    "005e": [  # circumflex
-        ("0061", "00e2"), ("0065", "00ea"), ("0069", "00ee"), ("006f", "00f4"), ("0075", "00fb"),
-        ("0041", "00c2"), ("0045", "00ca"), ("0049", "00ce"), ("004f", "00d4"), ("0055", "00db"),
-        ("0020", "005e"),
-    ],
-    "02dc": [  # tilde
-        ("0061", "00e3"), ("006e", "00f1"), ("006f", "00f5"),
-        ("0041", "00c3"), ("004e", "00d1"), ("004f", "00d5"),
-        ("0020", "02dc"),
-    ],
-    "00a8": [  # diaeresis
-        ("0061", "00e4"), ("0065", "00eb"), ("0069", "00ef"), ("006f", "00f6"), ("0075", "00fc"),
-        ("0041", "00c4"), ("0045", "00cb"), ("0049", "00cf"), ("004f", "00d6"), ("0055", "00dc"),
-        ("0079", "00ff"), ("0059", "0178"),
-        ("0020", "00a8"),
-    ],
-    "02da": [  # ring
-        ("0061", "00e5"), ("0075", "016f"),
-        ("0041", "00c5"), ("0055", "016e"),
-        ("0020", "02da"),
-    ],
-    "00b8": [  # cedilla
-        ("0063", "00e7"), ("0073", "015f"),
-        ("0043", "00c7"), ("0053", "015e"),
-        ("0020", "00b8"),
-    ],
-    "02c7": [  # caron
-        ("0063", "010d"), ("0073", "0161"), ("007a", "017e"), ("0072", "0159"), ("006e", "0148"),
-        ("0043", "010c"), ("0053", "0160"), ("005a", "017d"), ("0052", "0158"), ("004e", "0147"),
-        ("0064", "010f"), ("0065", "011b"), ("0074", "0165"),
-        ("0044", "010e"), ("0045", "011a"), ("0054", "0164"),
-        ("0020", "02c7"),
-    ],
-    "02d8": [  # breve
-        ("0061", "0103"), ("0067", "011f"),
-        ("0041", "0102"), ("0047", "011e"),
-        ("0020", "02d8"),
-    ],
-    "02dd": [  # double-acute
-        ("006f", "0151"), ("0075", "0171"),
-        ("004f", "0150"), ("0055", "0170"),
-        ("0020", "02dd"),
-    ],
-}
-
 # Layout configs
 LAYOUTS = {
     "polish": {
-        "json": "polish_typographic.json",
+        "json": "polish_typographic_full.json",
         "kbd_name": "pltypo",
         "description": "Polish Typographic by Kirkouski",
         "locale_name": "pl-PL",
@@ -174,7 +49,7 @@ LAYOUTS = {
         "lang_name": "Polish",
     },
     "russian": {
-        "json": "russian_typographic.json",
+        "json": "russian_typographic_full.json",
         "kbd_name": "rutypo",
         "description": "Russian Typographic by Kirkouski",
         "locale_name": "ru-RU",
@@ -183,7 +58,7 @@ LAYOUTS = {
         "lang_name": "Russian",
     },
     "us": {
-        "json": "polish_typographic.json",
+        "json": "polish_typographic_full.json",
         "kbd_name": "ustypo",
         "description": "US+POL Typographic by Kirkouski",
         "locale_name": "en-US",
@@ -201,7 +76,7 @@ def char_to_hex(ch):
     return f"{ord(ch):04x}"
 
 
-def format_char(ch, dead_keys_used):
+def format_char(ch, dead_keys_used, dead_key_chars):
     """Format a character for the LAYOUT section.
     Returns (hex_or_literal, is_dead_key).
     Multi-char strings (ligatures) are not supported in LAYOUT — use first char."""
@@ -209,8 +84,9 @@ def format_char(ch, dead_keys_used):
         return "-1", False
     if ch.startswith("dk:") or ch.startswith("act:"):
         dk_name = ch.replace("dk:", "").replace("act:", "").strip()
-        dk_hex = DEAD_KEY_CHARS.get(dk_name)
-        if dk_hex:
+        dk_cp = dead_key_chars.get(dk_name)
+        if dk_cp:
+            dk_hex = f"{dk_cp:04x}"
             dead_keys_used.add(dk_hex)
             return f"{dk_hex}@", True
         return "-1", False
@@ -226,12 +102,15 @@ def build_klc(config):
     """Build a .klc file content from layout config."""
     json_path = os.path.join(SCRIPT_DIR, config["json"])
     with open(json_path, encoding="utf-8") as f:
-        layout = json.load(f)
+        full_data = json.load(f)
 
-    base = layout["layers"].get("base", {})
-    shift = layout["layers"].get("shift", {})
-    altgr = layout["layers"].get("altgr", {})
-    sh_altgr = layout["layers"].get("shift_altgr", {})
+    layers = extract_layers_from_full_json(full_data)
+    base = layers["base"]
+    shift = layers["shift"]
+    altgr = layers["altgr"]
+    sh_altgr = layers["shift_altgr"]
+    dead_key_chars = layers["dead_key_chars"]
+    dead_key_compositions = layers["dead_key_compositions"]
 
     dead_keys_used = set()
     lines = []
@@ -310,16 +189,16 @@ def build_klc(config):
         # AltGr char
         ag_entry = altgr.get(key_id)
         if ag_entry and ag_entry.get("char"):
-            ag_hex, ag_dead = format_char(ag_entry["char"], dead_keys_used)
+            ag_hex, _ = format_char(ag_entry["char"], dead_keys_used, dead_key_chars)
         else:
-            ag_hex, ag_dead = "-1", False
+            ag_hex = "-1"
 
         # Shift+AltGr char
         sag_entry = sh_altgr.get(key_id)
         if sag_entry and sag_entry.get("char"):
-            sag_hex, sag_dead = format_char(sag_entry["char"], dead_keys_used)
+            sag_hex, _ = format_char(sag_entry["char"], dead_keys_used, dead_key_chars)
         else:
-            sag_hex, sag_dead = "-1", False
+            sag_hex = "-1"
 
         # Cap flag: 1 for letters (CapsLock = Shift), 0 otherwise
         # If AltGr layer has Polish diacritics that should also respond to CapsLock: use 5
@@ -336,12 +215,13 @@ def build_klc(config):
 
     # Dead key sections
     for dk_hex in sorted(dead_keys_used):
-        compositions = DEAD_KEY_COMPOSITIONS.get(dk_hex, [])
+        dk_cp = int(dk_hex, 16)
+        compositions = dead_key_compositions.get(dk_cp, [])
         if compositions:
             w(f'DEADKEY\t{dk_hex}')
             w()
-            for base_hex, result_hex in compositions:
-                w(f'{base_hex}\t{result_hex}\t// {chr(int(base_hex, 16))} -> {chr(int(result_hex, 16))}')
+            for base_cp, result_cp in compositions:
+                w(f'{base_cp:04x}\t{result_cp:04x}\t// {chr(base_cp)} -> {chr(result_cp)}')
             w()
 
     # Ligature section (none for our layouts, but include the header)
@@ -432,7 +312,7 @@ def main():
 
         out_path = os.path.join(SCRIPT_DIR, "dist", f"{config['kbd_name']}.klc")
         # KLC files MUST be UTF-16 LE with BOM
-        with open(out_path, "w", encoding="utf-16-le") as f:
+        with open(out_path, "w", encoding="utf-16-le", newline="") as f:
             f.write("\ufeff")  # BOM
             f.write(klc_content)
 

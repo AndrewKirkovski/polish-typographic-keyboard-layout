@@ -2,6 +2,7 @@
 import { onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useLayout } from './composables/useLayout'
+import { detectOS } from './composables/useOS'
 import SiteHeader from './components/SiteHeader.vue'
 import HeroSection from './components/HeroSection.vue'
 import KeyboardSection from './components/KeyboardSection.vue'
@@ -38,8 +39,11 @@ function skipToMain(e?: Event) {
 
 onMounted(async () => {
   await init()
-  // Detect macOS for platform-specific labels (AltGr → ⌥, Win → ⌘)
-  if (typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.userAgent)) {
+  // Set `data-os="mac"` on <html> so CSS rules in style.css (the macOS
+  // modifier key swap: AltGr → ⌥, Win → ⌘, and .os-win/.os-mac toggles) can
+  // style themselves. Components that need OS for initial state import
+  // detectOS() directly instead of waiting on this attribute.
+  if (detectOS() === 'macos') {
     document.documentElement.setAttribute('data-os', 'mac')
   }
   window.addEventListener('hashchange', () => {
@@ -66,6 +70,12 @@ onMounted(async () => {
       and the skip link is useless.
     -->
     <main id="main" tabindex="-1">
+      <div class="dev-banner" role="note">
+        <p>
+          {{ t('banner.development') }}
+          <a href="https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/issues" target="_blank" rel="noopener">{{ t('banner.issues') }}</a>
+        </p>
+      </div>
       <HeroSection />
       <KeyboardSection />
       <WhySection />
@@ -99,5 +109,19 @@ main {
   text-transform: uppercase;
   color: var(--text-muted);
   border-top: 1px solid var(--border);
+}
+
+.dev-banner {
+  background: #8b1a2b;
+  color: #fff;
+  text-align: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+}
+
+.dev-banner a {
+  color: #fff;
+  text-decoration: underline;
+  margin-left: 0.5em;
 }
 </style>

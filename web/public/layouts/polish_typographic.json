@@ -174,7 +174,11 @@
         "name": "RIGHT SINGLE QUOTATION MARK",
         "source": "BI"
       },
-      "\\": null,
+      "\\": {
+        "char": "`",
+        "name": "GRAVE ACCENT",
+        "source": "KI"
+      },
       "Z": {
         "char": "ż",
         "name": "LATIN SMALL LETTER Z WITH DOT ABOVE",
@@ -403,7 +407,11 @@
         "name": "dead key: tilde",
         "source": "MOVE"
       },
-      "\\": null,
+      "\\": {
+        "char": "~",
+        "name": "TILDE",
+        "source": "KI"
+      },
       "Z": {
         "char": "Ż",
         "name": "LATIN CAPITAL LETTER Z WITH DOT ABOVE",

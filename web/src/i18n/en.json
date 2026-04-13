@@ -8,6 +8,10 @@
   "a11y": {
     "skipToMain": "Skip to main content"
   },
+  "banner": {
+    "development": "This project is in active development. Versions 0.x may be unstable.",
+    "issues": "Report issues on GitHub"
+  },
   "hero": {
     "title": "Kirkouski Typographic",
     "subtitle": "Typographic symbols on AltGr. For Polish, Russian, and English keyboards.",

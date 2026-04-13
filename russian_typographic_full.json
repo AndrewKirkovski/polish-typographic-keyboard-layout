@@ -1132,9 +1132,6 @@
           "0": {
             "output": "₽"
           },
-          "1": {
-            "output": "§"
-          },
           "2": {
             "output": "°"
           },
@@ -1146,15 +1143,6 @@
           },
           "5": {
             "output": "·"
-          },
-          "6": {
-            "output": ""
-          },
-          "7": {
-            "output": "×"
-          },
-          "8": {
-            "output": "©"
           },
           "9": {
             "output": "↓"
@@ -1170,9 +1158,6 @@
           },
           "13": {
             "output": "✓"
-          },
-          "14": {
-            "output": "€"
           },
           "15": {
             "output": "®"
@@ -1240,9 +1225,6 @@
           "36": {
             "output": "\r"
           },
-          "37": {
-            "output": "”"
-          },
           "38": {
             "output": "“"
           },
@@ -1256,16 +1238,13 @@
             "output": "‘"
           },
           "42": {
-            "output": ""
+            "output": "ё"
           },
           "43": {
             "output": "«"
           },
           "44": {
             "output": "…"
-          },
-          "45": {
-            "output": ""
           },
           "46": {
             "output": "−"
@@ -1463,12 +1442,6 @@
       },
       "4": {
         "keys": {
-          "0": {
-            "output": "⌘"
-          },
-          "1": {
-            "output": "⇧"
-          },
           "2": {
             "output": "⌀"
           },
@@ -1480,15 +1453,6 @@
           },
           "5": {
             "action": "cedilla"
-          },
-          "6": {
-            "action": "cedilla"
-          },
-          "7": {
-            "output": "·"
-          },
-          "8": {
-            "output": "¢"
           },
           "9": {
             "action": " 2"
@@ -1574,9 +1538,6 @@
           "36": {
             "output": "\r"
           },
-          "37": {
-            "output": "’"
-          },
           "38": {
             "output": "‘"
           },
@@ -1590,16 +1551,13 @@
             "action": "ˆ"
           },
           "42": {
-            "output": ""
+            "output": "Ё"
           },
           "43": {
             "output": "„"
           },
           "44": {
-            "action": "dk_acute-2"
-          },
-          "45": {
-            "action": " 5"
+            "action": "⁄"
           },
           "46": {
             "output": "•"
@@ -1797,50 +1755,35 @@
       },
       "5": {
         "keys": {
-          "0": {
-            "output": "₽"
-          },
-          "1": {
-            "output": "Í"
-          },
           "2": {
-            "output": "°"
+            "output": "Î"
           },
           "3": {
-            "output": "£"
+            "output": "¢"
           },
           "4": {
-            "output": "„"
+            "output": "Ó"
           },
           "5": {
-            "output": "·"
-          },
-          "6": {
-            "output": "Ω"
-          },
-          "7": {
-            "output": "≈"
-          },
-          "8": {
-            "output": "Ç"
+            "action": "cedilla"
           },
           "9": {
-            "output": "↓"
+            "output": "√"
           },
           "10": {
             "output": "§"
           },
           "11": {
-            "output": "SS"
+            "output": "ı"
           },
           "12": {
-            "output": "©"
+            "output": "≈"
           },
           "13": {
-            "output": "✓"
+            "output": "∑"
           },
           "14": {
-            "output": "´"
+            "output": "Ѵ"
           },
           "15": {
             "output": "®"
@@ -1849,97 +1792,91 @@
             "output": "Ѣ"
           },
           "17": {
-            "output": "™"
+            "output": "†"
           },
           "18": {
-            "output": "¹"
+            "output": "¡"
           },
           "19": {
-            "output": "²"
+            "output": "™"
           },
           "20": {
-            "output": "³"
+            "output": "£"
           },
           "21": {
-            "output": "$"
+            "output": "¢"
           },
           "22": {
-            "output": "↑"
+            "output": "§"
           },
           "23": {
-            "output": "€"
+            "output": "‰"
           },
           "24": {
             "output": "≠"
           },
           "25": {
-            "output": "←"
+            "output": "ª"
           },
           "26": {
-            "output": "§"
+            "output": "¶"
           },
           "27": {
-            "output": "—"
+            "output": "–"
           },
           "28": {
-            "output": "×"
+            "output": "∞"
           },
           "29": {
-            "output": "→"
+            "output": "º"
           },
           "30": {
-            "output": "]"
+            "output": "‘"
           },
           "31": {
             "output": "Ѳ"
           },
           "32": {
-            "output": "Ѵ"
+            "action": ""
           },
           "33": {
-            "output": "["
+            "output": "“"
           },
           "34": {
             "output": "І"
           },
           "35": {
-            "output": "′"
+            "output": "∏"
           },
           "36": {
             "output": "\r"
           },
-          "37": {
-            "output": "Ò"
-          },
           "38": {
-            "output": "“"
-          },
-          "39": {
-            "output": "’"
-          },
-          "40": {
-            "output": "”"
-          },
-          "41": {
             "output": "‘"
           },
-          "42": {
-            "output": "«"
+          "39": {
+            "action": " 5"
           },
-          "43": {
-            "output": "«"
+          "40": {
+            "output": "’"
           },
-          "44": {
+          "41": {
             "output": "…"
           },
-          "45": {
-            "output": "˜"
+          "42": {
+            "output": "Ё"
+          },
+          "43": {
+            "output": "≤"
+          },
+          "44": {
+            "output": "÷"
           },
           "46": {
-            "output": "−"
+            "output": "Â"
           },
           "47": {
-            "output": "»"
+            "output": "≥"
           },
           "48": {
             "output": "\t"
@@ -4629,12 +4566,6 @@
       {
         "state": "acute",
         "output": "́"
-      }
-    ],
-    "dk_acute-2": [
-      {
-        "state": "none",
-        "next": "acute-2"
       }
     ]
   },
