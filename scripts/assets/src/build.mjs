@@ -13,6 +13,7 @@ import { VARIANTS, ICNS_ENTRIES, UNIQUE_ICNS_SIZES } from './variants.mjs';
 import { buildIconSvg } from './build-icon-svg.mjs';
 import { svgToPng } from './rasterize.mjs';
 import { packIcns } from './pack-icns.mjs';
+import { packIco } from './pack-ico.mjs';
 import { buildOgImage } from './build-og.mjs';
 import { buildWebIcons } from './build-web-icons.mjs';
 import { buildDiagrams } from './build-diagrams.mjs';
@@ -41,6 +42,19 @@ function buildIcon(name, { svgOnly = false } = {}) {
   const icnsPath = resolve(ICONS_OUT, `${variant.displayName}.icns`);
   writeFileSync(icnsPath, icns);
   console.log(`  ${variant.displayName}.icns  ${icns.length.toLocaleString()} bytes`);
+
+  // Windows DLL icon — multi-size .ico (16/32/48) per layout variant.
+  const png16 = pngs[16] ?? svgToPng(svg, 16);
+  const png32 = pngs[32] ?? svgToPng(svg, 32);
+  const png48 = svgToPng(svg, 48);
+  const ico = packIco([
+    { size: 16, png: png16 },
+    { size: 32, png: png32 },
+    { size: 48, png: png48 },
+  ]);
+  const icoPath = resolve(ICONS_OUT, `${name}.ico`);
+  writeFileSync(icoPath, ico);
+  console.log(`  ${name}.ico  ${ico.length.toLocaleString()} bytes`);
 }
 
 function buildIcons(targets, opts) {

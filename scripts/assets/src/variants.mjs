@@ -18,6 +18,12 @@ export const VARIANTS = {
   },
 };
 
+export const FAVICON_VARIANT = {
+  displayName: 'favicon',
+  letter: 'K',
+  gradient: ['#d4403a', '#b82e28'],
+};
+
 // Apple .icns entry table. Modern macOS accepts PNG payload in every type.
 // Several entries share pixel dimensions — the renderer dedupes by size.
 export const ICNS_ENTRIES = [

@@ -11,7 +11,7 @@
 import { writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { VARIANTS } from './variants.mjs';
+import { FAVICON_VARIANT } from './variants.mjs';
 import { buildIconSvg } from './build-icon-svg.mjs';
 import { svgToPng } from './rasterize.mjs';
 import { packIco } from './pack-ico.mjs';
@@ -21,7 +21,7 @@ const REPO_ROOT = resolve(__dir, '../../..');
 const WEB_PUBLIC = resolve(REPO_ROOT, 'web/public');
 
 export function buildWebIcons() {
-  const svg = buildIconSvg(VARIANTS.polish);
+  const svg = buildIconSvg(FAVICON_VARIANT);
 
   // Vector source for modern browsers.
   const svgPath = resolve(WEB_PUBLIC, 'favicon.svg');

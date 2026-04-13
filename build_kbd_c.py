@@ -13,6 +13,7 @@ Usage:
 Output goes to build/<kbd_name>.c, build/<kbd_name>.rc, build/<kbd_name>.def
 """
 import json
+import shutil
 import sys
 import os
 
@@ -41,6 +42,7 @@ LAYOUTS = {
         "locale_id": "0415",
         "res_id_text": 100,
         "res_id_lang": 101,
+        "icon": "polish.ico",
     },
     "russian": {
         "json": "russian_typographic_full.json",
@@ -49,6 +51,7 @@ LAYOUTS = {
         "locale_id": "0419",
         "res_id_text": 100,
         "res_id_lang": 101,
+        "icon": "russian.ico",
     },
     "us": {
         "json": "polish_typographic_full.json",
@@ -57,6 +60,7 @@ LAYOUTS = {
         "locale_id": "0409",
         "res_id_text": 100,
         "res_id_lang": 101,
+        "icon": "uspolish.ico",
     },
 }
 
@@ -473,8 +477,11 @@ def build_c_source(config):
 
 
 def build_rc(config):
-    """Generate the resource file with STRINGTABLE and VERSIONINFO."""
+    """Generate the resource file with STRINGTABLE, VERSIONINFO, and icon."""
+    icon_line = f'1 ICON "{config["kbd_name"]}.ico"' if config.get("icon") else ""
     return f"""#include <windows.h>
+
+{icon_line}
 
 STRINGTABLE
 BEGIN
@@ -547,6 +554,12 @@ def main():
         for path, content in [(c_path, c_source), (rc_path, rc_source), (def_path, def_source)]:
             with open(path, "w", encoding="utf-8") as f:
                 f.write(content)
+
+        if config.get("icon"):
+            ico_src = os.path.join(SCRIPT_DIR, "assets", "icons", config["icon"])
+            ico_dst = os.path.join(build_dir, f"{name}.ico")
+            if os.path.isfile(ico_src):
+                shutil.copy2(ico_src, ico_dst)
 
         c_lines = c_source.count("\n") + 1
         print(f"  -> {c_path} ({c_lines} lines)")
