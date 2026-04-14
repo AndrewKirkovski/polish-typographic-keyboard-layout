@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 const { t, tm } = useI18n()
 
-const SITE_URL = 'https://polish-typographic-keyboard-layout.pages.dev/'
+const SITE_URL = 'https://polish-typographic.com/'
 const SHARE_TEXT = 'Kirkouski Typographic — Polish & Russian keyboard layout with 80+ typographic symbols via AltGr'
 
 // Static feature detection — never changes after the first paint, so a

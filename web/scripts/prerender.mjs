@@ -13,7 +13,7 @@ import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(__dirname, '..')
 const DIST = resolve(ROOT, 'dist')
-const BASE_URL = 'https://polish-typographic-keyboard-layout.pages.dev'
+const BASE_URL = 'https://polish-typographic.com'
 
 const LOCALES = [
   { code: 'en', path: '/', lang: 'en', ogLocale: 'en_US' },

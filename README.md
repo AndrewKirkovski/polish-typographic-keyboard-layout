@@ -1,6 +1,6 @@
 # Kirkouski Typographic Keyboard Layout
 
-> **[Interactive Layout Preview & Downloads](https://polish-typographic-keyboard-layout.pages.dev/)** — explore the layout, download installers, and read installation guides.
+> **[Interactive Layout Preview & Downloads](https://polish-typographic.com/)** — explore the layout, download installers, and read installation guides.
 
 > **This project is in active development.** Versions 0.x may contain bugs or breaking changes between releases. If you encounter any issues, please [report them on GitHub Issues](../../issues).
 

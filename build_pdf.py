@@ -32,9 +32,9 @@ except ImportError:
 
 try:
     import qrcode
-    HAS_QRCODE = True
 except ImportError:
-    HAS_QRCODE = False
+    qrcode = None  # type: ignore[assignment]
+HAS_QRCODE = qrcode is not None
 
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -115,7 +115,7 @@ def _get_display_char(entry: Any) -> tuple[str, bool]:
         return ("", False)
     if char.startswith("dk:"):
         dk_name = char[3:]
-        display = DEAD_KEY_DISPLAY.get(dk_name, dk_name)
+        display = DEAD_KEY_DISPLAY.get(dk_name) or dk_name
         return (display, True)
     return (char, False)
 
@@ -315,11 +315,11 @@ def build_pdf(layout_name: str, style: str, output_dir: str,
 
             key_x += key_w + gap
 
-    site_url = "https://polish-typographic-keyboard-layout.pages.dev/"
+    site_url = "https://polish-typographic.com/"
     footer_y = margin + 2 * mm
     qr_size = 12 * mm
 
-    if HAS_QRCODE:
+    if qrcode is not None:
         qr = qrcode.QRCode(box_size=1, border=0)
         qr.add_data(site_url)
         qr.make(fit=True)
