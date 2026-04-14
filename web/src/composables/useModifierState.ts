@@ -61,10 +61,11 @@ export function useModifierState() {
       return true
     }
 
-    // Windows: AltGr sends Ctrl+Alt. Only AltRight triggers AltGr —
-    // AltLeft with Ctrl is a genuine Ctrl+Alt chord, not AltGr.
-    if (!isMac && e.ctrlKey && e.altKey
-        && (e.code === 'ControlLeft' || e.code === 'ControlRight')) return true
+    // Windows: AltGr fires as synthetic Ctrl+Alt. Treat any Ctrl+Alt
+    // combination as AltGr so users on keyboards without a physical AltGr
+    // (or who prefer the Ctrl+Alt substitute Windows provides) still see
+    // the AltGr / Shift+AltGr layers highlight correctly.
+    if (!isMac && e.ctrlKey && e.altKey) return true
 
     // macOS: Left Option also acts as AltGr.
     if (isMac && e.code === 'AltLeft') return true

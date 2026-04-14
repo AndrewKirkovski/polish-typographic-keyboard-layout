@@ -240,40 +240,42 @@ const layerClass = computed(() => {
   will-change: opacity, transform;
 }
 
-/* AltGr layer active → highlight altgr chars, fade base/shift */
-.key--layer-altgr .key__base,
-.key--layer-altgr .key__shift {
-  opacity: 0.3;
-}
-.key--layer-altgr .key__altgr {
-  transform: scale(1.15);
-}
-.key--layer-altgr .key__sh-altgr {
-  opacity: 0.3;
+/* Highlighted character in any active layer: scale up, sit above the
+   faded siblings, and draw a white text-shadow "stroke" so the glyph
+   stays legible when it overlaps its neighbours at the larger size. */
+.key--layer-altgr .key__altgr,
+.key--layer-shift .key__shift,
+.key--layer-shift_altgr .key__sh-altgr {
+  transform: scale(1.5);
+  z-index: 2;
+  text-shadow:
+    -2px -2px 0 var(--key-bg), 2px -2px 0 var(--key-bg),
+    -2px  2px 0 var(--key-bg), 2px  2px 0 var(--key-bg),
+    -2px  0   0 var(--key-bg), 2px  0   0 var(--key-bg),
+     0   -2px 0 var(--key-bg), 0    2px 0 var(--key-bg),
+    -1px -1px 0 var(--key-bg), 1px -1px 0 var(--key-bg),
+    -1px  1px 0 var(--key-bg), 1px  1px 0 var(--key-bg);
 }
 
-/* Shift layer active → highlight shift, fade altgr */
-.key--layer-shift .key__base {
-  opacity: 0.3;
+/* AltGr layer active → fade the inactive corners */
+.key--layer-altgr .key__base,
+.key--layer-altgr .key__shift,
+.key--layer-altgr .key__sh-altgr {
+  opacity: 0.25;
 }
-.key--layer-shift .key__shift {
-  transform: scale(1.15);
-}
+
+/* Shift layer active → fade the inactive corners */
+.key--layer-shift .key__base,
 .key--layer-shift .key__altgr,
 .key--layer-shift .key__sh-altgr {
-  opacity: 0.3;
+  opacity: 0.25;
 }
 
-/* Shift+AltGr layer active → highlight shift+altgr, fade the rest */
+/* Shift+AltGr layer active → fade the inactive corners */
 .key--layer-shift_altgr .key__base,
-.key--layer-shift_altgr .key__shift {
-  opacity: 0.3;
-}
+.key--layer-shift_altgr .key__shift,
 .key--layer-shift_altgr .key__altgr {
-  opacity: 0.3;
-}
-.key--layer-shift_altgr .key__sh-altgr {
-  transform: scale(1.15);
+  opacity: 0.25;
 }
 
 /* ── Pressed key animation ───────────────────────────────────────────
