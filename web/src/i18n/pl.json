@@ -75,7 +75,12 @@
     "installer": "Skrypt instalacyjny",
     "layoutDll": "Plik DLL układu",
     "layoutFile": "Plik układu",
-    "recommended": "Zalecane dla Twojego systemu"
+    "recommended": "Zalecane dla Twojego systemu",
+    "pdfTitle": "Ściągawka do druku",
+    "pdfPolishColor": "Polski (kolor)",
+    "pdfPolishBw": "Polski (B/W)",
+    "pdfRussianColor": "Rosyjski (kolor)",
+    "pdfRussianBw": "Rosyjski (B/W)"
   },
   "install": {
     "title": "Instalacja",

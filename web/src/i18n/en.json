@@ -75,7 +75,12 @@
     "installer": "Installer script",
     "layoutDll": "Layout DLL",
     "layoutFile": "Layout file",
-    "recommended": "Recommended for your system"
+    "recommended": "Recommended for your system",
+    "pdfTitle": "Printable Reference",
+    "pdfPolishColor": "Polish (color)",
+    "pdfPolishBw": "Polish (B/W)",
+    "pdfRussianColor": "Russian (color)",
+    "pdfRussianBw": "Russian (B/W)"
   },
   "install": {
     "title": "Installation",

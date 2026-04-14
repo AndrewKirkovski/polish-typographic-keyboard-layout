@@ -75,7 +75,12 @@
     "installer": "Скрипт установки",
     "layoutDll": "DLL раскладки",
     "layoutFile": "Файл раскладки",
-    "recommended": "Рекомендуется для вашей системы"
+    "recommended": "Рекомендуется для вашей системы",
+    "pdfTitle": "Шпаргалка для печати",
+    "pdfPolishColor": "Польская (цвет)",
+    "pdfPolishBw": "Польская (Ч/Б)",
+    "pdfRussianColor": "Русская (цвет)",
+    "pdfRussianBw": "Русская (Ч/Б)"
   },
   "install": {
     "title": "Установка",

@@ -31,6 +31,11 @@ jobs:
       - name: Build Windows (DLLs + KLC + Inno Setup installer + zip)
         run: python build.py windows klc
 
+      - name: Build PDF reference sheets
+        run: |
+          pip install reportlab qrcode
+          python build_pdf.py --layout all --style all
+
       - name: List outputs
         run: |
           Get-ChildItem -Recurse dist/ | Format-Table Name, Length
@@ -43,6 +48,7 @@ jobs:
             dist/kirkouski-typographic-*-windows-setup.exe
             dist/kirkouski-typographic-*-windows.zip
             dist/windows-v*/
+            dist/*_typographic_*.pdf
 
   # ── macOS: keylayouts + .pkg installer + zip ─────────────────────────
   build-macos:
@@ -106,3 +112,4 @@ jobs:
             release/kirkouski-typographic-*-windows.zip
             release/kirkouski-typographic-*-macos.zip
             release/kirkouski-typographic-*-macos.pkg
+            release/*_typographic_*.pdf

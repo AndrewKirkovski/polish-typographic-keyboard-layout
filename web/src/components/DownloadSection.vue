@@ -41,6 +41,13 @@ const platforms = computed(() => {
   }
   return detectedOS === 'windows' ? [win, mac] : [mac, win]
 })
+
+const pdfFiles = computed(() => [
+  { file: `polish_typographic_color.pdf`, label: t('download.pdfPolishColor') },
+  { file: `polish_typographic_bw.pdf`, label: t('download.pdfPolishBw') },
+  { file: `russian_typographic_color.pdf`, label: t('download.pdfRussianColor') },
+  { file: `russian_typographic_bw.pdf`, label: t('download.pdfRussianBw') },
+].map(f => ({ ...f, url: `${RELEASE_DL}/${f.file}` })))
 </script>
 
 <template>
@@ -75,6 +82,27 @@ const platforms = computed(() => {
                 </svg>
                 <span class="file-name">{{ file.file }}</span>
                 <span class="file-label">{{ file.label }}</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="download-card">
+          <div class="download-card__header">
+            <span class="download-card__icon">
+              <iconify-icon icon="mdi:file-pdf-box" width="22" aria-hidden="true"></iconify-icon>
+            </span>
+            <h3>{{ t('download.pdfTitle') }}</h3>
+          </div>
+          <ul class="download-card__files">
+            <li v-for="pdf in pdfFiles" :key="pdf.file">
+              <a :href="pdf.url" target="_blank" rel="noopener">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path d="M7 1v8M3 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M1 11v1.5h12V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="file-name">{{ pdf.file }}</span>
+                <span class="file-label">{{ pdf.label }}</span>
               </a>
             </li>
           </ul>
@@ -156,6 +184,7 @@ const platforms = computed(() => {
   color: var(--text);
   text-decoration: none;
   transition: background 0.15s;
+  overflow: hidden;
 }
 
 .download-card__files a:hover {
@@ -172,11 +201,17 @@ const platforms = computed(() => {
   font-family: var(--font-mono);
   font-size: 0.85rem;
   font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 .file-label {
   margin-left: auto;
   font-size: 0.75rem;
   color: var(--text-muted);
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 </style>
