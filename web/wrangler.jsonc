@@ -2,5 +2,8 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "polish-typographic-kirkouski",
   "pages_build_output_dir": "dist",
-  "compatibility_date": "2026-04-08"
+  "compatibility_date": "2026-04-08",
+  "vars": {
+    "VITE_COUNTERSCALE_URL": "https://counterscale.ryotsuke.workers.dev/"
+  }
 }
