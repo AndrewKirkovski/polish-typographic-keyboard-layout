@@ -28,7 +28,7 @@
       "altgr": "AltGr",
       "shAltgr": "Shift+AltGr",
       "polish": "Polski",
-      "russian": "Rosyjski",
+      "russian": "UA/BY",
       "deadKey": "Martwy klawisz",
       "deadKeyTip": "Naciśnij martwy klawisz, potem literę, aby uzyskać znak diakrytyczny (np. ´ potem a → á)"
     },
@@ -85,7 +85,7 @@
       "subtab_zip": "ZIP",
       "exe": {
         "step1": "Pobierz i uruchom instalator .exe — wszystko zrobi automatycznie i poprosi o restart",
-        "step2": "URUCHOM PONOWNIE KOMPUTER przed użyciem nowego układu. Instalator sam o to poprosi. Nie przełączaj się na układ Kirkouski Typographic w Win+Space przed restartem — Eksplorator się zawiesi jeśli DLL nie został jeszcze załadowany.",
+        "step2": "Zrestartuj komputer gdy instalator o to poprosi — nowy układ pojawi się w Ustawieniach po restarcie",
         "step3": "Po restarcie przejdź do Ustawienia > Czas i język > Język i region > Klawiatura i dodaj nowy układ",
         "uninstall": "Aby odinstalować: Ustawienia > Aplikacje > Zainstalowane aplikacje, znajdź Kirkouski Typographic i kliknij Odinstaluj. Wymagany restart."
       },

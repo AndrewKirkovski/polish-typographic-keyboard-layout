@@ -28,7 +28,7 @@
       "altgr": "AltGr",
       "shAltgr": "Shift+AltGr",
       "polish": "Polish",
-      "russian": "Russian",
+      "russian": "UA/BY",
       "deadKey": "Dead key",
       "deadKeyTip": "Press dead key, then a letter to produce an accented character (e.g. ´ then a → á)"
     },
@@ -85,7 +85,7 @@
       "subtab_zip": "ZIP",
       "exe": {
         "step1": "Download and run the .exe installer — it handles everything automatically and prompts for a reboot",
-        "step2": "RESTART YOUR COMPUTER before using the new layout. The installer will prompt you. Don't switch to the Kirkouski Typographic layout in Win+Space until after the reboot — Explorer will crash if the DLL isn't loaded yet.",
+        "step2": "Restart when prompted — the new layout will appear in Settings after the reboot",
         "step3": "After the reboot, go to Settings > Time & Language > Language & Region > Keyboard and add the new layout",
         "uninstall": "To uninstall: open Settings > Apps > Installed Apps, find Kirkouski Typographic, and click Uninstall. Reboot required."
       },

@@ -39,12 +39,9 @@ const activeTab = ref<InstallTab>(detectOS() === 'macos' ? 'mac-pkg' : 'win-exe'
           <span class="step-num">1</span>
           <p>{{ t('install.windows.exe.step1') }}</p>
         </div>
-        <div class="step step--warning">
-          <span class="step-num">
-            <iconify-icon icon="material-symbols:warning-rounded" aria-hidden="true"></iconify-icon>
-            <span class="step-num-text">2</span>
-          </span>
-          <p><strong>{{ t('install.windows.exe.step2') }}</strong></p>
+        <div class="step">
+          <span class="step-num">2</span>
+          <p>{{ t('install.windows.exe.step2') }}</p>
         </div>
         <div class="step">
           <span class="step-num">3</span>

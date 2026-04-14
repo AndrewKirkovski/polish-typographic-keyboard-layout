@@ -280,10 +280,24 @@ const layerClass = computed(() => {
    A subtle scale-down + inset shadow simulates the physical press.
    The glow uses the accent colour at low alpha for a satisfying
    visual cue without being distracting. */
+.key::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: calc(var(--key-radius) + 2px);
+  box-shadow: 0 0 0 2px var(--color-altgr), inset 0 0 0 2px var(--color-altgr);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 80ms ease-out;
+}
+
 .key--pressed {
   transform: scale(0.95);
-  box-shadow: 0 0 6px 1px rgba(196, 54, 44, 0.35), inset 0 1px 2px rgba(0, 0, 0, 0.15);
-  transition: transform 80ms ease-out, box-shadow 80ms ease-out, background 0.12s, border-color 0.12s;
+  transition: transform 80ms ease-out, background 0.12s, border-color 0.12s;
+}
+
+.key--pressed::after {
+  opacity: 0.4;
 }
 
 /* Tooltip body skin lives in style.css under .v-popper--theme-key-tooltip

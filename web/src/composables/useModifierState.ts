@@ -38,11 +38,6 @@ export function useModifierState() {
     manualLayer.value = layer
   }
 
-  // ── AltGr timing heuristic (Windows) ────────────────────────────────
-  // Windows sends ControlLeft keydown ~0-2 ms before AltRight keydown
-  // when the physical AltGr key is pressed. We track the ControlLeft
-  // timestamp and suppress it if AltRight follows within 10 ms.
-  let ctrlLeftDownTime = 0
   let suppressCtrlLeft = false
   const isMac = detectOS() === 'macos'
 
@@ -58,20 +53,21 @@ export function useModifierState() {
 
   // ── Helpers ─────────────────────────────────────────────────────────
   function isAltGrEvent(e: KeyboardEvent): boolean {
-    // Primary detection: the browser knows.
     if (e.getModifierState('AltGraph')) return true
 
-    // macOS: either Alt/Option key is "AltGr" for our purposes.
-    if (isMac && (e.code === 'AltLeft' || e.code === 'AltRight')) return true
-
-    // Windows fallback: AltRight within 10 ms of ControlLeft = AltGr.
-    if (!isMac && e.code === 'AltRight') {
-      const gap = e.timeStamp - ctrlLeftDownTime
-      if (gap < 10) {
-        suppressCtrlLeft = true
-        return true
-      }
+    // AltRight is physically AltGr on every platform.
+    if (e.code === 'AltRight') {
+      if (!isMac) suppressCtrlLeft = true
+      return true
     }
+
+    // Windows: AltGr sends Ctrl+Alt. Only AltRight triggers AltGr —
+    // AltLeft with Ctrl is a genuine Ctrl+Alt chord, not AltGr.
+    if (!isMac && e.ctrlKey && e.altKey
+        && (e.code === 'ControlLeft' || e.code === 'ControlRight')) return true
+
+    // macOS: Left Option also acts as AltGr.
+    if (isMac && e.code === 'AltLeft') return true
 
     return false
   }
@@ -80,7 +76,6 @@ export function useModifierState() {
     shiftHeld.value = false
     altGrHeld.value = false
     pressedKeyIds.value = new Set()
-    ctrlLeftDownTime = 0
     suppressCtrlLeft = false
   }
 
@@ -90,11 +85,6 @@ export function useModifierState() {
     // visualisation follows the physical state again.
     if (manualLayer.value !== null) {
       manualLayer.value = null
-    }
-
-    // Track ControlLeft timing for AltGr heuristic.
-    if (e.code === 'ControlLeft') {
-      ctrlLeftDownTime = e.timeStamp
     }
 
     // Shift
@@ -110,6 +100,11 @@ export function useModifierState() {
     // Track pressed key for visual feedback.
     const keyId = codeToKeyId[e.code]
     if (keyId) {
+      const target = e.target as HTMLElement | null
+      const isEditable = target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA'
+        || target?.tagName === 'SELECT' || target?.isContentEditable
+        || target?.getAttribute('role') === 'textbox'
+      if (altGrHeld.value && !isEditable) e.preventDefault()
       const next = new Set(pressedKeyIds.value)
       next.add(keyId)
       pressedKeyIds.value = next
@@ -131,10 +126,12 @@ export function useModifierState() {
       // (AltGr release sends both ControlLeft up and AltRight up.)
     }
 
-    // AltGr / Alt release
-    if (e.code === 'AltRight' || (isMac && (e.code === 'AltLeft' || e.code === 'AltRight'))) {
-      altGrHeld.value = false
-      suppressCtrlLeft = false
+    // AltGr / Alt release — also clears when either half of Ctrl+Alt is released
+    if (e.code === 'AltRight' || e.code === 'AltLeft' || e.code === 'ControlLeft') {
+      if (altGrHeld.value && (!e.ctrlKey || !e.altKey)) {
+        altGrHeld.value = false
+        suppressCtrlLeft = false
+      }
     }
 
     // Un-track pressed key.
@@ -151,9 +148,7 @@ export function useModifierState() {
   }
 
   function onVisibilityChange() {
-    if (typeof document !== 'undefined' && document.hidden) {
-      resetAll()
-    }
+    resetAll()
   }
 
   // ── Lifecycle ───────────────────────────────────────────────────────
