@@ -1,17 +1,21 @@
 :root {
   --bg: #faf9f6;
+  --bg-raised: #ffffff;
   --fg: #1a1a1a;
   --muted: #6e6e6e;
   --accent: #c4362c;
+  --accent-weak: rgba(196, 54, 44, 0.12);
   --border: #e4e2dc;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #1a1a1a;
+    --bg-raised: #222;
     --fg: #eaeaea;
     --muted: #9a9a9a;
     --accent: #d94a3d;
+    --accent-weak: rgba(217, 74, 61, 0.18);
     --border: #2a2a2a;
   }
 }
@@ -21,7 +25,7 @@
 body {
   margin: 0;
   padding: 16px 18px 14px;
-  width: 300px;
+  width: 320px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   font-size: 13px;
   line-height: 1.45;
@@ -41,6 +45,94 @@ h1 {
   font-size: 11px;
   color: var(--muted);
 }
+
+/* ── Per-site section ─────────────────────────────────────── */
+
+.site {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.section-legend {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.hostname {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  color: var(--fg);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 220px;
+  direction: rtl;  /* ellipsize from the left so the TLD stays visible */
+  text-align: right;
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  padding: 2px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.segmented label {
+  position: relative;
+}
+
+.segmented input[type="radio"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.segmented label span {
+  display: block;
+  padding: 6px 4px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 4px;
+  color: var(--muted);
+  transition: background 0.15s, color 0.15s;
+}
+
+.segmented label:hover span { color: var(--fg); }
+
+.segmented input[type="radio"]:checked + span {
+  background: var(--accent-weak);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.site-hint {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--muted);
+  min-height: 1.2em;
+}
+
+/* ── Global default fieldset ──────────────────────────────── */
 
 .modes {
   border: 1px solid var(--border);

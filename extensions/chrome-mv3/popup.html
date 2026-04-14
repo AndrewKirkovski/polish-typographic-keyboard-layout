@@ -9,8 +9,32 @@
   <h1>Szpargalka Sans</h1>
   <p class="subtitle">Polish pronunciation hints via OpenType ligatures</p>
 
+  <!-- Per-site override (this tab only) -->
+  <section class="site" aria-labelledby="site-legend">
+    <div class="site-header">
+      <span id="site-legend" class="section-legend">This site</span>
+      <span id="hostname" class="hostname" title="">—</span>
+    </div>
+    <div class="segmented" role="radiogroup" aria-label="Per-site override">
+      <label>
+        <input type="radio" name="siteOverride" value="default">
+        <span>Default</span>
+      </label>
+      <label>
+        <input type="radio" name="siteOverride" value="on">
+        <span>Force&nbsp;on</span>
+      </label>
+      <label>
+        <input type="radio" name="siteOverride" value="off">
+        <span>Force&nbsp;off</span>
+      </label>
+    </div>
+    <p class="site-hint" id="site-hint">Uses the global default below.</p>
+  </section>
+
+  <!-- Global default (all sites) -->
   <fieldset class="modes">
-    <legend>Apply on</legend>
+    <legend>Global default</legend>
     <label>
       <input type="radio" name="mode" value="polish">
       <span class="title">Polish pages only</span>
@@ -24,7 +48,7 @@
     <label>
       <input type="radio" name="mode" value="off">
       <span class="title">Off</span>
-      <span class="desc">Extension does nothing</span>
+      <span class="desc">Extension does nothing unless overridden per-site</span>
     </label>
   </fieldset>
 

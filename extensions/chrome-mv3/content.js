@@ -6,14 +6,22 @@
  * universal font override. The actual CSS override lives in the same style
  * block so we only inject once per page.
  *
- * Mode is read from chrome.storage.sync and defaults to "polish" (only
- * activate on Polish pages). The popup writes to the same key and the
- * storage.onChanged listener below re-applies without needing a reload.
+ * Two settings layers:
+ *   - `mode` (global default): 'polish' | 'always' | 'off'
+ *   - `siteOverrides[hostname]`: 'on' | 'off' | undefined
+ *
+ * Site overrides always win over the global default. `on` forces activation
+ * even when the page isn't Polish; `off` forces deactivation even when the
+ * global is `always`. Both are keyed by the exact hostname of the page.
+ *
+ * The popup writes to these keys and the storage.onChanged listener below
+ * re-applies the effective mode without needing a page reload.
  */
 
 const SZPARGALKA_STYLE_ID = 'szpargalka-sans-override'
 const ACTIVE_CLASS = 'szpargalka-active'
 const DEFAULT_MODE = 'polish' // polish | always | off
+const DEFAULT_SITE_OVERRIDES = {}
 
 // ── Polish detection ───────────────────────────────────────────────
 
@@ -126,11 +134,40 @@ function applyMode(mode) {
   }
 }
 
-// ── Load mode + listen for changes ──────────────────────────────────
+// ── Effective mode resolver ─────────────────────────────────────────
+// A site override always wins over the global mode. We map the override
+// to a regular mode string so applyMode() doesn't need to know about
+// overrides.
 
-chrome.storage.sync.get({ mode: DEFAULT_MODE }, ({ mode }) => applyMode(mode))
+function resolveEffectiveMode(globalMode, siteOverrides) {
+  const override = siteOverrides?.[location.hostname]
+  if (override === 'on') return 'always'
+  if (override === 'off') return 'off'
+  return globalMode
+}
+
+// ── Load state + listen for changes ─────────────────────────────────
+
+function loadAndApply() {
+  chrome.storage.sync.get(
+    { mode: DEFAULT_MODE, siteOverrides: DEFAULT_SITE_OVERRIDES },
+    ({ mode, siteOverrides }) => {
+      applyMode(resolveEffectiveMode(mode, siteOverrides))
+    },
+  )
+}
+
+loadAndApply()
 
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area !== 'sync' || !changes.mode) return
-  applyMode(changes.mode.newValue || DEFAULT_MODE)
+  if (area !== 'sync') return
+  // Re-apply if either the global mode OR our site's override changed.
+  const modeChanged = !!changes.mode
+  const overrideChanged =
+    !!changes.siteOverrides &&
+    (changes.siteOverrides.oldValue?.[location.hostname] !==
+      changes.siteOverrides.newValue?.[location.hostname])
+  if (modeChanged || overrideChanged) {
+    loadAndApply()
+  }
 })

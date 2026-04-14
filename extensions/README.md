@@ -85,9 +85,14 @@ works offline.
    ```
 2. Open `chrome://extensions` → enable **Developer mode** (top right) →
    click **Load unpacked** → select the `extensions/chrome-mv3/` folder.
-3. Click the extension's toolbar icon. The popup shows a 3-way radio:
-   *Polish pages only / Everywhere / Off*. Pick one and the active tab
-   re-applies immediately — no reload needed.
+3. Click the extension's toolbar icon. The popup has two sections:
+   - **This site** — per-site override showing the active tab's
+     hostname. Toggle *Default / Force on / Force off* to override the
+     global behaviour for just this site. "Default" clears the override
+     and falls back to the global setting below.
+   - **Global default** — the 3-way radio *Polish pages only / Everywhere
+     / Off* that applies to every site without its own override.
+   Both changes re-apply in the active tab immediately — no reload.
 
 ## Known quirks
 
