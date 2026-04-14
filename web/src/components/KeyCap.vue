@@ -7,12 +7,15 @@ import { Tooltip as VTooltip } from 'floating-vue'
 import type { KeyDef } from '../composables/keyboardData'
 import type { LayoutData } from '../composables/useLayout'
 import { parseEntry } from '../composables/useLayout'
+import type { Layer } from '../composables/useModifierState'
 
 const { t } = useI18n()
 
 const props = defineProps<{
   keyDef: KeyDef
   layout: LayoutData | null
+  activeLayer?: Layer
+  isPressed?: boolean
 }>()
 
 const baseChar = computed(() => {
@@ -56,6 +59,11 @@ const keyWidth = computed(() => {
 })
 
 const isAltGrKey = computed(() => props.keyDef.id === '_ra')
+
+const layerClass = computed(() => {
+  if (!props.activeLayer || props.activeLayer === 'base') return ''
+  return `key--layer-${props.activeLayer}`
+})
 </script>
 
 <template>
@@ -66,10 +74,14 @@ const isAltGrKey = computed(() => props.keyDef.id === '_ra')
   >
     <div
       class="key"
-      :class="{
-        'key--modifier': keyDef.isModifier,
-        'key--altgr': isAltGrKey,
-      }"
+      :class="[
+        layerClass,
+        {
+          'key--modifier': keyDef.isModifier,
+          'key--altgr': isAltGrKey,
+          'key--pressed': isPressed,
+        },
+      ]"
       :style="{ width: keyWidth }"
       :tabindex="keyDef.isModifier ? -1 : 0"
       :role="keyDef.isModifier ? undefined : 'button'"
@@ -128,7 +140,7 @@ const isAltGrKey = computed(() => props.keyDef.id === '_ra')
   border-radius: var(--key-radius);
   position: relative;
   cursor: default;
-  transition: background 0.12s, border-color 0.12s;
+  transition: background 0.12s, border-color 0.12s, transform 80ms ease-out, box-shadow 80ms ease-out;
   box-shadow: var(--key-shadow);
   flex-shrink: 0;
 }
@@ -213,6 +225,66 @@ const isAltGrKey = computed(() => props.keyDef.id === '_ra')
 .color-polish { color: var(--color-polish); }
 .color-russian { color: var(--color-russian); }
 .color-dead { color: var(--color-dead); }
+
+/* ── Layer highlighting ──────────────────────────────────────────────
+   When a modifier layer is active, the "active" corner characters
+   scale up slightly and stay at full opacity. The other corners fade
+   to 0.3 so the active layer pops visually. GPU-composited properties
+   only (opacity + transform) for smooth 150ms transitions. */
+
+.key__base,
+.key__shift,
+.key__altgr,
+.key__sh-altgr {
+  transition: opacity 150ms ease-out, transform 150ms ease-out;
+  will-change: opacity, transform;
+}
+
+/* AltGr layer active → highlight altgr chars, fade base/shift */
+.key--layer-altgr .key__base,
+.key--layer-altgr .key__shift {
+  opacity: 0.3;
+}
+.key--layer-altgr .key__altgr {
+  transform: scale(1.15);
+}
+.key--layer-altgr .key__sh-altgr {
+  opacity: 0.3;
+}
+
+/* Shift layer active → highlight shift, fade altgr */
+.key--layer-shift .key__base {
+  opacity: 0.3;
+}
+.key--layer-shift .key__shift {
+  transform: scale(1.15);
+}
+.key--layer-shift .key__altgr,
+.key--layer-shift .key__sh-altgr {
+  opacity: 0.3;
+}
+
+/* Shift+AltGr layer active → highlight shift+altgr, fade the rest */
+.key--layer-shift_altgr .key__base,
+.key--layer-shift_altgr .key__shift {
+  opacity: 0.3;
+}
+.key--layer-shift_altgr .key__altgr {
+  opacity: 0.3;
+}
+.key--layer-shift_altgr .key__sh-altgr {
+  transform: scale(1.15);
+}
+
+/* ── Pressed key animation ───────────────────────────────────────────
+   A subtle scale-down + inset shadow simulates the physical press.
+   The glow uses the accent colour at low alpha for a satisfying
+   visual cue without being distracting. */
+.key--pressed {
+  transform: scale(0.95);
+  box-shadow: 0 0 6px 1px rgba(196, 54, 44, 0.35), inset 0 1px 2px rgba(0, 0, 0, 0.15);
+  transition: transform 80ms ease-out, box-shadow 80ms ease-out, background 0.12s, border-color 0.12s;
+}
 
 /* Tooltip body skin lives in style.css under .v-popper--theme-key-tooltip
    and .key-tooltip-body — the popper is teleported to <body> by floating-vue,

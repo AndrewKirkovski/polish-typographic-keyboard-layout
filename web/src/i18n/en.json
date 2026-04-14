@@ -32,6 +32,10 @@
       "deadKey": "Dead key",
       "deadKeyTip": "Press dead key, then a letter to produce an accented character (e.g. ´ then a → á)"
     },
+    "layers": {
+      "label": "Layer",
+      "auto": "Auto"
+    },
     "tooltip": {
       "key": "Key",
       "altgr": "AltGr",
@@ -77,20 +81,38 @@
     "title": "Installation",
     "windows": {
       "tab": "Windows",
-      "step1_exe": "Download and run the .exe installer — it handles everything automatically and prompts for a reboot",
-      "step1_zip": "Or download the .zip for manual install: extract, right-click install.ps1 and select \"Run with PowerShell\"",
-      "step2": "RESTART YOUR COMPUTER before using the new layout. The installer will prompt you. Don't switch to the Kirkouski Typographic layout in Win+Space until after the reboot — Explorer will crash if the DLL isn't loaded yet.",
-      "step3": "After the reboot, go to Settings > Time & Language > Language & Region > Keyboard and add the new layout",
+      "subtab_exe": "Installer",
+      "subtab_zip": "ZIP",
+      "exe": {
+        "step1": "Download and run the .exe installer — it handles everything automatically and prompts for a reboot",
+        "step2": "RESTART YOUR COMPUTER before using the new layout. The installer will prompt you. Don't switch to the Kirkouski Typographic layout in Win+Space until after the reboot — Explorer will crash if the DLL isn't loaded yet.",
+        "step3": "After the reboot, go to Settings > Time & Language > Language & Region > Keyboard and add the new layout",
+        "uninstall": "To uninstall: open Settings > Apps > Installed Apps, find Kirkouski Typographic, and click Uninstall. Reboot required."
+      },
+      "zip": {
+        "step1": "Download the .zip, extract it, right-click install.ps1 and select \"Run with PowerShell\"",
+        "step2": "RESTART YOUR COMPUTER before using the new layout. The script will prompt you. Don't switch to the Kirkouski Typographic layout in Win+Space until after the reboot — Explorer will crash if the DLL isn't loaded yet.",
+        "step3": "After the reboot, go to Settings > Time & Language > Language & Region > Keyboard and add the new layout",
+        "uninstall": "To uninstall: run install.ps1 again — it detects the install and offers removal. Reboot required."
+      },
       "loginScreen": "To apply to login screen: Win+R > intl.cpl > Administrative > Copy settings > check both boxes",
-      "uninstall": "To uninstall: open Settings > Apps > Installed Apps, find Kirkouski Typographic, and click Uninstall. For ZIP installs, run install.ps1 again — it detects the install and offers removal. Reboot required after either method.",
       "hardCleanup": "If Explorer crashes after a reboot (rare): run {cmd} to remove all traces."
     },
     "macos": {
       "tab": "macOS",
-      "step1_install": "Download the .zip, unzip, and move Kirkouski Typographic.bundle to {userPath} (current user) or {systemPath} (all users)",
-      "step2_xattr": "Clear the quarantine xattr — without this, macOS may silently refuse to load the bundle: {cmd}",
-      "step3_logout": "Log out and log back in (a full logout, not just the lock screen)",
-      "step4_pick": "Open System Settings > Keyboard > Input Sources > + and add the Polish/Russian Kirkouski Typographic layouts"
+      "subtab_pkg": "Installer",
+      "subtab_zip": "ZIP",
+      "pkg": {
+        "step1": "Download and run the .pkg installer — it copies the keyboard bundle to the correct location automatically",
+        "step2": "Log out and log back in (a full logout, not just the lock screen)",
+        "step3": "Open System Settings > Keyboard > Input Sources > + and add the Polish/Russian Kirkouski Typographic layouts"
+      },
+      "zip": {
+        "step1": "Download the .zip, unzip, and move Kirkouski Typographic.bundle to {userPath} (current user) or {systemPath} (all users)",
+        "step2": "Clear the quarantine xattr — without this, macOS may silently refuse to load the bundle: {cmd}",
+        "step3": "Log out and log back in (a full logout, not just the lock screen)",
+        "step4": "Open System Settings > Keyboard > Input Sources > + and add the Polish/Russian Kirkouski Typographic layouts"
+      }
     }
   },
   "about": {

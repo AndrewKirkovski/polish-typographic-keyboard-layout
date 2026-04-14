@@ -4,10 +4,9 @@ import { useI18n } from 'vue-i18n'
 import { detectOS } from '../composables/useOS'
 
 const { t } = useI18n()
-// Default the tab to the visitor's actual OS. Synchronous detection so the
-// first render lands on the correct panel — no flash of Windows content for
-// mac users.
-const activeTab = ref<'windows' | 'macos'>(detectOS())
+
+type InstallTab = 'win-exe' | 'win-zip' | 'mac-pkg' | 'mac-zip'
+const activeTab = ref<InstallTab>(detectOS() === 'macos' ? 'mac-pkg' : 'win-exe')
 </script>
 
 <template>
@@ -17,77 +16,106 @@ const activeTab = ref<'windows' | 'macos'>(detectOS())
 
       <div class="tabs" role="tablist" :aria-label="t('install.title')">
         <button
-          id="tab-windows"
+          v-for="tab in ([
+            { id: 'win-exe', label: `${t('install.windows.tab')} · ${t('install.windows.subtab_exe')}` },
+            { id: 'win-zip', label: `${t('install.windows.tab')} · ${t('install.windows.subtab_zip')}` },
+            { id: 'mac-pkg', label: `${t('install.macos.tab')} · ${t('install.macos.subtab_pkg')}` },
+            { id: 'mac-zip', label: `${t('install.macos.tab')} · ${t('install.macos.subtab_zip')}` },
+          ] as const)"
+          :key="tab.id"
+          :id="`tab-${tab.id}`"
           role="tab"
-          :aria-selected="activeTab === 'windows'"
-          :tabindex="activeTab === 'windows' ? 0 : -1"
-          aria-controls="panel-windows"
-          :class="{ active: activeTab === 'windows' }"
-          @click="activeTab = 'windows'"
-        >{{ t('install.windows.tab') }}</button>
-        <button
-          id="tab-macos"
-          role="tab"
-          :aria-selected="activeTab === 'macos'"
-          :tabindex="activeTab === 'macos' ? 0 : -1"
-          aria-controls="panel-macos"
-          :class="{ active: activeTab === 'macos' }"
-          @click="activeTab = 'macos'"
-        >{{ t('install.macos.tab') }}</button>
+          :aria-selected="activeTab === tab.id"
+          :tabindex="activeTab === tab.id ? 0 : -1"
+          :aria-controls="`panel-${tab.id}`"
+          :class="{ active: activeTab === tab.id }"
+          @click="activeTab = tab.id as InstallTab"
+        >{{ tab.label }}</button>
       </div>
 
-      <div v-if="activeTab === 'windows'" id="panel-windows" role="tabpanel" aria-labelledby="tab-windows" class="install-steps">
+      <!-- ── Windows EXE ───────────────────────────────────────────── -->
+      <div v-if="activeTab === 'win-exe'" id="panel-win-exe" role="tabpanel" aria-labelledby="tab-win-exe" class="install-steps">
         <div class="step">
           <span class="step-num">1</span>
-          <p>{{ t('install.windows.step1_exe') }}</p>
-        </div>
-        <div class="step step--alt">
-          <span class="step-num" aria-hidden="true">&mdash;</span>
-          <p>{{ t('install.windows.step1_zip') }}</p>
+          <p>{{ t('install.windows.exe.step1') }}</p>
         </div>
         <div class="step step--warning">
           <span class="step-num">
             <iconify-icon icon="material-symbols:warning-rounded" aria-hidden="true"></iconify-icon>
             <span class="step-num-text">2</span>
           </span>
-          <p><strong>{{ t('install.windows.step2') }}</strong></p>
+          <p><strong>{{ t('install.windows.exe.step2') }}</strong></p>
         </div>
         <div class="step">
           <span class="step-num">3</span>
-          <p>{{ t('install.windows.step3') }}</p>
+          <p>{{ t('install.windows.exe.step3') }}</p>
         </div>
-        <p class="info-note">
-          {{ t('install.windows.loginScreen') }}
-        </p>
-        <p class="uninstall-note">
-          {{ t('install.windows.uninstall') }}
-        </p>
+        <p class="uninstall-note">{{ t('install.windows.exe.uninstall') }}</p>
+        <p class="info-note">{{ t('install.windows.loginScreen') }}</p>
+      </div>
+
+      <!-- ── Windows ZIP ───────────────────────────────────────────── -->
+      <div v-if="activeTab === 'win-zip'" id="panel-win-zip" role="tabpanel" aria-labelledby="tab-win-zip" class="install-steps">
+        <div class="step">
+          <span class="step-num">1</span>
+          <p>{{ t('install.windows.zip.step1') }}</p>
+        </div>
+        <div class="step step--warning">
+          <span class="step-num">
+            <iconify-icon icon="material-symbols:warning-rounded" aria-hidden="true"></iconify-icon>
+            <span class="step-num-text">2</span>
+          </span>
+          <p><strong>{{ t('install.windows.zip.step2') }}</strong></p>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <p>{{ t('install.windows.zip.step3') }}</p>
+        </div>
+        <p class="uninstall-note">{{ t('install.windows.zip.uninstall') }}</p>
+        <p class="info-note">{{ t('install.windows.loginScreen') }}</p>
         <p class="uninstall-note">
           {{ t('install.windows.hardCleanup', { cmd: '.\\install.ps1 -HardCleanup' }) }}
         </p>
       </div>
 
-      <div v-if="activeTab === 'macos'" id="panel-macos" role="tabpanel" aria-labelledby="tab-macos" class="install-steps">
+      <!-- ── macOS PKG ─────────────────────────────────────────────── -->
+      <div v-if="activeTab === 'mac-pkg'" id="panel-mac-pkg" role="tabpanel" aria-labelledby="tab-mac-pkg" class="install-steps">
         <div class="step">
           <span class="step-num">1</span>
-          <p>{{ t('install.macos.step1_install', {
+          <p>{{ t('install.macos.pkg.step1') }}</p>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <p>{{ t('install.macos.pkg.step2') }}</p>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <p>{{ t('install.macos.pkg.step3') }}</p>
+        </div>
+      </div>
+
+      <!-- ── macOS ZIP ─────────────────────────────────────────────── -->
+      <div v-if="activeTab === 'mac-zip'" id="panel-mac-zip" role="tabpanel" aria-labelledby="tab-mac-zip" class="install-steps">
+        <div class="step">
+          <span class="step-num">1</span>
+          <p>{{ t('install.macos.zip.step1', {
             userPath: '~/Library/Keyboard Layouts/',
             systemPath: '/Library/Keyboard Layouts/'
           }) }}</p>
         </div>
         <div class="step step--command">
           <span class="step-num">2</span>
-          <p>{{ t('install.macos.step2_xattr', {
+          <p>{{ t('install.macos.zip.step2', {
             cmd: 'xattr -dr com.apple.quarantine ~/Library/Keyboard\\ Layouts/Kirkouski\\ Typographic.bundle'
           }) }}</p>
         </div>
         <div class="step">
           <span class="step-num">3</span>
-          <p>{{ t('install.macos.step3_logout') }}</p>
+          <p>{{ t('install.macos.zip.step3') }}</p>
         </div>
         <div class="step">
           <span class="step-num">4</span>
-          <p>{{ t('install.macos.step4_pick') }}</p>
+          <p>{{ t('install.macos.zip.step4') }}</p>
         </div>
       </div>
     </div>
@@ -102,19 +130,21 @@ const activeTab = ref<'windows' | 'macos'>(detectOS())
   border-radius: 8px;
   padding: 3px;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
 }
 
 .tabs button {
   font-family: var(--font-body);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 500;
-  padding: 8px 24px;
+  padding: 7px 16px;
   border: none;
   border-radius: 6px;
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;
   transition: all 0.15s;
+  white-space: nowrap;
 }
 
 .tabs button.active {
@@ -154,9 +184,6 @@ const activeTab = ref<'windows' | 'macos'>(detectOS())
   padding-top: 0.15rem;
 }
 
-/* Warning step (Windows reboot requirement) — visually loud so users
-   don't skip it. The crash reports we get are 100% from people who
-   skipped this step. */
 .step--warning {
   background: rgba(212, 64, 58, 0.06);
   border-radius: 8px;
@@ -190,10 +217,6 @@ const activeTab = ref<'windows' | 'macos'>(detectOS())
   font-weight: 600;
 }
 
-/* macOS shell-command step (xattr quarantine clear). Same prominence as a
-   numbered step, but the body text is monospace because it includes a
-   verbatim command the user must run. Not styled as `step--alt` because
-   it's mandatory, not optional. */
 .step--command p {
   font-family: var(--font-mono, ui-monospace, 'JetBrains Mono', monospace);
   font-size: 0.85rem;

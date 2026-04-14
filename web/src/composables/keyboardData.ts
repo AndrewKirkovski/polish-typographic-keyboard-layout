@@ -7,6 +7,84 @@ export interface KeyDef {
   altLabel?: string  // Mac equivalent symbol
 }
 
+/**
+ * Maps KeyboardEvent.code values to KeyDef.id values used in KEYBOARD_ROWS.
+ * This lets useModifierState translate physical key events into the key IDs
+ * that KeyCap uses for pressed-state highlighting.
+ */
+export const CODE_TO_KEY_ID: Record<string, string> = {
+  // Number row
+  Backquote: '`',
+  Digit1: '1',
+  Digit2: '2',
+  Digit3: '3',
+  Digit4: '4',
+  Digit5: '5',
+  Digit6: '6',
+  Digit7: '7',
+  Digit8: '8',
+  Digit9: '9',
+  Digit0: '0',
+  Minus: '-',
+  Equal: '=',
+  Backspace: '_bs',
+
+  // QWERTY row
+  Tab: '_tab',
+  KeyQ: 'Q',
+  KeyW: 'W',
+  KeyE: 'E',
+  KeyR: 'R',
+  KeyT: 'T',
+  KeyY: 'Y',
+  KeyU: 'U',
+  KeyI: 'I',
+  KeyO: 'O',
+  KeyP: 'P',
+  BracketLeft: '[',
+  BracketRight: ']',
+  Backslash: '\\',
+
+  // Home row
+  CapsLock: '_caps',
+  KeyA: 'A',
+  KeyS: 'S',
+  KeyD: 'D',
+  KeyF: 'F',
+  KeyG: 'G',
+  KeyH: 'H',
+  KeyJ: 'J',
+  KeyK: 'K',
+  KeyL: 'L',
+  Semicolon: ';',
+  Quote: "'",
+  Enter: '_enter',
+
+  // Bottom row
+  ShiftLeft: '_lsh',
+  KeyZ: 'Z',
+  KeyX: 'X',
+  KeyC: 'C',
+  KeyV: 'V',
+  KeyB: 'B',
+  KeyN: 'N',
+  KeyM: 'M',
+  Comma: ',',
+  Period: '.',
+  Slash: '/',
+  ShiftRight: '_rsh',
+
+  // Space row
+  ControlLeft: '_lc',
+  MetaLeft: '_lw',
+  AltLeft: '_la',
+  Space: '_sp',
+  AltRight: '_ra',
+  MetaRight: '_rw',
+  ContextMenu: '_mn',
+  ControlRight: '_rc',
+}
+
 export const KEYBOARD_ROWS: KeyDef[][] = [
   // Number row
   [

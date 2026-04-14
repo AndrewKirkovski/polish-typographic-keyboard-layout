@@ -1,11 +1,30 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { useLayout } from '../composables/useLayout'
-import { KEYBOARD_ROWS } from '../composables/keyboardData'
+import { KEYBOARD_ROWS, CODE_TO_KEY_ID } from '../composables/keyboardData'
+import { useModifierState } from '../composables/useModifierState'
+import type { Layer } from '../composables/useModifierState'
 import KeyCap from './KeyCap.vue'
 
 const { t } = useI18n()
 const { active, activeId, setActive } = useLayout()
+const {
+  activeLayer,
+  pressedKeyIds,
+  manualLayer,
+  setManualLayer,
+  setCodeToKeyId,
+} = useModifierState()
+
+// Wire up the code-to-key-id mapping so pressed keys light up.
+setCodeToKeyId(CODE_TO_KEY_ID)
+
+const LAYER_OPTIONS: { value: Layer | null; labelKey: string }[] = [
+  { value: null, labelKey: 'keyboard.layers.auto' },
+  { value: 'base', labelKey: 'keyboard.legend.base' },
+  { value: 'altgr', labelKey: 'keyboard.legend.altgr' },
+  { value: 'shift_altgr', labelKey: 'keyboard.legend.shAltgr' },
+]
 </script>
 
 <template>
@@ -40,9 +59,22 @@ const { active, activeId, setActive } = useLayout()
               :key="keyDef.id"
               :keyDef="keyDef"
               :layout="active"
+              :activeLayer="activeLayer"
+              :isPressed="pressedKeyIds.has(keyDef.id)"
             />
           </div>
         </div>
+      </div>
+
+      <div class="layer-switcher" role="radiogroup" :aria-label="t('keyboard.layers.label')">
+        <button
+          v-for="opt in LAYER_OPTIONS"
+          :key="opt.labelKey"
+          role="radio"
+          :aria-checked="manualLayer === opt.value"
+          :class="{ active: manualLayer === opt.value }"
+          @click="setManualLayer(opt.value)"
+        >{{ t(opt.labelKey) }}</button>
       </div>
 
       <div class="legend">
@@ -199,5 +231,38 @@ const { active, activeId, setActive } = useLayout()
 .legend-item--has-tip {
   cursor: help;
   position: relative;
+}
+
+/* ── Layer toggle (mobile / manual) ────────────────────────────────── */
+.layer-switcher {
+  display: inline-flex;
+  gap: 2px;
+  background: var(--bg-subtle);
+  border-radius: 8px;
+  padding: 3px;
+  margin-top: 0.75rem;
+}
+
+.layer-switcher button {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.layer-switcher button.active {
+  background: var(--bg-elevated);
+  color: var(--text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.layer-switcher button:hover:not(.active) {
+  color: var(--text-secondary);
 }
 </style>

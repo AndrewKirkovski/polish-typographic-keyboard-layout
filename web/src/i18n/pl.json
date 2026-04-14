@@ -32,6 +32,10 @@
       "deadKey": "Martwy klawisz",
       "deadKeyTip": "Naciśnij martwy klawisz, potem literę, aby uzyskać znak diakrytyczny (np. ´ potem a → á)"
     },
+    "layers": {
+      "label": "Warstwa",
+      "auto": "Auto"
+    },
     "tooltip": {
       "key": "Klawisz",
       "altgr": "AltGr",
@@ -77,20 +81,38 @@
     "title": "Instalacja",
     "windows": {
       "tab": "Windows",
-      "step1_exe": "Pobierz i uruchom instalator .exe — wszystko zrobi automatycznie i poprosi o restart",
-      "step1_zip": "Lub pobierz .zip do ręcznej instalacji: rozpakuj, kliknij prawym na install.ps1 i wybierz \"Uruchom w PowerShell\"",
-      "step2": "URUCHOM PONOWNIE KOMPUTER przed użyciem nowego układu. Instalator sam o to poprosi. Nie przełączaj się na układ Kirkouski Typographic w Win+Space przed restartem — Eksplorator się zawiesi jeśli DLL nie został jeszcze załadowany.",
-      "step3": "Po restarcie przejdź do Ustawienia > Czas i język > Język i region > Klawiatura i dodaj nowy układ",
+      "subtab_exe": "Instalator",
+      "subtab_zip": "ZIP",
+      "exe": {
+        "step1": "Pobierz i uruchom instalator .exe — wszystko zrobi automatycznie i poprosi o restart",
+        "step2": "URUCHOM PONOWNIE KOMPUTER przed użyciem nowego układu. Instalator sam o to poprosi. Nie przełączaj się na układ Kirkouski Typographic w Win+Space przed restartem — Eksplorator się zawiesi jeśli DLL nie został jeszcze załadowany.",
+        "step3": "Po restarcie przejdź do Ustawienia > Czas i język > Język i region > Klawiatura i dodaj nowy układ",
+        "uninstall": "Aby odinstalować: Ustawienia > Aplikacje > Zainstalowane aplikacje, znajdź Kirkouski Typographic i kliknij Odinstaluj. Wymagany restart."
+      },
+      "zip": {
+        "step1": "Pobierz .zip, rozpakuj, kliknij prawym na install.ps1 i wybierz \"Uruchom w PowerShell\"",
+        "step2": "URUCHOM PONOWNIE KOMPUTER przed użyciem nowego układu. Skrypt sam o to poprosi. Nie przełączaj się na układ Kirkouski Typographic w Win+Space przed restartem — Eksplorator się zawiesi jeśli DLL nie został jeszcze załadowany.",
+        "step3": "Po restarcie przejdź do Ustawienia > Czas i język > Język i region > Klawiatura i dodaj nowy układ",
+        "uninstall": "Aby odinstalować: uruchom install.ps1 ponownie — wykryje instalację i zaproponuje usunięcie. Wymagany restart."
+      },
       "loginScreen": "Ekran logowania: Win+R > intl.cpl > Administracyjne > Kopiuj ustawienia > zaznacz obie opcje",
-      "uninstall": "Aby odinstalować: Ustawienia > Aplikacje > Zainstalowane aplikacje, znajdź Kirkouski Typographic i kliknij Odinstaluj. Dla instalacji z ZIP uruchom install.ps1 ponownie — wykryje instalację i zaproponuje usunięcie. Po każdej metodzie wymagany restart.",
       "hardCleanup": "Jeśli Eksplorator zawiesza się po restarcie (rzadko): uruchom {cmd} aby usunąć wszystkie ślady."
     },
     "macos": {
       "tab": "macOS",
-      "step1_install": "Pobierz .zip, rozpakuj i przenieś Kirkouski Typographic.bundle do {userPath} (bieżący użytkownik) lub {systemPath} (wszyscy użytkownicy)",
-      "step2_xattr": "Wyczyść atrybut kwarantanny — bez tego macOS może po cichu odmówić załadowania bundle'a: {cmd}",
-      "step3_logout": "Wyloguj się i zaloguj ponownie (pełne wylogowanie, nie tylko ekran blokady)",
-      "step4_pick": "Otwórz Ustawienia systemowe > Klawiatura > Źródła wprowadzania > + i dodaj układy Kirkouski Typographic"
+      "subtab_pkg": "Instalator",
+      "subtab_zip": "ZIP",
+      "pkg": {
+        "step1": "Pobierz i uruchom instalator .pkg — automatycznie skopiuje bundle klawiatury we właściwe miejsce",
+        "step2": "Wyloguj się i zaloguj ponownie (pełne wylogowanie, nie tylko ekran blokady)",
+        "step3": "Otwórz Ustawienia systemowe > Klawiatura > Źródła wprowadzania > + i dodaj układy Kirkouski Typographic"
+      },
+      "zip": {
+        "step1": "Pobierz .zip, rozpakuj i przenieś Kirkouski Typographic.bundle do {userPath} (bieżący użytkownik) lub {systemPath} (wszyscy użytkownicy)",
+        "step2": "Wyczyść atrybut kwarantanny — bez tego macOS może po cichu odmówić załadowania bundle'a: {cmd}",
+        "step3": "Wyloguj się i zaloguj ponownie (pełne wylogowanie, nie tylko ekran blokady)",
+        "step4": "Otwórz Ustawienia systemowe > Klawiatura > Źródła wprowadzania > + i dodaj układy Kirkouski Typographic"
+      }
     }
   },
   "about": {
