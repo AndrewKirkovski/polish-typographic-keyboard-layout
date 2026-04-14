@@ -1,0 +1,39 @@
+/* ==UserStyle==
+@name         Szpargalka Sans — everywhere
+@namespace    https://polish-typographic.com/
+@version      0.1.0
+@description  Forces Szpargalka Sans on every page, regardless of language. The font's OpenType ligatures replace Polish digraphs (sz, cz, rz, szcz, ch, …) with Cyrillic pronunciation hints — only useful on pages that contain Polish text. On non-Polish sites the ligatures don't fire and you just get a slightly more opinionated sans-serif.
+@author       Andrei Kirkouski
+@homepageURL  https://polish-typographic.com/fonts
+@license      MIT
+==/UserStyle== */
+
+@-moz-document regexp(".*") {
+  @font-face {
+    font-family: 'Szpargalka Sans';
+    src: url('https://polish-typographic.com/fonts/SzpargalkaSans-Regular.ttf') format('truetype');
+    font-display: swap;
+  }
+
+  * {
+    font-family: 'Szpargalka Sans', sans-serif !important;
+    /* letter-spacing disables OpenType ligatures — force it to 0 so the
+       GSUB substitutions that render sz→ш, cz→ч etc. actually fire */
+    letter-spacing: 0 !important;
+    font-feature-settings: 'liga' 1, 'dlig' 1 !important;
+  }
+
+  /* Preserve icon fonts and monospace code — these would otherwise render
+     as unreadable letter soup because the glyphs they map to are not in
+     Szpargalka's codepoint range. */
+  :is(
+    code, pre, kbd, samp, tt, var,
+    .material-icons, .material-symbols-outlined,
+    [class*="fa-"], [class^="icon-"], [class*=" icon-"],
+    i.bi, .glyphicon, .octicon
+  ) {
+    font-family: revert !important;
+    letter-spacing: revert !important;
+    font-feature-settings: revert !important;
+  }
+}

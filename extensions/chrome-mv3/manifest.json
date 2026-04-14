@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Szpargalka Sans — Polish pronunciation font",
+  "version": "0.1.0",
+  "description": "Forces Szpargalka Sans on web pages so Polish digraphs (sz, cz, rz, szcz, ch, …) render as Cyrillic pronunciation hints inline. Toggle between Polish-only detection, everywhere, or off.",
+  "homepage_url": "https://polish-typographic.com/fonts",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Szpargalka Sans",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["font-data.js", "content.js"],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ]
+}

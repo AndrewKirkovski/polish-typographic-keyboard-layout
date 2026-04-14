@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Szpargalka Sans</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <h1>Szpargalka Sans</h1>
+  <p class="subtitle">Polish pronunciation hints via OpenType ligatures</p>
+
+  <fieldset class="modes">
+    <legend>Apply on</legend>
+    <label>
+      <input type="radio" name="mode" value="polish">
+      <span class="title">Polish pages only</span>
+      <span class="desc">Detects <code>&lt;html lang="pl"&gt;</code> or high Polish-letter density</span>
+    </label>
+    <label>
+      <input type="radio" name="mode" value="always">
+      <span class="title">Everywhere</span>
+      <span class="desc">Overrides the font on every page you visit</span>
+    </label>
+    <label>
+      <input type="radio" name="mode" value="off">
+      <span class="title">Off</span>
+      <span class="desc">Extension does nothing</span>
+    </label>
+  </fieldset>
+
+  <p class="footer">
+    <a href="https://polish-typographic.com/fonts" target="_blank" rel="noopener">
+      polish-typographic.com/fonts
+    </a>
+  </p>
+
+  <script src="popup.js"></script>
+</body>
+</html>
