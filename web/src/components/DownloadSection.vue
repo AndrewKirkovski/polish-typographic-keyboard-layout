@@ -69,10 +69,10 @@ const pdfFiles = computed(() => [
               <iconify-icon v-else icon="mdi:apple" width="22" aria-hidden="true"></iconify-icon>
             </span>
             <h3>{{ platform.name }}</h3>
-            <span v-if="platform.primary" class="badge">
-              {{ t('download.recommended') }}
-            </span>
           </div>
+          <span v-if="platform.primary" class="badge">
+            {{ t('download.recommended') }}
+          </span>
           <ul class="download-card__files">
             <li v-for="file in platform.files" :key="file.file">
               <a :href="file.url" target="_blank" rel="noopener">
@@ -115,7 +115,7 @@ const pdfFiles = computed(() => [
 <style scoped>
 .download-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
   gap: 1.5rem;
 }
 
@@ -125,6 +125,8 @@ const pdfFiles = computed(() => [
   border-radius: 12px;
   padding: 2rem;
   transition: border-color 0.2s;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .download-card:hover {
@@ -155,15 +157,22 @@ const pdfFiles = computed(() => [
 }
 
 .badge {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-altgr);
-  background: color-mix(in srgb, var(--color-altgr) 10%, transparent);
-  padding: 3px 8px;
-  border-radius: 4px;
-  margin-left: auto;
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .badge {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-altgr);
+    background: color-mix(in srgb, var(--color-altgr) 10%, transparent);
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-top: 0.5rem;
+  }
 }
 
 .download-card__files {
@@ -221,20 +230,11 @@ const pdfFiles = computed(() => [
 
 .download-card__files--grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
   gap: 0.75rem;
 }
 
 .download-card__files--grid li + li {
   margin-top: 0;
-}
-
-@media (max-width: 640px) {
-  .download-grid {
-    grid-template-columns: 1fr;
-  }
-  .download-card__files--grid {
-    grid-template-columns: 1fr;
-  }
 }
 </style>
