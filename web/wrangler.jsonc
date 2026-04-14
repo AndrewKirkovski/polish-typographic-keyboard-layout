@@ -4,6 +4,12 @@
   "pages_build_output_dir": "dist",
   "compatibility_date": "2026-04-08",
   "vars": {
-    "VITE_COUNTERSCALE_URL": "https://counterscale.ryotsuke.workers.dev/"
+    // Must end in /collect: Counterscale's tracker appends `?params`
+    // directly to the reporter URL (no path rewriting). Pointing this at
+    // /collect makes beacons land on the Access-bypassed path; the
+    // /cache hit-type probe silently fails against Access (no-op) and
+    // the tracker falls back to ht=1, which only costs us exact
+    // returning-visitor tracking.
+    "VITE_COUNTERSCALE_URL": "https://counterscale.ryotsuke.workers.dev/collect"
   }
 }
