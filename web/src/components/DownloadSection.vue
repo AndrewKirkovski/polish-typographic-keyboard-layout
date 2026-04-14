@@ -87,14 +87,14 @@ const pdfFiles = computed(() => [
           </ul>
         </div>
 
-        <div class="download-card">
+        <div class="download-card download-card--full">
           <div class="download-card__header">
             <span class="download-card__icon">
               <iconify-icon icon="mdi:file-pdf-box" width="22" aria-hidden="true"></iconify-icon>
             </span>
             <h3>{{ t('download.pdfTitle') }}</h3>
           </div>
-          <ul class="download-card__files">
+          <ul class="download-card__files download-card__files--grid">
             <li v-for="pdf in pdfFiles" :key="pdf.file">
               <a :href="pdf.url" target="_blank" rel="noopener">
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
@@ -115,7 +115,7 @@ const pdfFiles = computed(() => [
 <style scoped>
 .download-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
 }
 
@@ -213,5 +213,28 @@ const pdfFiles = computed(() => [
   color: var(--text-muted);
   flex-shrink: 0;
   white-space: nowrap;
+}
+
+.download-card--full {
+  grid-column: 1 / -1;
+}
+
+.download-card__files--grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.download-card__files--grid li + li {
+  margin-top: 0;
+}
+
+@media (max-width: 640px) {
+  .download-grid {
+    grid-template-columns: 1fr;
+  }
+  .download-card__files--grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
