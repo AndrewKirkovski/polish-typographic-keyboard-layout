@@ -80,7 +80,7 @@ function injectStyle() {
       code, pre, kbd, samp, tt, var,
       .material-icons, .material-symbols-outlined,
       [class*="fa-"], [class^="icon-"], [class*=" icon-"],
-      i.bi, .glyphicon, .octicon
+      i[class*="icon" i], i.bi, .glyphicon, .octicon
     ) {
       font-family: revert !important;
       letter-spacing: revert !important;
