@@ -43,13 +43,21 @@ jobs:
       - name: Validate keylayouts (JSON)
         run: python validate_keylayout.py polish_typographic_full.json russian_typographic_full.json
 
+      - name: Build pronunciation fonts
+        run: |
+          pip install fonttools
+          python polish_liga.py --variant cyrillic --input scripts/assets/fonts/NotoSans-Regular.ttf --output dist/SzpargalkaSans-Regular.ttf
+          python polish_liga.py --variant ipa --input scripts/assets/fonts/NotoSans-Regular.ttf --output dist/PolishPhoneticsSans-Regular.ttf
+
       - name: Verify outputs
         run: |
           $version = (Get-Content VERSION).Trim()
           $expected = @(
             "dist/pltypo.dll", "dist/rutypo.dll", "dist/ustypo.dll",
             "dist/pltypo.klc", "dist/rutypo.klc", "dist/ustypo.klc",
-            "dist/kirkouski-typographic-v$version-windows-setup.exe"
+            "dist/kirkouski-typographic-v$version-windows-setup.exe",
+            "dist/SzpargalkaSans-Regular.ttf",
+            "dist/PolishPhoneticsSans-Regular.ttf"
           )
           foreach ($f in $expected) {
             if (!(Test-Path $f)) { throw "$f not found" }

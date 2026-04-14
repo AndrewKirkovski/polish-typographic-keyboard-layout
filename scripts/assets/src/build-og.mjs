@@ -29,6 +29,17 @@ const FONT_PLACEHOLDERS = {
   __JETBRAINS_MONO_REGULAR__: 'JetBrainsMono-Regular.ttf',
 };
 
+const FONTS_OG_TEMPLATE = resolve(__dir, '../templates/og-fonts-template.html');
+const FONTS_OG_OUT = resolve(REPO_ROOT, 'web/public/og-fonts.png');
+const FONTS_DIST = resolve(REPO_ROOT, 'dist');
+
+const FONTS_OG_PLACEHOLDERS = {
+  __DM_SERIF_DISPLAY_ITALIC__: resolve(FONTS_DIR, 'DMSerifDisplay-Italic.ttf'),
+  __NOTO_SANS_REGULAR__: resolve(FONTS_DIR, 'NotoSans-Regular.ttf'),
+  __SZPARGALKA_SANS__: resolve(FONTS_DIST, 'SzpargalkaSans-Regular.ttf'),
+  __POLISH_PHONETICS_SANS__: resolve(FONTS_DIST, 'PolishPhoneticsSans-Regular.ttf'),
+};
+
 function inlineFonts(html) {
   let out = html;
   for (const [placeholder, filename] of Object.entries(FONT_PLACEHOLDERS)) {
@@ -68,6 +79,36 @@ export async function buildOgImage() {
     writeFileSync(OUT_PATH, png);
     console.log(`  og-image.png  ${png.length.toLocaleString()} bytes  (${versionLabel})`);
     return OUT_PATH;
+  } finally {
+    await browser.close();
+  }
+}
+
+export async function buildFontsOgImage() {
+  let html = readFileSync(FONTS_OG_TEMPLATE, 'utf-8');
+  for (const [placeholder, filepath] of Object.entries(FONTS_OG_PLACEHOLDERS)) {
+    try {
+      const buf = readFileSync(filepath);
+      html = html.split(placeholder).join(`data:font/ttf;base64,${buf.toString('base64')}`);
+    } catch {
+      console.log(`  SKIP og-fonts.png: ${filepath} not found (build fonts first)`);
+      return null;
+    }
+  }
+
+  const browser = await chromium.launch();
+  try {
+    const page = await browser.newPage({ viewport: { width: 1200, height: 630 } });
+    await page.setContent(html, { waitUntil: 'load' });
+    await page.evaluate(() => document.fonts.ready);
+    const png = await page.screenshot({
+      type: 'png',
+      omitBackground: false,
+      clip: { x: 0, y: 0, width: 1200, height: 630 },
+    });
+    writeFileSync(FONTS_OG_OUT, png);
+    console.log(`  og-fonts.png  ${png.length.toLocaleString()} bytes`);
+    return FONTS_OG_OUT;
   } finally {
     await browser.close();
   }

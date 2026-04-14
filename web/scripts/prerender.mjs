@@ -21,6 +21,27 @@ const LOCALES = [
   { code: 'ru', path: '/ru/', lang: 'ru', ogLocale: 'ru_RU' },
 ]
 
+const FONT_PAGES = [
+  { code: 'en', path: '/fonts/', lang: 'en', ogLocale: 'en_US' },
+  { code: 'pl', path: '/pl/fonts/', lang: 'pl', ogLocale: 'pl_PL' },
+  { code: 'ru', path: '/ru/fonts/', lang: 'ru', ogLocale: 'ru_RU' },
+]
+
+const FONT_META = {
+  en: {
+    title: 'Szpargalka Sans — Polish pronunciation fonts with Cyrillic and IPA hints',
+    description: 'Free fonts that show how to pronounce Polish digraphs — Cyrillic hints for Russian speakers, IPA for everyone. Type Polish text and see pronunciation above each letter combination.',
+  },
+  pl: {
+    title: 'Szpargałka Sans — czcionki wymowy polskiej z podpowiedziami cyrylicą i IPA',
+    description: 'Darmowe czcionki pokazujące wymowę polskich dwuznaków — podpowiedzi cyrylicą dla rosyjskojęzycznych, IPA dla wszystkich. Pisz po polsku i zobacz wymowę nad każdym połączeniem liter.',
+  },
+  ru: {
+    title: 'Шпаргалка Sans — шрифты произношения польского с кириллицей и IPA',
+    description: 'Бесплатные шрифты, показывающие произношение польских буквосочетаний — кириллицей для русскоязычных, IPA для всех. Пишите по-польски и видите произношение над каждой комбинацией букв.',
+  },
+}
+
 // Translated meta content per locale. The descriptions lead with the
 // real differentiator (US+POL = type Polish on Windows without adding
 // Polish as a separate input language) instead of the generic "lots of
@@ -122,6 +143,36 @@ async function main() {
     mkdirSync(outDir, { recursive: true })
     writeFileSync(resolve(outDir, 'index.html'), html)
     console.log(`  ${locale.code} -> ${locale.path} (${appHtml.length} chars SSR)`)
+  }
+
+  // Generate /fonts/ pages — same SSR app, the component detects /fonts in pathname
+  const FONT_HREFLANG = FONT_PAGES.map(l =>
+    `<link rel="alternate" hreflang="${l.lang}" href="${BASE_URL}${l.path}" />`
+  ).concat(`<link rel="alternate" hreflang="x-default" href="${BASE_URL}/fonts/" />`).join('\n    ')
+
+  for (const fp of FONT_PAGES) {
+    const fm = FONT_META[fp.code]
+    const appHtml = await render(fp.code, 'fonts')
+
+    let html = template
+      .replace('<div id="app"></div>', `<div id="app">${appHtml}</div>`)
+      .replace('<html lang="en">', `<html lang="${fp.lang}">`)
+      .replace(/<title>[^<]*<\/title>/, `<title>${fm.title}</title>`)
+      .replace(/<meta name="description" content="[^"]*"/, `<meta name="description" content="${fm.description}"`)
+      .replace(/<meta property="og:title" content="[^"]*"/, `<meta property="og:title" content="${fm.title}"`)
+      .replace(/<meta property="og:description" content="[^"]*"/, `<meta property="og:description" content="${fm.description}"`)
+      .replace(/<meta property="og:url" content="[^"]*"/, `<meta property="og:url" content="${BASE_URL}${fp.path}"`)
+      .replace(/<meta property="og:locale" content="[^"]*"/, `<meta property="og:locale" content="${fp.ogLocale}"`)
+      .replace(/og-image\.png/g, 'og-fonts.png')
+      .replace(/<meta name="twitter:title" content="[^"]*"/, `<meta name="twitter:title" content="${fm.title}"`)
+      .replace(/<meta name="twitter:description" content="[^"]*"/, `<meta name="twitter:description" content="${fm.description}"`)
+      .replace(/<link rel="canonical" href="[^"]*"/, `<link rel="canonical" href="${BASE_URL}${fp.path}"`)
+      .replace('</head>', `    ${FONT_HREFLANG}\n  </head>`)
+
+    const outDir = fp.code === 'en' ? resolve(DIST, 'fonts') : resolve(DIST, fp.code, 'fonts')
+    mkdirSync(outDir, { recursive: true })
+    writeFileSync(resolve(outDir, 'index.html'), html)
+    console.log(`  ${fp.code} -> ${fp.path} (${appHtml.length} chars SSR) [fonts]`)
   }
 
   await vite.close()

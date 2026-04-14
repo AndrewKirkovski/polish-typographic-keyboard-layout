@@ -13,7 +13,7 @@ import { VARIANTS, ICNS_ENTRIES, UNIQUE_ICNS_SIZES } from './variants.mjs';
 import { buildIconSvg } from './build-icon-svg.mjs';
 import { svgToPng } from './rasterize.mjs';
 import { packIcns } from './pack-icns.mjs';
-import { buildOgImage } from './build-og.mjs';
+import { buildOgImage, buildFontsOgImage } from './build-og.mjs';
 import { buildWebIcons } from './build-web-icons.mjs';
 import { buildDiagrams } from './build-diagrams.mjs';
 
@@ -66,6 +66,8 @@ async function main() {
     await buildDiagrams();
     console.log('Building OG image:');
     await buildOgImage();
+    console.log('Building fonts OG image:');
+    await buildFontsOgImage();
   } else if (target === 'icons') {
     console.log('Building macOS icons:');
     buildIcons(variantArgs, { svgOnly });

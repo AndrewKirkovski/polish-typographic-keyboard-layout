@@ -21,7 +21,11 @@ if _reconfigure is not None:
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 _vp = os.path.join(SCRIPT_DIR, "VERSION")
-VERSION = open(_vp, encoding="utf-8").read().strip() if os.path.exists(_vp) else "dev"
+if os.path.exists(_vp):
+    with open(_vp, encoding="utf-8") as _f:
+        VERSION = _f.read().strip()
+else:
+    VERSION = "dev"
 
 _reconfigure_err = getattr(sys.stderr, "reconfigure", None)
 if _reconfigure_err is not None:
@@ -44,25 +48,43 @@ except ImportError:
 SUBSTITUTION_CYRILLIC: list[tuple[str, str]] = [
     ("chrz", "хш"),   ("szcz", "щ"),    ("strz", "стш"),  ("sprz", "спш"),
     ("prz", "пш"),    ("trz", "тш"),    ("krz", "кш"),
-    ("dzi", "дзь"),
+    ("dzią", "дзён"), ("dzię", "дзен"),
+    ("dzia", "дзя"),  ("dzie", "дзе"),  ("dzio", "дзё"),  ("dziu", "дзю"),
+    ("dzi", "дзи"),
     ("sz", "ш"),      ("cz", "ч"),      ("ch", "х"),      ("rz", "ж"),
     ("dż", "дж"),     ("dź", "дзь"),    ("dz", "дз"),
-    ("ci", "чь"),     ("si", "шь"),     ("ni", "нь"),     ("zi", "жь"),
+    ("cią", "чён"),   ("cię", "чен"),
+    ("cia", "чя"),    ("cie", "че"),    ("cio", "чё"),    ("ciu", "чю"),
+    ("sią", "шён"),   ("się", "шен"),
+    ("sia", "шя"),    ("sie", "ше"),    ("sio", "шё"),    ("siu", "шю"),
+    ("zią", "жён"),   ("zię", "жен"),
+    ("zia", "жя"),    ("zie", "же"),    ("zio", "жё"),    ("ziu", "жю"),
+    ("ci", "чи"),     ("si", "ши"),     ("zi", "жи"),
     ("ia", "я"),      ("ie", "е"),      ("io", "йо"),     ("iu", "ю"),
-    ("ią", "ён"),     ("ię", "ен"),
-    ("ó", "у"),       ("ł", "в"),
+    ("ją", "ён"),     ("ią", "ён"),     ("ię", "ен"),
+    ("jó", "ю"),      ("ió", "ю"),
+    ("ó", "у"),       ("ł", "ў"),      ("ą", "он"),
 ]
 
 SUBSTITUTION_IPA: list[tuple[str, str]] = [
-    ("chrz", "xʃ"),   ("szcz", "ʃtʃ"),  ("strz", "stʃ"),  ("sprz", "spʃ"),
-    ("prz", "pʃ"),    ("trz", "tʃ"),    ("krz", "kʃ"),
+    ("chrz", "xʂ"),   ("szcz", "ʂtʂ"),  ("strz", "stʂ"),  ("sprz", "spʂ"),
+    ("prz", "pʂ"),    ("trz", "tʂ"),    ("krz", "kʂ"),
+    ("dzią", "dʑɔ̃"),  ("dzię", "dʑɛ̃"),
+    ("dzia", "dʑa"),  ("dzie", "dʑɛ"),  ("dzio", "dʑɔ"),  ("dziu", "dʑu"),
     ("dzi", "dʑi"),
-    ("sz", "ʃ"),      ("cz", "tʃ"),     ("ch", "x"),      ("rz", "ʒ"),
-    ("dż", "dʒ"),     ("dź", "dʑ"),     ("dz", "dz"),
-    ("ci", "tɕ"),     ("si", "ɕ"),      ("ni", "ɲ"),      ("zi", "ʑ"),
+    ("sz", "ʂ"),      ("cz", "tʂ"),     ("ch", "x"),      ("rz", "ʐ"),
+    ("dż", "dʐ"),     ("dź", "dʑ"),     ("dz", "dz"),
+    ("cią", "tɕɔ̃"),   ("cię", "tɕɛ̃"),
+    ("cia", "tɕa"),   ("cie", "tɕɛ"),   ("cio", "tɕɔ"),   ("ciu", "tɕu"),
+    ("sią", "ɕɔ̃"),    ("się", "ɕɛ̃"),
+    ("sia", "ɕa"),    ("sie", "ɕɛ"),    ("sio", "ɕɔ"),    ("siu", "ɕu"),
+    ("zią", "ʑɔ̃"),    ("zię", "ʑɛ̃"),
+    ("zia", "ʑa"),    ("zie", "ʑɛ"),    ("zio", "ʑɔ"),    ("ziu", "ʑu"),
+    ("ci", "tɕi"),    ("si", "ɕi"),     ("zi", "ʑi"),
     ("ia", "ja"),     ("ie", "jɛ"),     ("io", "jɔ"),     ("iu", "ju"),
-    ("ią", "jɔ̃"),     ("ię", "jɛ̃"),
-    ("ó", "u"),       ("ł", "w"),
+    ("ją", "jɔ̃"),     ("ią", "jɔ̃"),     ("ię", "jɛ̃"),
+    ("jó", "ju"),     ("ió", "ju"),
+    ("ó", "u"),       ("ł", "w"),      ("ą", "ɔ̃"),
 ]
 
 VARIANT_CONFIG = {
@@ -78,7 +100,16 @@ VARIANT_CONFIG = {
     },
 }
 
-SUBSTITUTION_TABLE = SUBSTITUTION_CYRILLIC
+def _expand_with_caps(table: list[tuple[str, str]]) -> list[tuple[str, str]]:
+    """Add first-letter-capitalized variants for each rule (Sz→ш, Cz→ч, etc.)."""
+    expanded = list(table)
+    for latin, hint in table:
+        if len(latin) >= 2 and latin[0].islower():
+            cap = latin[0].upper() + latin[1:]
+            expanded.append((cap, hint))
+    return expanded
+
+SUBSTITUTION_TABLE = _expand_with_caps(SUBSTITUTION_CYRILLIC)
 
 # Collect exactly which Cyrillic chars are used by the substitution table
 def _required_hint_chars() -> set[str]:
@@ -227,12 +258,15 @@ def _create_liga_glyph(
     pen = TTGlyphPen(font.getGlyphSet())
 
     total_base_advance = 0
-    for ch in latin_str:
+    first_lsb = 0
+    for i, ch in enumerate(latin_str):
         cp = ord(ch)
         src_name = cmap.get(cp)
         if src_name is None:
             raise ValueError(f"Missing Latin glyph U+{cp:04X} ({ch})")
-        src_advance = hmtx[src_name][0]
+        src_advance, src_lsb = hmtx[src_name]
+        if i == 0:
+            first_lsb = src_lsb
         pen.addComponent(src_name, (1, 0, 0, 1, total_base_advance, 0))
         total_base_advance += int(src_advance * advance_factor)
 
@@ -241,7 +275,7 @@ def _create_liga_glyph(
     pen.addComponent(hint_glyph_name, (1, 0, 0, 1, hint_x, 0))
 
     glyf_table[glyph_name] = pen.glyph()
-    hmtx[glyph_name] = (total_base_advance, 0)
+    hmtx[glyph_name] = (total_base_advance, first_lsb)
     return glyph_name
 
 
@@ -341,16 +375,6 @@ def _build_gsub_ligatures(
     gsub = _ensure_gsub(font)
     lookup_indices: list[int] = []
 
-    if singles:
-        single_subtable = buildSingleSubstSubtable(singles)
-        single_lookup = otTables.Lookup()
-        single_lookup.LookupType = 1
-        single_lookup.LookupFlag = 0
-        single_lookup.SubTableCount = 1
-        single_lookup.SubTable = [single_subtable]
-        lookup_indices.append(len(gsub.LookupList.Lookup))
-        gsub.LookupList.Lookup.append(single_lookup)
-
     if multi:
         liga_subtable = buildLigatureSubstSubtable(multi)
         liga_lookup = otTables.Lookup()
@@ -360,6 +384,16 @@ def _build_gsub_ligatures(
         liga_lookup.SubTable = [liga_subtable]
         lookup_indices.append(len(gsub.LookupList.Lookup))
         gsub.LookupList.Lookup.append(liga_lookup)
+
+    if singles:
+        single_subtable = buildSingleSubstSubtable(singles)
+        single_lookup = otTables.Lookup()
+        single_lookup.LookupType = 1
+        single_lookup.LookupFlag = 0
+        single_lookup.SubTableCount = 1
+        single_lookup.SubTable = [single_subtable]
+        lookup_indices.append(len(gsub.LookupList.Lookup))
+        gsub.LookupList.Lookup.append(single_lookup)
 
     existing_liga = None
     for fr in gsub.FeatureList.FeatureRecord:
@@ -534,7 +568,7 @@ def main() -> None:
 
     global SUBSTITUTION_TABLE
     vcfg = VARIANT_CONFIG[args.variant]
-    SUBSTITUTION_TABLE = vcfg["table"]
+    SUBSTITUTION_TABLE = _expand_with_caps(vcfg["table"])
 
     font = TTFont(args.input)
 

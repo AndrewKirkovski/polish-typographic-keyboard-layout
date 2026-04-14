@@ -169,6 +169,27 @@
       }
     ]
   },
+  "fonts": {
+    "title": "Шрифты произношения",
+    "subtitle": "Подсказки произношения прямо в шрифте — пишите по-польски и видите кириллицу или IPA над каждым сочетанием букв.",
+    "tabCyrillic": "Шпаргалка Sans (кириллица)",
+    "tabIpa": "Polish Phonetics Sans (IPA)",
+    "placeholder": "Пишите по-польски... попробуйте: szczególnie, przyczyna, dziecko",
+    "sampleText": "Przeczytaj szczególnie o dzieciach z Łodzi. Człowiek szedł przez rzekę, szukając źródła. Ciasto z orzechami i szynką na kolację.",
+    "sampleTitle": "Пример текста",
+    "testTitle": "Пишите и тестируйте",
+    "referenceTitle": "Таблица лигатур",
+    "download": "Скачать шрифт",
+    "backToMain": "Назад к раскладкам клавиатуры",
+    "testHint": "Попробуйте: szczegol, przyczyna, dziecko, czlowiek, szynka, zrodlo, ciasto",
+    "tableInput": "Ввод",
+    "tableRendered": "Отображение",
+    "tablePronunciation": "Произношение",
+    "ipaNote": "IPA использует правильные ретрофлексные символы (ʂ ʐ tʂ dʐ) для польских sz/rz/cz/dż. Лигатуры аффрикат опущены для читаемости в мелком размере.",
+    "teaserTitle": "Шрифты произношения",
+    "teaserText": "Мы также сделали шрифты, показывающие произношение польского — подсказки кириллицей для русскоязычных, IPA для всех остальных.",
+    "teaserLink": "Попробовать шрифты"
+  },
   "theme": {
     "light": "Светлая",
     "dark": "Тёмная"

@@ -34,14 +34,23 @@ function parentLayouts(): Plugin {
       })
     },
 
-    // Build: copy layout JSONs into public/layouts/ before build
+    // Build: copy layout JSONs and pronunciation fonts into public/ before build
     buildStart() {
-      const outDir = resolve(__dirname, 'public', 'layouts')
-      mkdirSync(outDir, { recursive: true })
+      const layoutsDir = resolve(__dirname, 'public', 'layouts')
+      mkdirSync(layoutsDir, { recursive: true })
       for (const name of LAYOUT_FILES) {
         const src = resolve(ROOT, name)
         if (existsSync(src)) {
-          copyFileSync(src, resolve(outDir, name))
+          copyFileSync(src, resolve(layoutsDir, name))
+        }
+      }
+
+      const fontsDir = resolve(__dirname, 'public', 'fonts')
+      mkdirSync(fontsDir, { recursive: true })
+      for (const name of ['SzpargalkaSans-Regular.ttf', 'PolishPhoneticsSans-Regular.ttf']) {
+        const src = resolve(ROOT, 'dist', name)
+        if (existsSync(src)) {
+          copyFileSync(src, resolve(fontsDir, name))
         }
       }
     },

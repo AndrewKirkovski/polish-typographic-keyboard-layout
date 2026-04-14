@@ -36,6 +36,12 @@ jobs:
           pip install reportlab qrcode
           python build_pdf.py --layout all --style all
 
+      - name: Build pronunciation fonts
+        run: |
+          pip install fonttools
+          python polish_liga.py --variant cyrillic --input scripts/assets/fonts/NotoSans-Regular.ttf --output dist/SzpargalkaSans-Regular.ttf
+          python polish_liga.py --variant ipa --input scripts/assets/fonts/NotoSans-Regular.ttf --output dist/PolishPhoneticsSans-Regular.ttf
+
       - name: List outputs
         run: |
           Get-ChildItem -Recurse dist/ | Format-Table Name, Length
@@ -49,6 +55,8 @@ jobs:
             dist/kirkouski-typographic-*-windows.zip
             dist/windows-v*/
             dist/*_typographic_*.pdf
+            dist/SzpargalkaSans-Regular.ttf
+            dist/PolishPhoneticsSans-Regular.ttf
 
   # ── macOS: keylayouts + .pkg installer + zip ─────────────────────────
   build-macos:
@@ -113,3 +121,5 @@ jobs:
             release/kirkouski-typographic-*-macos.zip
             release/kirkouski-typographic-*-macos.pkg
             release/*_typographic_*.pdf
+            release/SzpargalkaSans-Regular.ttf
+            release/PolishPhoneticsSans-Regular.ttf

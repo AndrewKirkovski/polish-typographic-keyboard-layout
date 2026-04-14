@@ -52,6 +52,8 @@ can be run standalone.
 |--------|---------|-------|
 | `diff_keylayouts.py` | Compare two keylayout files (XML or JSON), decode keycodes to key labels | `python diff_keylayouts.py <file_a> <file_b> [--layer N] [--keys-only] [--json]` |
 | `validate_keylayout.py` | Check for orphan dead keys, missing terminators, multi-char leaks, undefined actions | `python validate_keylayout.py dist/*.keylayout` |
+| `polish_liga.py` | Generate pronunciation fonts with Cyrillic or IPA hints above Polish digraphs. Input: `NotoSans-Regular.ttf` (bundled in `scripts/assets/fonts/`). Output: `dist/SzpargalkaSans-Regular.ttf` (Cyrillic), `dist/PolishPhoneticsSans-Regular.ttf` (IPA). Requires `fonttools`. | `python polish_liga.py --variant cyrillic\|ipa --input scripts/assets/fonts/NotoSans-Regular.ttf [--output path.ttf] [--dry-run]` |
+| `build_pdf.py` | Render printable A4 landscape PDF reference sheets showing all four layers on each key. Requires `reportlab`; optional `qrcode` for QR code. | `python build_pdf.py [--layout polish\|russian] [--style color\|bw]` |
 
 ## Key data files
 
@@ -126,6 +128,34 @@ cd web && pnpm build    # production build
 - **Birman keylayout filenames contain en-dashes** (`–` U+2013) which get
   mojibaked on Windows (displayed as `ÔÇô`). Use `os.listdir()` + startswith
   filtering instead of hardcoding filenames.
+
+## Version bump checklist
+
+When bumping VERSION, follow this exact sequence:
+
+1. **Edit `VERSION`** file (single source of truth)
+2. **Search for old version** — `grep -rn "v0.X" --include="*.json" --include="*.py" --include="*.iss" --include="*.md" .`
+   Update any hardcoded fallback versions (e.g., `installer.iss` default VERSION define,
+   overlay JSON `name` fields)
+3. **Rebuild everything:**
+   ```bash
+   python extract_base.py
+   python build_keylayout.py
+   python build_macos_bundle.py
+   python build_kbd_c.py
+   python compile_kbd.py
+   python build_klc.py
+   pip install reportlab qrcode fonttools
+   python build_pdf.py --layout all --style all
+   python polish_liga.py --variant cyrillic --input scripts/assets/fonts/NotoSans-Regular.ttf
+   python polish_liga.py --variant ipa --input scripts/assets/fonts/NotoSans-Regular.ttf
+   python validate_keylayout.py dist/*.keylayout
+   cd scripts/assets && pnpm build    # icons, OG images, diagrams
+   cd web && pnpm build               # web frontend + prerender
+   ```
+4. **Verify no old version remains** — repeat the grep from step 2
+5. **Commit, tag, push** — `git commit`, `git tag -a vX.Y`, `git push --tags`
+6. **Verify release** — check GitHub Actions builds, release artifacts
 
 ## Layout identifiers (macOS)
 

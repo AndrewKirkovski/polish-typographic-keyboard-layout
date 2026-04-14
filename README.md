@@ -90,7 +90,15 @@ When installing VS Build Tools, select the **"Desktop development with C++"** wo
 
 Inno Setup is optional — if not installed, `build.py` skips the .exe installer and produces only the zip.
 
-No external Python packages are required — the toolchain uses only the Python standard library.
+Optional Python packages (install with `pip install <package>`):
+
+| Package | Required for | Install |
+|---------|-------------|---------|
+| `fonttools` | `polish_liga.py` — pronunciation font generator | `pip install fonttools` |
+| `reportlab` | `build_pdf.py` — printable PDF reference sheets | `pip install reportlab` |
+| `qrcode` | `build_pdf.py` — optional QR code on PDF sheets | `pip install qrcode` |
+
+The core build pipeline (`build.py`) uses only the Python standard library.
 
 ### Build Commands
 
@@ -160,6 +168,8 @@ install.ps1             # Windows PowerShell installer/uninstaller
 # Dev/QA tools
 diff_keylayouts.py      # Compare two keylayouts, decode keycodes to key labels
 validate_keylayout.py   # Check for orphan dead keys, missing terminators, leaks
+polish_liga.py          # Pronunciation font generator (Cyrillic or IPA hints)
+build_pdf.py            # Printable A4 keyboard layout reference sheets (PDF)
 
 # Layout data — source of truth
 polish_typographic.json       # Polish overlay (what we change from Birman)
@@ -231,6 +241,40 @@ python validate_keylayout.py dist/*.keylayout --errors-only
 ```
 
 Checks: orphan dead key states (fatal on macOS), missing terminators, multi-character output leaks, undefined action references, unused actions.
+
+### Pronunciation Fonts
+
+`polish_liga.py` generates TrueType fonts that display small pronunciation hints above Polish digraphs (sz, cz, rz, etc.) using OpenType ligature substitution. Two variants are available:
+
+- **Szpargalka Sans** (`--variant cyrillic`) — Cyrillic hints (e.g. sz → ш, cz → ч)
+- **Polish Phonetics Sans** (`--variant ipa`) — IPA hints (e.g. sz → ʃ, cz → tʃ)
+
+```bash
+# Generate the Cyrillic-hint font (default)
+python polish_liga.py --input scripts/assets/fonts/NotoSans-Regular.ttf --variant cyrillic
+
+# Generate the IPA-hint font
+python polish_liga.py --input scripts/assets/fonts/NotoSans-Regular.ttf --variant ipa
+
+# Preview planned changes without writing
+python polish_liga.py --input scripts/assets/fonts/NotoSans-Regular.ttf --dry-run
+```
+
+Output goes to `dist/SzpargalkaSans-Regular.ttf` (Cyrillic) or `dist/PolishPhoneticsSans-Regular.ttf` (IPA) by default. Override with `--output`.
+
+Requires `fonttools` (`pip install fonttools`).
+
+### PDF Reference Sheets
+
+`build_pdf.py` renders printable A4 landscape PDFs showing all four layers (base, shift, AltGr, shift+AltGr) on each key:
+
+```bash
+python build_pdf.py                                    # all layouts, all styles
+python build_pdf.py --layout polish --style color       # Polish color only
+python build_pdf.py --layout russian --style bw         # Russian B/W only
+```
+
+Requires `reportlab` (`pip install reportlab`). Optional: `qrcode` for a QR code linking to the project.
 
 ## Troubleshooting
 

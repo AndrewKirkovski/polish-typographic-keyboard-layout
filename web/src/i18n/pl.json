@@ -169,6 +169,27 @@
       }
     ]
   },
+  "fonts": {
+    "title": "Czcionki wymowy",
+    "subtitle": "Podpowiedzi wymowy polskiej renderowane bezpośrednio w czcionce — pisz po polsku i zobacz fonetykę cyrylicą lub IPA nad każdym dwuznakiem.",
+    "tabCyrillic": "Szpargałka Sans (cyrylica)",
+    "tabIpa": "Polish Phonetics Sans (IPA)",
+    "placeholder": "Wpisz tutaj po polsku... spróbuj: szczególnie, przyczyna, dziecko",
+    "sampleText": "Przeczytaj szczególnie o dzieciach z Łodzi. Człowiek szedł przez rzekę, szukając źródła. Ciasto z orzechami i szynką na kolację.",
+    "sampleTitle": "Przykładowy tekst",
+    "testTitle": "Pisz i testuj",
+    "testHint": "Spróbuj: szczegol, przyczyna, dziecko, czlowiek, szynka, zrodlo, ciasto",
+    "referenceTitle": "Tabela ligatur",
+    "tableInput": "Wejście",
+    "tableRendered": "Wynik",
+    "tablePronunciation": "Wymowa",
+    "download": "Pobierz czcionkę",
+    "backToMain": "Wróć do układów klawiatury",
+    "ipaNote": "IPA używa prawidłowych symboli retrofleksyjnych (ʂ ʐ tʂ dʐ) dla polskich sz/rz/cz/dż. Ligatury afrykat pominięte dla czytelności w małym rozmiarze.",
+    "teaserTitle": "Czcionki wymowy",
+    "teaserText": "Stworzyliśmy też czcionki pokazujące wymowę polskiego — podpowiedzi cyrylicą dla rosyjskojęzycznych, IPA dla wszystkich.",
+    "teaserLink": "Wypróbuj czcionki"
+  },
   "theme": {
     "light": "Jasny",
     "dark": "Ciemny"

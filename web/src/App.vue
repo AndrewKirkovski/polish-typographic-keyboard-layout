@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useLayout } from './composables/useLayout'
 import { detectOS } from './composables/useOS'
@@ -11,9 +11,23 @@ import DownloadSection from './components/DownloadSection.vue'
 import InstallSection from './components/InstallSection.vue'
 import FaqSection from './components/FaqSection.vue'
 import AboutSection from './components/AboutSection.vue'
+import FontDemoPage from './components/FontDemoPage.vue'
+
+const props = defineProps<{ ssrPage?: string }>()
 
 const { init } = useLayout()
 const { t, locale } = useI18n()
+
+const isFontsPage = computed(() => {
+  if (props.ssrPage) return props.ssrPage === 'fonts'
+  if (typeof window === 'undefined') return false
+  return window.location.pathname.includes('/fonts')
+})
+
+const fontsUrl = computed(() => {
+  const base = locale.value === 'en' ? '' : `/${locale.value}`
+  return `${base}/fonts/`
+})
 
 // Move focus into <main> from the skip link.
 //
@@ -77,13 +91,37 @@ onMounted(async () => {
           <a href="https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/issues" target="_blank" rel="noopener">{{ t('banner.issues') }}</a>
         </p>
       </div>
-      <HeroSection />
-      <KeyboardSection />
-      <WhySection />
-      <FaqSection />
-      <DownloadSection />
-      <InstallSection />
-      <AboutSection />
+      <template v-if="isFontsPage">
+        <FontDemoPage />
+      </template>
+      <template v-else>
+        <HeroSection />
+        <KeyboardSection />
+        <WhySection />
+        <FaqSection />
+        <DownloadSection />
+        <InstallSection />
+
+        <section class="section font-teaser">
+          <div class="container">
+            <h2 class="section-title">{{ t('fonts.teaserTitle') }}</h2>
+            <p class="font-teaser__text">{{ t('fonts.teaserText') }}</p>
+            <div class="font-teaser__samples">
+              <div class="font-teaser__sample">
+                <span class="font-teaser__label">Cyrillic</span>
+                <span class="font-teaser__preview" style="font-family: 'Szpargalka Sans', sans-serif;">szczególnie</span>
+              </div>
+              <div class="font-teaser__sample">
+                <span class="font-teaser__label">IPA</span>
+                <span class="font-teaser__preview" style="font-family: 'Polish Phonetics Sans', sans-serif;">szczególnie</span>
+              </div>
+            </div>
+            <a :href="fontsUrl" class="font-teaser__link">{{ t('fonts.teaserLink') }} &rarr;</a>
+          </div>
+        </section>
+
+        <AboutSection />
+      </template>
     </main>
     <footer class="site-footer">
       <p>MIT License &middot; 2026 Andrew Kirkouski</p>
@@ -125,5 +163,52 @@ main {
   color: #fff;
   text-decoration: underline;
   margin-left: 0.5em;
+}
+
+.font-teaser__text {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  max-width: 40rem;
+}
+
+.font-teaser__samples {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.font-teaser__sample {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.font-teaser__label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.font-teaser__preview {
+  font-size: 2rem;
+  line-height: 2;
+  padding: 0.75rem 1.5rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.font-teaser__link {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--color-altgr);
+  text-decoration: none;
+}
+
+.font-teaser__link:hover {
+  text-decoration: underline;
 }
 </style>

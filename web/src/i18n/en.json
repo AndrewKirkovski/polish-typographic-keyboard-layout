@@ -169,6 +169,27 @@
       }
     ]
   },
+  "fonts": {
+    "title": "Pronunciation Fonts",
+    "subtitle": "Polish pronunciation hints rendered directly in the font — type Polish text and see Cyrillic or IPA phonetics above each digraph.",
+    "tabCyrillic": "Szpargalka Sans (Cyrillic)",
+    "tabIpa": "Polish Phonetics Sans (IPA)",
+    "placeholder": "Type Polish text here... try: szczegolnie, przyczyna, dziecko",
+    "sampleText": "Przeczytaj szczegolnie o dzieciach z Lodzi. Czlowiek szedl przez rzeke, szukajac zrodla. Ciasto z orzechami i szynka na kolacje.",
+    "sampleTitle": "Sample text",
+    "testTitle": "Type to test",
+    "testHint": "Try: szczegol, przyczyna, dziecko, czlowiek, szynka, zrodlo, ciasto",
+    "referenceTitle": "Ligature reference",
+    "tableInput": "Input",
+    "tableRendered": "Rendered",
+    "tablePronunciation": "Pronunciation",
+    "download": "Download font",
+    "backToMain": "Back to keyboard layouts",
+    "ipaNote": "IPA uses correct retroflex symbols (ʂ ʐ tʂ dʐ) for Polish sz/rz/cz/dż. Affricate tie bars omitted for readability at small sizes.",
+    "teaserTitle": "Pronunciation Fonts",
+    "teaserText": "We also made fonts that show how to pronounce Polish — Cyrillic hints for Russian speakers, IPA for everyone else.",
+    "teaserLink": "Try the fonts"
+  },
   "theme": {
     "light": "Light",
     "dark": "Dark"

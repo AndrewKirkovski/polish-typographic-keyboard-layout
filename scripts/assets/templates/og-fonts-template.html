@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+@font-face {
+  font-family: 'Szpargalka Sans';
+  src: url('__SZPARGALKA_SANS__') format('truetype');
+}
+@font-face {
+  font-family: 'Polish Phonetics Sans';
+  src: url('__POLISH_PHONETICS_SANS__') format('truetype');
+}
+@font-face {
+  font-family: 'DM Serif Display';
+  src: url('__DM_SERIF_DISPLAY_ITALIC__') format('truetype');
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Noto Sans';
+  src: url('__NOTO_SANS_REGULAR__') format('truetype');
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  width: 1200px;
+  height: 630px;
+  background: linear-gradient(145deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Noto Sans', sans-serif;
+  overflow: hidden;
+  position: relative;
+}
+body::before {
+  content: '';
+  position: absolute;
+  top: -200px;
+  right: -200px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(196,54,44,0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+body::after {
+  content: '';
+  position: absolute;
+  bottom: -150px;
+  left: -150px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(31,110,158,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.title {
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+  font-size: 56px;
+  color: #fff;
+  margin-bottom: 6px;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+}
+.subtitle {
+  font-size: 20px;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 50px;
+  letter-spacing: 0.03em;
+}
+.samples {
+  display: flex;
+  gap: 32px;
+  align-items: stretch;
+}
+.sample {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.sample-label {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+.label-cyrillic { color: #c4362c; }
+.label-ipa { color: #1f6e9e; }
+.sample-text {
+  font-size: 64px;
+  line-height: 1.9;
+  padding: 14px 36px;
+  border-radius: 14px;
+  color: #1a1a1a;
+}
+.card-cyrillic {
+  font-family: 'Szpargalka Sans', sans-serif;
+  background: linear-gradient(180deg, #fff 0%, #fdf8f7 100%);
+  border: 2px solid rgba(196,54,44,0.2);
+  box-shadow: 0 4px 24px rgba(196,54,44,0.08), 0 1px 4px rgba(0,0,0,0.06);
+}
+.card-ipa {
+  font-family: 'Polish Phonetics Sans', sans-serif;
+  background: linear-gradient(180deg, #fff 0%, #f7fafd 100%);
+  border: 2px solid rgba(31,110,158,0.2);
+  box-shadow: 0 4px 24px rgba(31,110,158,0.08), 0 1px 4px rgba(0,0,0,0.06);
+}
+.footer {
+  position: absolute;
+  bottom: 22px;
+  font-size: 15px;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 0.03em;
+}
+</style>
+</head>
+<body>
+  <div class="title">Szpargałka Sans</div>
+  <div class="subtitle">Polish pronunciation fonts — Cyrillic &amp; IPA hints</div>
+  <div class="samples">
+    <div class="sample">
+      <span class="sample-label label-cyrillic">Cyrillic</span>
+      <span class="sample-text card-cyrillic">szczególnie</span>
+    </div>
+    <div class="sample">
+      <span class="sample-label label-ipa">IPA</span>
+      <span class="sample-text card-ipa">szczególnie</span>
+    </div>
+  </div>
+  <div class="footer">polish-typographic-keyboard-layout.pages.dev/fonts</div>
+</body>
+</html>
