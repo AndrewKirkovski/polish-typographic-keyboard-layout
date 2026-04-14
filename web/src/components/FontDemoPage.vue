@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { trackFontTab, trackDownload } from '../composables/useAnalytics'
 
 const { t } = useI18n()
 
@@ -11,6 +12,12 @@ const RELEASE_DL = `https://github.com/AndrewKirkovski/polish-typographic-keyboa
 // Active font tab
 type FontTab = 'cyrillic' | 'ipa'
 const activeTab = ref<FontTab>('cyrillic')
+
+function selectTab(tab: FontTab) {
+  if (activeTab.value === tab) return
+  activeTab.value = tab
+  trackFontTab(tab)
+}
 
 const activeFont = computed(() =>
   activeTab.value === 'cyrillic' ? 'Szpargalka Sans' : 'Polish Phonetics Sans',
@@ -105,7 +112,7 @@ const activeLigatures = computed(() =>
           :tabindex="activeTab === 'cyrillic' ? 0 : -1"
           aria-controls="panel-font"
           :class="{ active: activeTab === 'cyrillic' }"
-          @click="activeTab = 'cyrillic'"
+          @click="selectTab('cyrillic')"
         >{{ t('fonts.tabCyrillic') }}</button>
         <button
           id="tab-ipa"
@@ -114,7 +121,7 @@ const activeLigatures = computed(() =>
           :tabindex="activeTab === 'ipa' ? 0 : -1"
           aria-controls="panel-font"
           :class="{ active: activeTab === 'ipa' }"
-          @click="activeTab = 'ipa'"
+          @click="selectTab('ipa')"
         >{{ t('fonts.tabIpa') }}</button>
       </div>
 
@@ -179,6 +186,7 @@ const activeLigatures = computed(() =>
             :class="{ 'font-download-card--active': activeTab === 'cyrillic' }"
             target="_blank"
             rel="noopener"
+            @click="trackDownload('font', FONT_FILES.cyrillic, { variant: 'cyrillic' })"
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
               <path d="M7 1v8M3 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -193,6 +201,7 @@ const activeLigatures = computed(() =>
             :class="{ 'font-download-card--active': activeTab === 'ipa' }"
             target="_blank"
             rel="noopener"
+            @click="trackDownload('font', FONT_FILES.ipa, { variant: 'ipa' })"
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
               <path d="M7 1v8M3 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>

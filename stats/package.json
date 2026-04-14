@@ -1,0 +1,15 @@
+{
+  "name": "stats",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Counterscale analytics worker vendored into repo. See docs/analytics.md.",
+  "type": "module",
+  "scripts": {
+    "deploy": "wrangler deploy --config wrangler.jsonc",
+    "tail": "wrangler tail --config wrangler.jsonc"
+  },
+  "dependencies": {
+    "@counterscale/server": "3.4.1",
+    "wrangler": "^4.23.0"
+  }
+}

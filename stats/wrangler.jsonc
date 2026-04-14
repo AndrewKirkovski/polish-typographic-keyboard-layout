@@ -1,0 +1,43 @@
+// Counterscale analytics worker — vendored deploy config.
+//
+// Instead of running `npx @counterscale/cli install` (which has three
+// Windows/first-run bugs as of v3.4.1), we pin `@counterscale/server` as
+// a dep in stats/package.json and point this config at its pre-built
+// assets inside node_modules. `wrangler deploy --config stats/wrangler.jsonc`
+// compiles the TS entrypoint and uploads everything without any CLI wrapper.
+//
+// See docs/analytics.md for the full rationale + runbook.
+{
+  "name": "counterscale",
+  "account_id": "19e599d359525b97807e431f1f8124a3",
+  "main": "./node_modules/@counterscale/server/workers/app.ts",
+  "compatibility_date": "2024-12-13",
+  "compatibility_flags": ["nodejs_compat_v2"],
+
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./node_modules/@counterscale/server/build/client"
+  },
+
+  "analytics_engine_datasets": [
+    {
+      "binding": "WEB_COUNTER_AE",
+      "dataset": "counterscale"
+    }
+  ],
+
+  // Daily rollups to R2 are off for now — AE's 90-day window is enough for
+  // this site. To enable: create the bucket via CF API, uncomment both blocks
+  // below, and flip CF_STORAGE_ENABLED to "true" as a secret.
+  // "r2_buckets": [
+  //   {
+  //     "binding": "DAILY_ROLLUPS",
+  //     "bucket_name": "counterscale-daily-rollups"
+  //   }
+  // ],
+  // "triggers": { "crons": ["0 2 * * *"] },
+
+  "vars": {
+    "CF_STORAGE_ENABLED": "false"
+  }
+}

@@ -4,6 +4,7 @@ import { useLayout } from '../composables/useLayout'
 import { KEYBOARD_ROWS, CODE_TO_KEY_ID } from '../composables/keyboardData'
 import { useModifierState } from '../composables/useModifierState'
 import type { Layer } from '../composables/useModifierState'
+import { trackLayerSwitch, trackVariantSwitch } from '../composables/useAnalytics'
 import KeyCap from './KeyCap.vue'
 
 const { t } = useI18n()
@@ -18,6 +19,17 @@ const {
 
 // Wire up the code-to-key-id mapping so pressed keys light up.
 setCodeToKeyId(CODE_TO_KEY_ID)
+
+function onVariantClick(variant: 'polish' | 'russian') {
+  if (activeId.value === variant) return
+  setActive(variant)
+  trackVariantSwitch(variant)
+}
+
+function onLayerClick(layer: Layer | null) {
+  setManualLayer(layer)
+  trackLayerSwitch(layer ?? 'auto')
+}
 
 const LAYER_OPTIONS: { value: Layer | null; labelKey: string }[] = [
   { value: null, labelKey: 'keyboard.layers.auto' },
@@ -38,7 +50,7 @@ const LAYER_OPTIONS: { value: Layer | null; labelKey: string }[] = [
             :aria-selected="activeId === 'polish'"
             :tabindex="activeId === 'polish' ? 0 : -1"
             :class="{ active: activeId === 'polish' }"
-            @click="setActive('polish')"
+            @click="onVariantClick('polish')"
           >{{ t('keyboard.polish') }}</button>
           <button
             id="layout-russian"
@@ -46,7 +58,7 @@ const LAYER_OPTIONS: { value: Layer | null; labelKey: string }[] = [
             :aria-selected="activeId === 'russian'"
             :tabindex="activeId === 'russian' ? 0 : -1"
             :class="{ active: activeId === 'russian' }"
-            @click="setActive('russian')"
+            @click="onVariantClick('russian')"
           >{{ t('keyboard.russian') }}</button>
         </div>
       </div>
@@ -73,7 +85,7 @@ const LAYER_OPTIONS: { value: Layer | null; labelKey: string }[] = [
           role="radio"
           :aria-checked="manualLayer === opt.value"
           :class="{ active: manualLayer === opt.value }"
-          @click="setManualLayer(opt.value)"
+          @click="onLayerClick(opt.value)"
         >{{ t(opt.labelKey) }}</button>
       </div>
 

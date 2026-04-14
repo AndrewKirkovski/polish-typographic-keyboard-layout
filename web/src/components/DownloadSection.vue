@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { detectOS } from '../composables/useOS'
+import { trackDownload } from '../composables/useAnalytics'
 
 const { t } = useI18n()
 
@@ -73,7 +74,12 @@ const pdfFiles = computed(() => [
           </span>
           <ul class="download-card__files">
             <li v-for="file in platform.files" :key="file.file">
-              <a :href="file.url" target="_blank" rel="noopener">
+              <a
+                :href="file.url"
+                target="_blank"
+                rel="noopener"
+                @click="trackDownload(platform.id as 'windows' | 'macos', file.file)"
+              >
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                   <path d="M7 1v8M3 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                   <path d="M1 11v1.5h12V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -94,7 +100,12 @@ const pdfFiles = computed(() => [
           </div>
           <ul class="download-card__files download-card__files--2col">
             <li v-for="pdf in pdfFiles" :key="pdf.file">
-              <a :href="pdf.url" target="_blank" rel="noopener">
+              <a
+                :href="pdf.url"
+                target="_blank"
+                rel="noopener"
+                @click="trackDownload('pdf', pdf.file)"
+              >
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                   <path d="M7 1v8M3 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                   <path d="M1 11v1.5h12V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>

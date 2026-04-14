@@ -3,6 +3,7 @@ import { createI18n } from 'vue-i18n'
 import FloatingVue from 'floating-vue'
 import App from './App.vue'
 import { FLOATING_VUE_OPTIONS } from './floating-vue-options'
+import { initAnalytics, trackScrollDepth } from './composables/useAnalytics'
 import en from './i18n/en.json'
 import pl from './i18n/pl.json'
 import ru from './i18n/ru.json'
@@ -34,6 +35,27 @@ app.use(i18n)
 // SSR and client renders can never drift on tooltip config.
 app.use(FloatingVue, FLOATING_VUE_OPTIONS)
 app.mount('#app')
+
+// Analytics — no-ops when VITE_COUNTERSCALE_URL is unset (dev + initial deploy)
+initAnalytics()
+
+// Scroll depth milestones — fire once per session at 25 / 50 / 75 / 100%.
+// The listener is passive so scroll performance is untouched.
+const scrollMilestones: Array<25 | 50 | 75 | 100> = [25, 50, 75, 100]
+const firedMilestones = new Set<number>()
+function onScroll() {
+  const doc = document.documentElement
+  const scrollable = doc.scrollHeight - window.innerHeight
+  if (scrollable <= 0) return
+  const pct = (window.scrollY / scrollable) * 100
+  for (const m of scrollMilestones) {
+    if (pct >= m && !firedMilestones.has(m)) {
+      firedMilestones.add(m)
+      trackScrollDepth(m)
+    }
+  }
+}
+window.addEventListener('scroll', onScroll, { passive: true })
 
 // floating-vue v5 hardcodes `tabindex="0"` on every popper element so
 // "interactive" tooltips (with clickable content inside) can be reached

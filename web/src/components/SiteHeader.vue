@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { trackLocaleSwitch } from '../composables/useAnalytics'
 
 const { t, locale } = useI18n()
 const menuOpen = ref(false)
@@ -19,11 +20,13 @@ function langHref(lang: typeof langs[0]) {
 function switchLang(e: Event, lang: typeof langs[0]) {
   e.preventDefault()
   if (locale.value === lang.code) return
+  const from = locale.value
   locale.value = lang.code
   const url = langHref(lang)
   history.pushState(null, '', url)
   document.documentElement.lang = lang.code
   menuOpen.value = false
+  trackLocaleSwitch(from, lang.code)
 }
 
 function closeMenu() {
