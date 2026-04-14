@@ -19,10 +19,15 @@
     "directory": "./node_modules/@counterscale/server/build/client"
   },
 
+  // Dataset name MUST be "metricsDataset" — Counterscale's server hardcodes
+  // `FROM metricsDataset` in every SQL query (see
+  // node_modules/@counterscale/server/app/analytics/query.ts). Renaming it
+  // means the worker writes beacons fine via the binding, but the dashboard
+  // SQL queries come back empty because they point at a nonexistent dataset.
   "analytics_engine_datasets": [
     {
       "binding": "WEB_COUNTER_AE",
-      "dataset": "counterscale"
+      "dataset": "metricsDataset"
     }
   ],
 
