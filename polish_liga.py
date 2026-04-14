@@ -19,6 +19,10 @@ _reconfigure = getattr(sys.stdout, "reconfigure", None)
 if _reconfigure is not None:
     _reconfigure(encoding="utf-8", errors="replace")
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+_vp = os.path.join(SCRIPT_DIR, "VERSION")
+VERSION = open(_vp, encoding="utf-8").read().strip() if os.path.exists(_vp) else "dev"
+
 _reconfigure_err = getattr(sys.stderr, "reconfigure", None)
 if _reconfigure_err is not None:
     _reconfigure_err(encoding="utf-8", errors="replace")
@@ -32,65 +36,49 @@ except ImportError:
     sys.exit(1)
 
 # ---------------------------------------------------------------------------
-# Substitution table
+# Substitution tables
 # ---------------------------------------------------------------------------
-# Each entry: (input_letters, cyrillic_hint)
-# input_letters is a string of Latin chars that form the ligature trigger.
-# cyrillic_hint is the Cyrillic string shown as the pronunciation guide.
-#
-# Order matters: longest sequences first so GSUB picks the most specific match.
-# The builder sorts by length internally, but we keep the source readable.
+# Each entry: (input_letters, hint_string)
+# Longest sequences first so GSUB picks the most specific match.
 
-SUBSTITUTION_TABLE: list[tuple[str, str]] = [
-    # Tetragraphs / long clusters
-    ("chrz", "хш"),
-    ("szcz", "щ"),
-    ("strz", "стш"),
-    ("sprz", "спш"),
-
-    # Contextual rz (after certain consonants → ш not ж)
-    ("prz", "пш"),
-    ("trz", "тш"),
-    ("krz", "кш"),
-
-    # Trigraphs
+SUBSTITUTION_CYRILLIC: list[tuple[str, str]] = [
+    ("chrz", "хш"),   ("szcz", "щ"),    ("strz", "стш"),  ("sprz", "спш"),
+    ("prz", "пш"),    ("trz", "тш"),    ("krz", "кш"),
     ("dzi", "дзь"),
-
-    # Digraphs
-    ("sz", "ш"),
-    ("cz", "ч"),
-    ("ch", "х"),
-    ("rz", "ж"),
-
-    # dz-family (with diacritics)
-    ("dż", "дж"),
-    ("dź", "дзь"),
-    ("dz", "дз"),
-
-    # Soft consonant + i
-    ("ci", "чь"),
-    ("si", "шь"),
-    ("ni", "нь"),
-    ("zi", "жь"),
-
-    # Vowel + i
-    ("ia", "я"),
-    ("ie", "е"),
-    ("io", "йо"),
-    ("iu", "ю"),
-    ("ią", "ён"),
-    ("ię", "ен"),
-
-    # Singles
-    ("ó", "у"),
-    ("ł", "в"),
-
-    # TODO: Contextual substitutions (GSUB Type 6) for v2:
-    # - "rz" after p/t/k/ch should become ш not ж (currently handled by
-    #   explicit prz/trz/krz/chrz entries above, but a proper contextual
-    #   rule would catch novel clusters)
-    # - Word-initial "i" before vowels
+    ("sz", "ш"),      ("cz", "ч"),      ("ch", "х"),      ("rz", "ж"),
+    ("dż", "дж"),     ("dź", "дзь"),    ("dz", "дз"),
+    ("ci", "чь"),     ("si", "шь"),     ("ni", "нь"),     ("zi", "жь"),
+    ("ia", "я"),      ("ie", "е"),      ("io", "йо"),     ("iu", "ю"),
+    ("ią", "ён"),     ("ię", "ен"),
+    ("ó", "у"),       ("ł", "в"),
 ]
+
+SUBSTITUTION_IPA: list[tuple[str, str]] = [
+    ("chrz", "xʃ"),   ("szcz", "ʃtʃ"),  ("strz", "stʃ"),  ("sprz", "spʃ"),
+    ("prz", "pʃ"),    ("trz", "tʃ"),    ("krz", "kʃ"),
+    ("dzi", "dʑi"),
+    ("sz", "ʃ"),      ("cz", "tʃ"),     ("ch", "x"),      ("rz", "ʒ"),
+    ("dż", "dʒ"),     ("dź", "dʑ"),     ("dz", "dz"),
+    ("ci", "tɕ"),     ("si", "ɕ"),      ("ni", "ɲ"),      ("zi", "ʑ"),
+    ("ia", "ja"),     ("ie", "jɛ"),     ("io", "jɔ"),     ("iu", "ju"),
+    ("ią", "jɔ̃"),     ("ię", "jɛ̃"),
+    ("ó", "u"),       ("ł", "w"),
+]
+
+VARIANT_CONFIG = {
+    "cyrillic": {
+        "table": SUBSTITUTION_CYRILLIC,
+        "font_family": "Szpargalka Sans",
+        "default_output": "SzpargalkaSans-Regular.ttf",
+    },
+    "ipa": {
+        "table": SUBSTITUTION_IPA,
+        "font_family": "Polish Phonetics Sans",
+        "default_output": "PolishPhoneticsSans-Regular.ttf",
+    },
+}
+
+SUBSTITUTION_TABLE = SUBSTITUTION_CYRILLIC
 
 # Collect exactly which Cyrillic chars are used by the substitution table
 def _required_hint_chars() -> set[str]:
@@ -213,9 +201,6 @@ def _create_hint_glyph(
 
     glyf_table[glyph_name] = pen.glyph()
     hmtx[glyph_name] = (total_advance, 0)
-
-    font.setGlyphOrder(font.getGlyphOrder() + [glyph_name])
-
     return glyph_name
 
 
@@ -257,9 +242,6 @@ def _create_liga_glyph(
 
     glyf_table[glyph_name] = pen.glyph()
     hmtx[glyph_name] = (total_base_advance, 0)
-
-    font.setGlyphOrder(font.getGlyphOrder() + [glyph_name])
-
     return glyph_name
 
 
@@ -379,7 +361,17 @@ def _build_gsub_ligatures(
         lookup_indices.append(len(gsub.LookupList.Lookup))
         gsub.LookupList.Lookup.append(liga_lookup)
 
-    _add_feature_for_lookups(gsub, "liga", lookup_indices)
+    existing_liga = None
+    for fr in gsub.FeatureList.FeatureRecord:
+        if fr.FeatureTag == "liga":
+            existing_liga = fr
+            break
+
+    if existing_liga:
+        existing_liga.Feature.LookupListIndex.extend(lookup_indices)
+        existing_liga.Feature.LookupCount = len(existing_liga.Feature.LookupListIndex)
+    else:
+        _add_feature_for_lookups(gsub, "liga", lookup_indices)
 
 
 # ---------------------------------------------------------------------------
@@ -407,6 +399,26 @@ def _adjust_line_height(font: TTFont, factor: float = 1.25) -> dict[str, Any]:
         changes["hhea.ascent"] = f"{old_ascent} -> {hhea.ascent}"
 
     return changes
+
+
+def _rename_font(font: TTFont, family: str, style: str) -> None:
+    name_table = font["name"]
+    full_name = f"{family} {style}"
+    ps_name = family.replace(" ", "") + "-" + style
+    records = {
+        0: f"Copyright 2022 The Noto Project Authors. Modified: Szpargalka Sans by Kirkouski.",
+        1: family,
+        2: style,
+        3: f"{ps_name};{VERSION}",
+        4: full_name,
+        5: f"Version {VERSION}",
+        6: ps_name,
+        16: family,
+        17: style,
+    }
+    for name_id, value in records.items():
+        name_table.setName(value, name_id, 3, 1, 0x0409)
+        name_table.setName(value, name_id, 1, 0, 0)
 
 
 # ---------------------------------------------------------------------------
@@ -502,21 +514,27 @@ def main() -> None:
         epilog="Requires a font with both Latin and Cyrillic glyph coverage.",
     )
     parser.add_argument("--input", "-i", required=True, help="Input TTF font path")
-    parser.add_argument("--output", "-o", help="Output TTF font path (default: input_liga.ttf)")
+    parser.add_argument("--output", "-o", help="Output TTF font path")
+    parser.add_argument("--variant", choices=["cyrillic", "ipa"], default="cyrillic",
+                        help="Hint style: cyrillic (Szpargalka Sans) or ipa (Polish Phonetics Sans)")
     parser.add_argument("--dry-run", action="store_true", help="Print planned changes without modifying")
     parser.add_argument(
         "--hint-scale", type=float, default=0.42,
-        help="Scale factor for Cyrillic hint glyphs (default: 0.42)",
+        help="Scale factor for hint glyphs (default: 0.42)",
     )
     parser.add_argument(
-        "--advance-factor", type=float, default=0.80,
-        help="Advance width factor for base Latin letters in ligatures (default: 0.80)",
+        "--advance-factor", type=float, default=1.0,
+        help="Advance width factor for base Latin letters in ligatures (default: 1.0)",
     )
     args = parser.parse_args()
 
     if not os.path.isfile(args.input):
         print(f"ERROR: Input file not found: {args.input}", file=sys.stderr)
         sys.exit(1)
+
+    global SUBSTITUTION_TABLE
+    vcfg = VARIANT_CONFIG[args.variant]
+    SUBSTITUTION_TABLE = vcfg["table"]
 
     font = TTFont(args.input)
 
@@ -533,12 +551,11 @@ def main() -> None:
 
     missing = _validate_cyrillic(font)
     if missing:
-        print("ERROR: Font is missing required Cyrillic glyphs:", file=sys.stderr)
+        print(f"ERROR: Font is missing required hint glyphs for '{args.variant}' variant:", file=sys.stderr)
         for m in missing:
             print(m, file=sys.stderr)
         print(file=sys.stderr)
-        print("This tool requires a font with Cyrillic coverage.", file=sys.stderr)
-        print(f"Try one of: {', '.join(FONTS_WITH_CYRILLIC)}", file=sys.stderr)
+        print("Suggested fonts with full coverage: Noto Sans, Source Sans 3", file=sys.stderr)
         font.close()
         sys.exit(1)
 
@@ -589,8 +606,11 @@ def main() -> None:
 
     output_path = args.output
     if not output_path:
-        base, ext = os.path.splitext(args.input)
-        output_path = f"{base}_liga{ext}"
+        output_path = os.path.join("dist", vcfg["default_output"])
+
+    font_family = vcfg["font_family"]
+    _rename_font(font, font_family, "Regular")
+    print(f"  Renamed to {font_family} Regular")
 
     font.save(output_path)
     font.close()

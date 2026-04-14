@@ -5,16 +5,14 @@ import { detectOS } from '../composables/useOS'
 
 const { t } = useI18n()
 
-// Single source of truth: vite injects __APP_VERSION__ from /VERSION at the
-// repo root, so bumping that file propagates here automatically.
 const VERSION = __APP_VERSION__
 const RELEASE_TAG = `v${VERSION}`
 const RELEASE_DL = `https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/releases/download/${RELEASE_TAG}`
 
-// Synchronous OS detection — runs during <script setup> so the very first
-// render reflects the real OS. (Earlier version read `dataset.os` which was
-// only set in App.vue's onMounted, losing the race on first paint.)
 const detectedOS = detectOS()
+
+const isMobile = typeof navigator !== 'undefined'
+  && /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
 
 const platforms = computed(() => {
   const winInstaller = `kirkouski-typographic-v${VERSION}-windows-setup.exe`
@@ -28,7 +26,7 @@ const platforms = computed(() => {
       { label: t('download.installer'), file: winInstaller, url: `${RELEASE_DL}/${winInstaller}` },
       { label: 'ZIP', file: winZip, url: `${RELEASE_DL}/${winZip}` },
     ],
-    primary: detectedOS === 'windows',
+    primary: !isMobile && detectedOS === 'windows',
   }
   const mac = {
     id: 'macos',
@@ -37,7 +35,7 @@ const platforms = computed(() => {
       { label: t('download.installer'), file: macPkg, url: `${RELEASE_DL}/${macPkg}` },
       { label: 'ZIP', file: macZip, url: `${RELEASE_DL}/${macZip}` },
     ],
-    primary: detectedOS === 'macos',
+    primary: !isMobile && detectedOS === 'macos',
   }
   return detectedOS === 'windows' ? [win, mac] : [mac, win]
 })
@@ -94,7 +92,7 @@ const pdfFiles = computed(() => [
             </span>
             <h3>{{ t('download.pdfTitle') }}</h3>
           </div>
-          <ul class="download-card__files download-card__files--grid">
+          <ul class="download-card__files download-card__files--2col">
             <li v-for="pdf in pdfFiles" :key="pdf.file">
               <a :href="pdf.url" target="_blank" rel="noopener">
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
@@ -115,8 +113,14 @@ const pdfFiles = computed(() => [
 <style scoped>
 .download-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .download-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .download-card {
@@ -138,11 +142,15 @@ const pdfFiles = computed(() => [
   box-shadow: 0 0 0 1px var(--color-altgr);
 }
 
+.download-card--full {
+  grid-column: 1 / -1;
+}
+
 .download-card__header {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .download-card__icon {
@@ -157,22 +165,16 @@ const pdfFiles = computed(() => [
 }
 
 .badge {
-  display: none;
-}
-
-@media (min-width: 640px) {
-  .badge {
-    display: block;
-    font-family: var(--font-mono);
-    font-size: 0.6rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-altgr);
-    background: color-mix(in srgb, var(--color-altgr) 10%, transparent);
-    padding: 3px 8px;
-    border-radius: 4px;
-    margin-top: 0.5rem;
-  }
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-altgr);
+  background: color-mix(in srgb, var(--color-altgr) 10%, transparent);
+  padding: 3px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 1rem;
 }
 
 .download-card__files {
@@ -224,17 +226,23 @@ const pdfFiles = computed(() => [
   white-space: nowrap;
 }
 
-.download-card--full {
-  grid-column: 1 / -1;
-}
-
-.download-card__files--grid {
+.download-card__files--2col {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 0.75rem;
 }
 
-.download-card__files--grid li + li {
+.download-card__files--2col li {
+  min-width: 0;
+}
+
+.download-card__files--2col li + li {
   margin-top: 0;
+}
+
+@media (max-width: 640px) {
+  .download-card__files--2col {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
