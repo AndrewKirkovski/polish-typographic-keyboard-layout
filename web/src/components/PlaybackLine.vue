@@ -42,8 +42,10 @@ const { t } = useI18n()
         class="playback-line__pending"
         :title="'Dead key held, waiting for a base letter'"
       >
-        <span class="playback-line__pending-accent">{{ pendingAccent }}</span>
-        <span class="playback-line__pending-slot" aria-hidden="true"></span>
+        <span class="playback-line__pending-inner">
+          <span class="playback-line__pending-accent">{{ pendingAccent }}</span>
+          <span class="playback-line__pending-slot" aria-hidden="true"></span>
+        </span>
       </span>
       <span
         class="playback-line__caret"
@@ -96,41 +98,52 @@ const { t } = useI18n()
 }
 
 .playback-line__pending {
-  /* Two-part dead-state indicator:
-       - the spacing accent glyph (caron, diaeresis, breve, …) at
-         the top, marking which dead key is pending;
-       - a dotted-outline circle slot below it, symbolising the
-         empty "waiting for a base letter" placeholder the layout
-         is about to fill.
-     No background, no shadow, no box — just the glyph and the slot
-     drawn in the current text color so it reads as part of the text
-     rather than a separate UI chrome element. */
-  display: inline-flex;
+  /* Zero-width in-flow anchor. When the paired letter commits and
+     this element is removed, the upcoming char slots into the caret
+     position with ZERO horizontal shift — the pending indicator
+     never took up any flow width to begin with. The visible parts
+     (accent + slot) are absolutely positioned inside `pending-inner`
+     and hover right next to the caret. */
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 1em;
+  vertical-align: baseline;
+}
+
+.playback-line__pending-inner {
+  /* Absolute anchor to the 0-width parent. Nudged 2px right of the
+     caret so it doesn't overlap the blinking cursor. */
+  position: absolute;
+  left: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1px;
-  margin: 0 3px;
-  vertical-align: middle;
+  pointer-events: none;
   line-height: 1;
 }
 
 .playback-line__pending-accent {
+  /* Two-part dead-state indicator: accent glyph on top, dotted
+     slot underneath — no background, no shadow, no box. Reads as
+     part of the text, not a UI chrome element. */
   display: block;
-  font-size: 0.75em;
+  font-size: 0.7em;
   font-weight: 700;
   line-height: 1;
   color: currentColor;
-  /* Drop in with a subtle overshoot — no glow, no background, no
-     flashing; the pulse lives on the slot circle below. */
   animation: playback-pending-accent-drop 160ms cubic-bezier(0.2, 1.6, 0.4, 1) both;
 }
 
 .playback-line__pending-slot {
   display: block;
-  width: 0.85em;
-  height: 0.85em;
+  width: 0.45em;
+  height: 0.45em;
   border-radius: 50%;
-  border: 1.5px dashed currentColor;
+  border: 1.2px dashed currentColor;
   opacity: 0.55;
   animation: playback-pending-slot-pulse 900ms ease-in-out infinite;
 }
