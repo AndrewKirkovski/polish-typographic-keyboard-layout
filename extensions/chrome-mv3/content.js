@@ -7,39 +7,24 @@
  * block so we only inject once per page.
  *
  * Two settings layers:
- *   - `mode` (global default): 'polish' | 'always' | 'off'
+ *   - `mode` (global default): 'on' | 'off', defaults to 'off'
  *   - `siteOverrides[hostname]`: 'on' | 'off' | undefined
  *
- * Site overrides always win over the global default. `on` forces activation
- * even when the page isn't Polish; `off` forces deactivation even when the
- * global is `always`. Both are keyed by the exact hostname of the page.
- *
- * The popup writes to these keys and the storage.onChanged listener below
- * re-applies the effective mode without needing a page reload.
+ * Site overrides always win over the global default. Both the global and
+ * the per-site overrides are strict binary toggles — we no longer try to
+ * auto-detect Polish pages because that was too intrusive in practice.
  */
 
 const SZPARGALKA_STYLE_ID = 'szpargalka-sans-override'
 const ACTIVE_CLASS = 'szpargalka-active'
-const DEFAULT_MODE = 'polish' // polish | always | off
+const DEFAULT_MODE = 'off' // on | off
 const DEFAULT_SITE_OVERRIDES = {}
 
-// ── Polish detection ───────────────────────────────────────────────
-
-function langIsPolish() {
-  const lang = (document.documentElement.lang || '').toLowerCase()
-  if (lang.startsWith('pl')) return true
-  const metaLang = document
-    .querySelector('meta[http-equiv="content-language" i]')
-    ?.getAttribute('content')
-    ?.toLowerCase()
-  return !!metaLang && metaLang.startsWith('pl')
-}
-
-function textLooksPolish() {
-  const text = (document.body?.innerText || '').slice(0, 5000)
-  if (text.length < 200) return false
-  const polishChars = text.match(/[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/g) || []
-  return polishChars.length / text.length > 0.02
+// Coerce any stored value (including legacy 'polish' / 'always' from the
+// pre-binary extension) to the current 'on' | 'off' scheme.
+function normalizeMode(mode) {
+  if (mode === 'on' || mode === 'always') return 'on'
+  return 'off'
 }
 
 // ── Style injection ─────────────────────────────────────────────────
@@ -105,45 +90,17 @@ function deactivate() {
 // ── Apply current mode ──────────────────────────────────────────────
 
 function applyMode(mode) {
-  if (mode === 'off') {
-    deactivate()
-    return
-  }
-
-  if (mode === 'always') {
-    activate()
-    return
-  }
-
-  // mode === 'polish' — try fast path (lang attribute) first, fall back
-  // to a text density check once the body is ready.
-  if (langIsPolish()) {
-    activate()
-    return
-  }
-
-  const recheck = () => {
-    if (langIsPolish() || textLooksPolish()) activate()
-    else deactivate()
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', recheck, { once: true })
-  } else {
-    recheck()
-  }
+  if (normalizeMode(mode) === 'on') activate()
+  else deactivate()
 }
 
 // ── Effective mode resolver ─────────────────────────────────────────
-// A site override always wins over the global mode. We map the override
-// to a regular mode string so applyMode() doesn't need to know about
-// overrides.
+// A site override always wins over the global mode.
 
 function resolveEffectiveMode(globalMode, siteOverrides) {
   const override = siteOverrides?.[location.hostname]
-  if (override === 'on') return 'always'
-  if (override === 'off') return 'off'
-  return globalMode
+  if (override === 'on' || override === 'off') return override
+  return normalizeMode(globalMode)
 }
 
 // ── Load state + listen for changes ─────────────────────────────────

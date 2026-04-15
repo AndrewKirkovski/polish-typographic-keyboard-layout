@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Szpargalka Sans — Polish pronunciation font",
   "version": "0.1.0",
-  "description": "Forces Szpargalka Sans on web pages so Polish digraphs (sz, cz, rz, szcz, ch, …) render as Cyrillic pronunciation hints inline. Toggle between Polish-only detection, everywhere, or off.",
+  "description": "Forces Szpargalka Sans on web pages so Polish digraphs (sz, cz, rz, szcz, ch, …) render as Cyrillic pronunciation hints inline. Ships disabled — toggle the global switch or set per-site overrides from the popup.",
   "homepage_url": "https://polish-typographic.com/fonts",
   "icons": {
     "16": "icons/icon-16.png",

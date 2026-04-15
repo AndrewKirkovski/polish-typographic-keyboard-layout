@@ -188,7 +188,32 @@
     "ipaNote": "IPA uses correct retroflex symbols (ʂ ʐ tʂ dʐ) for Polish sz/rz/cz/dż. Affricate tie bars omitted for readability at small sizes.",
     "teaserTitle": "Pronunciation Fonts",
     "teaserText": "We also made fonts that show how to pronounce Polish — Cyrillic hints for Russian speakers, IPA for everyone else.",
-    "teaserLink": "Try the fonts"
+    "teaserLink": "Try the fonts",
+    "try": {
+      "title": "Try on any website",
+      "subtitle": "Install one of three browser helpers and Szpargalka Sans takes over on every Polish page you visit, rendering inline pronunciation hints above the digraphs — shown here on the Polish Wikipedia article about the Polish language.",
+      "screenshotLight": "Light mode",
+      "screenshotDark": "Dark mode",
+      "screenshotAltLight": "Polish Wikipedia article about the Polish language rendered with Szpargalka Sans in light mode, showing Cyrillic pronunciation hints above Polish digraphs.",
+      "screenshotAltDark": "The same Polish Wikipedia article rendered with Szpargalka Sans in Wikipedia's native dark mode.",
+      "tablistLabel": "Installation options",
+      "tabChrome": "Chrome extension",
+      "tabTampermonkey": "Tampermonkey",
+      "tabStylus": "Stylus",
+      "chromeIntro": "One-click download of the pre-built extension zip. Recommended path — it has a popup with per-site toggles and bundles the font as a base64 data URI so it works offline.",
+      "chromeStep1": "Download <code>szpargalka-sans-chrome.zip</code>",
+      "chromeStep2": "Unzip it anywhere on your disk.",
+      "chromeStep3": "Open <code>chrome://extensions</code> and enable <strong>Developer mode</strong> in the top-right corner.",
+      "chromeStep4": "Click <strong>Load unpacked</strong> and point it at the unzipped <code>chrome-mv3</code> folder. The extension ships disabled — click the toolbar icon to flip the global toggle to <em>On</em>, or leave it <em>Off</em> and use per-site overrides only.",
+      "tampermonkeyIntro": "For power users who already run Tampermonkey. Single user-script, toggle modes through the Tampermonkey menu.",
+      "tampermonkeyStep1": "Install the <a href=\"https://www.tampermonkey.net/\" target=\"_blank\" rel=\"noopener\">Tampermonkey extension</a> if you don't have it.",
+      "tampermonkeyStep2": "Install <code>szpargalka-sans.user.js</code>",
+      "tampermonkeyStep3": "The script ships disabled. Click the Tampermonkey icon → hover <em>Szpargalka Sans</em> → click the entry to flip it <strong>On</strong>; click again to turn it back off. A ✓ marks the current state.",
+      "stylusIntro": "The lightest path — pure user-CSS, no JavaScript. Works in any Stylus-compatible browser extension.",
+      "stylusStep1": "Install the <a href=\"https://add0n.com/stylus.html\" target=\"_blank\" rel=\"noopener\">Stylus extension</a> for your browser.",
+      "stylusStep2": "Install <code>szpargalka-sans.user.css</code>",
+      "stylusStep3": "Stylus opens the import dialog — click <strong>Install style</strong>. Done. Toggle the style on or off at any time from the Stylus popup — it ships enabled after install, so click it off if you only want to reach for it occasionally."
+    }
   },
   "theme": {
     "light": "Light",

@@ -4,13 +4,23 @@
  *   - Per-site override (top): "default / force on / force off" for the
  *     active tab's hostname. Stored as `siteOverrides[hostname]` in
  *     chrome.storage.sync, with "default" meaning the entry is removed.
- *   - Global default (bottom): "polish / always / off" stored as `mode`.
+ *   - Global default (bottom): "on / off" stored as `mode`, defaulting
+ *     to "off" — the extension ships silent and only lights up when the
+ *     user opts in, globally or per-site.
  *
  * Content scripts on every open tab subscribe to storage.onChanged and
  * re-apply the effective mode live — no reload needed.
  */
 
-const DEFAULT_MODE = 'polish'
+const DEFAULT_MODE = 'off'
+
+// Coerce any stored value (including legacy 'polish' / 'always' from the
+// pre-binary extension) to the current 'on' | 'off' scheme so the radio
+// state stays correct after upgrading.
+function normalizeMode(mode) {
+  if (mode === 'on' || mode === 'always') return 'on'
+  return 'off'
+}
 const hostnameEl = document.getElementById('hostname')
 const siteHintEl = document.getElementById('site-hint')
 const siteRadios = document.querySelectorAll('input[name="siteOverride"]')
@@ -49,8 +59,9 @@ Promise.all([
   getActiveHostname(),
   chrome.storage.sync.get({ mode: DEFAULT_MODE, siteOverrides: {} }),
 ]).then(([hostname, { mode, siteOverrides }]) => {
+  const currentMode = normalizeMode(mode)
   // Global mode radios
-  for (const r of modeRadios) r.checked = r.value === mode
+  for (const r of modeRadios) r.checked = r.value === currentMode
 
   // Hostname + per-site section
   if (!hostname) {
@@ -67,7 +78,7 @@ Promise.all([
   const activeValue = override ?? 'default'
   for (const r of siteRadios) r.checked = r.value === activeValue
   setSiteDisabled(false)
-  updateSiteHint(activeValue, mode)
+  updateSiteHint(activeValue, currentMode)
 })
 
 // ── Event handlers ────────────────────────────────────────────────
@@ -104,10 +115,7 @@ for (const r of siteRadios) {
 // enough information if the global is "Off".
 
 function globalModeLabel(mode) {
-  if (mode === 'polish') return 'Polish pages only'
-  if (mode === 'always') return 'Everywhere'
-  if (mode === 'off') return 'Off'
-  return mode
+  return normalizeMode(mode) === 'on' ? 'On' : 'Off'
 }
 
 function updateSiteHint(siteValue, globalMode) {

@@ -83,9 +83,46 @@ jobs:
             dist/kirkouski-typographic-*-macos.pkg
             dist/macos-v*/
 
+  # ── Chrome extension: bake Szpargalka TTF into base64 + zip ─────────
+  build-extension:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build Szpargalka Sans TTF from sources
+        run: |
+          pip install fonttools
+          python polish_liga.py --variant cyrillic --input scripts/assets/fonts/NotoSans-Regular.ttf --output dist/SzpargalkaSans-Regular.ttf
+
+      - name: Bake TTF into extension as base64 data URI
+        run: node extensions/chrome-mv3/build-font.mjs
+
+      - name: Pack chrome extension zip
+        # Named without a version suffix so the /releases/latest/download/
+        # URL stays stable across releases. The extension's own version
+        # lives inside manifest.json and doesn't need to match the repo tag.
+        run: |
+          mkdir -p dist
+          cd extensions && zip -r ../dist/szpargalka-sans-chrome.zip chrome-mv3
+          cd .. && ls -lh dist/szpargalka-sans-chrome.zip
+
+      - name: Upload extension artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: extension-release
+          path: dist/szpargalka-sans-chrome.zip
+
   # ── Create GitHub Release ────────────────────────────────────────────
   release:
-    needs: [build-windows, build-macos]
+    needs: [build-windows, build-macos, build-extension]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     permissions:
@@ -103,6 +140,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: macos-release
+          path: release/
+
+      - name: Download Chrome extension artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: extension-release
           path: release/
 
       - name: List release files
@@ -123,3 +166,4 @@ jobs:
             release/*_typographic_*.pdf
             release/SzpargalkaSans-Regular.ttf
             release/PolishPhoneticsSans-Regular.ttf
+            release/szpargalka-sans-chrome.zip

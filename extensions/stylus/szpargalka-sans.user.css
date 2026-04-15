@@ -1,8 +1,8 @@
 /* ==UserStyle==
-@name         Szpargalka Sans — everywhere
+@name         Szpargalka Sans
 @namespace    https://polish-typographic.com/
-@version      0.1.0
-@description  Forces Szpargalka Sans on every page, regardless of language. The font's OpenType ligatures replace Polish digraphs (sz, cz, rz, szcz, ch, …) with Cyrillic pronunciation hints — only useful on pages that contain Polish text. On non-Polish sites the ligatures don't fire and you just get a slightly more opinionated sans-serif.
+@version      0.2.0
+@description  Forces Szpargalka Sans on every page. The font's OpenType ligatures replace Polish digraphs (sz, cz, rz, szcz, ch, …) with Cyrillic pronunciation hints — most useful on pages that actually contain Polish text. Toggle this user-style on or off from the Stylus popup whenever you need it.
 @author       Andrei Kirkouski
 @homepageURL  https://polish-typographic.com/fonts
 @license      MIT

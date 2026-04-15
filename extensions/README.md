@@ -7,33 +7,25 @@ onto any webpage, ranked from easiest to most featured.
 |---|---|---|---|
 | [Stylus user CSS](./stylus/) | Stylus extension + one user-style click | 1 min | Anyone who already uses Stylus |
 | [Tampermonkey user script](./tampermonkey/) | Tampermonkey + one script install | 2 min | Power users who already have Tampermonkey |
-| [Chrome MV3 extension](./chrome-mv3/) | Unpacked Chrome extension (not published to store) | 5 min | Standalone install with a popup toggle |
+| [Chrome MV3 extension](./chrome-mv3/) | Unpacked Chrome extension (not published to store) | 5 min | Standalone install with a popup toggle and per-site overrides |
 
 All three do the same thing at their core: inject an `@font-face` declaration
 that loads Szpargalka Sans, then apply it via `* { font-family: ... !important }`
 with code/icon-font exclusions so page chrome stays legible.
 
-## Detection modes
+## Toggle model
 
-All three variants support some form of "only activate on Polish pages"
-behaviour. Szpargalka Sans is a *pedagogical* font — its OpenType ligatures
-replace Polish digraphs (`sz`, `cz`, `rz`, `szcz`, …) with Cyrillic glyphs
-for pronunciation hints — so leaving it on for English, German, or code sites
-is noise. The default is **Polish pages only**.
+All three variants are **strictly manual on/off**. Earlier revisions tried to
+auto-detect Polish pages via `<html lang>` sniffing and letter-density checks,
+but in practice the false positives and mis-identified mixed-language pages
+made the font feel intrusive. The current rule is simpler: you flip it on
+when you want pronunciation hints, and flip it off otherwise.
 
 | Variant | Toggle mechanism |
 |---|---|
-| Stylus | Two separate user-styles (install whichever you want): `szpargalka-sans-polish.user.css` or `szpargalka-sans-everywhere.user.css` |
-| Tampermonkey | In-menu toggle via `GM_registerMenuCommand` — 3-way switch |
-| Chrome extension | Popup with a 3-way radio: *Polish only / Everywhere / Off* |
-
-## How "Polish" is detected
-
-- **Primary signal**: `<html lang="pl">` (matches `pl`, `pl-PL`, `pl_PL`, etc.)
-- **Secondary** (Tampermonkey / Chrome only — not available in CSS): text-density
-  sniff — count occurrences of the nine uniquely-Polish letters `ą ć ę ł ń ó ś ź ż`
-  in the visible body text. If they make up >2% of characters, it's Polish.
-  This catches sites like Reddit and X that don't set `lang` correctly.
+| Stylus | Stylus's own popup toggle enables or disables the installed user-style. No custom UI inside the style itself. |
+| Tampermonkey | Single menu entry via `GM_registerMenuCommand` — ships disabled, one click flips to enabled and reloads. |
+| Chrome extension | Popup with a binary `On / Off` global toggle (default **Off**) and an optional per-site override showing the active tab's hostname. |
 
 ## Ignored elements
 
@@ -61,20 +53,22 @@ works offline.
 ### Stylus
 
 1. Install the [Stylus extension](https://chromewebstore.google.com/detail/stylus/clngdbkpkpeebahjckkjfobafhncgmne).
-2. Open `stylus/szpargalka-sans-polish.user.css` or
-   `stylus/szpargalka-sans-everywhere.user.css` in your editor, copy the
-   contents, then in the Stylus popup → *Manage* → *Write new style* →
-   paste → *Save*. Polish-only and Everywhere are separate styles; install
-   whichever fits, or both and toggle between them.
+2. Open `stylus/szpargalka-sans.user.css` in your browser — Stylus auto-detects
+   the `==UserStyle==` header and offers to install. Or copy the contents and
+   paste them into Stylus → *Manage* → *Write new style* → *Save*.
+3. The user-style ships enabled after install. Click it off in the Stylus
+   popup whenever you don't want it; Stylus's own on/off is the toggle —
+   there's no custom UI inside the style.
 
 ### Tampermonkey
 
 1. Install the [Tampermonkey extension](https://www.tampermonkey.net/).
 2. Open `tampermonkey/szpargalka-sans.user.js` in your browser — Tampermonkey
    auto-detects the `==UserScript==` header and offers to install.
-3. Click the Tampermonkey icon → `Szpargalka Sans — ...` menu to toggle
-   between *Polish pages only* / *Everywhere* / *Off*. The menu entries
-   show a ✓ next to the current mode.
+3. The script ships **disabled**. Click the Tampermonkey icon → hover
+   *Szpargalka Sans* → click the menu entry to flip it on; click again to
+   flip it off. The menu entry shows the current state (`✓ On` / `  Off`)
+   and reloads the tab on change.
 
 ### Chrome extension (unpacked)
 
@@ -88,10 +82,10 @@ works offline.
 3. Click the extension's toolbar icon. The popup has two sections:
    - **This site** — per-site override showing the active tab's
      hostname. Toggle *Default / Force on / Force off* to override the
-     global behaviour for just this site. "Default" clears the override
-     and falls back to the global setting below.
-   - **Global default** — the 3-way radio *Polish pages only / Everywhere
-     / Off* that applies to every site without its own override.
+     global setting for just this site. "Default" clears the override
+     and falls back to the global toggle below.
+   - **Global default** — a binary `On / Off` radio (defaulting to **Off**).
+     The extension ships silent so flipping it on is an explicit opt-in.
    Both changes re-apply in the active tab immediately — no reload.
 
 ## Known quirks

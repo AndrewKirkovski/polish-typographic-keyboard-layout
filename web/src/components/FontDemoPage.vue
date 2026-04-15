@@ -19,6 +19,25 @@ function selectTab(tab: FontTab) {
   trackFontTab(tab)
 }
 
+// "Try on any website" install-path tab
+type InstallTab = 'chrome' | 'tampermonkey' | 'stylus'
+const activeInstallTab = ref<InstallTab>('chrome')
+
+function selectInstallTab(tab: InstallTab) {
+  if (activeInstallTab.value === tab) return
+  activeInstallTab.value = tab
+}
+
+// Pre-built extension zip attached to the latest GitHub release by CI.
+// /releases/latest/download/ resolves through to whatever the latest tag
+// is, so this URL stays valid across future releases with no rebuild.
+const CHROME_EXTENSION_ZIP_URL =
+  'https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/releases/latest/download/szpargalka-sans-chrome.zip'
+const TAMPERMONKEY_USER_JS_URL =
+  'https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/raw/main/extensions/tampermonkey/szpargalka-sans.user.js'
+const STYLUS_USER_CSS_URL =
+  'https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/raw/main/extensions/stylus/szpargalka-sans.user.css'
+
 const activeFont = computed(() =>
   activeTab.value === 'cyrillic' ? 'Szpargalka Sans' : 'Polish Phonetics Sans',
 )
@@ -210,6 +229,150 @@ const activeLigatures = computed(() =>
             <span class="font-download-card__name">{{ FONT_FILES.ipa }}</span>
             <span class="font-download-card__label">{{ t('fonts.tabIpa') }}</span>
           </a>
+        </div>
+      </section>
+
+      <!-- Try on any website — browser extensions -->
+      <section class="demo-section try-section">
+        <h2 class="demo-heading">{{ t('fonts.try.title') }}</h2>
+        <p class="try-subtitle">{{ t('fonts.try.subtitle') }}</p>
+
+        <!-- Screenshots: light + dark side by side -->
+        <div class="try-screens">
+          <figure class="try-screen try-screen--light">
+            <img
+              src="/extensions/wikipedia-light.webp"
+              :alt="t('fonts.try.screenshotAltLight')"
+              loading="lazy"
+              width="920"
+              height="518"
+            />
+            <figcaption>{{ t('fonts.try.screenshotLight') }}</figcaption>
+          </figure>
+          <figure class="try-screen try-screen--dark">
+            <img
+              src="/extensions/wikipedia-dark.webp"
+              :alt="t('fonts.try.screenshotAltDark')"
+              loading="lazy"
+              width="920"
+              height="518"
+            />
+            <figcaption>{{ t('fonts.try.screenshotDark') }}</figcaption>
+          </figure>
+        </div>
+
+        <!-- Install instruction tabs -->
+        <div class="install-tabs" role="tablist" :aria-label="t('fonts.try.tablistLabel')">
+          <button
+            id="install-tab-chrome"
+            role="tab"
+            :aria-selected="activeInstallTab === 'chrome'"
+            :tabindex="activeInstallTab === 'chrome' ? 0 : -1"
+            :class="{ active: activeInstallTab === 'chrome' }"
+            @click="selectInstallTab('chrome')"
+          >{{ t('fonts.try.tabChrome') }}</button>
+          <button
+            id="install-tab-tampermonkey"
+            role="tab"
+            :aria-selected="activeInstallTab === 'tampermonkey'"
+            :tabindex="activeInstallTab === 'tampermonkey' ? 0 : -1"
+            :class="{ active: activeInstallTab === 'tampermonkey' }"
+            @click="selectInstallTab('tampermonkey')"
+          >{{ t('fonts.try.tabTampermonkey') }}</button>
+          <button
+            id="install-tab-stylus"
+            role="tab"
+            :aria-selected="activeInstallTab === 'stylus'"
+            :tabindex="activeInstallTab === 'stylus' ? 0 : -1"
+            :class="{ active: activeInstallTab === 'stylus' }"
+            @click="selectInstallTab('stylus')"
+          >{{ t('fonts.try.tabStylus') }}</button>
+        </div>
+
+        <!-- Chrome extension panel -->
+        <div
+          v-if="activeInstallTab === 'chrome'"
+          role="tabpanel"
+          aria-labelledby="install-tab-chrome"
+          class="install-panel"
+        >
+          <p class="install-panel__intro">{{ t('fonts.try.chromeIntro') }}</p>
+          <ol class="install-panel__steps">
+            <li>
+              <a
+                :href="CHROME_EXTENSION_ZIP_URL"
+                class="install-download"
+                target="_blank"
+                rel="noopener"
+                @click="trackDownload('font', 'szpargalka-sans-chrome.zip', { variant: 'extension-chrome' })"
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path d="M7 1v8M3 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M1 11v1.5h12V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span v-html="t('fonts.try.chromeStep1')"></span>
+              </a>
+            </li>
+            <li v-html="t('fonts.try.chromeStep2')"></li>
+            <li v-html="t('fonts.try.chromeStep3')"></li>
+            <li v-html="t('fonts.try.chromeStep4')"></li>
+          </ol>
+        </div>
+
+        <!-- Tampermonkey panel -->
+        <div
+          v-if="activeInstallTab === 'tampermonkey'"
+          role="tabpanel"
+          aria-labelledby="install-tab-tampermonkey"
+          class="install-panel"
+        >
+          <p class="install-panel__intro">{{ t('fonts.try.tampermonkeyIntro') }}</p>
+          <ol class="install-panel__steps">
+            <li v-html="t('fonts.try.tampermonkeyStep1')"></li>
+            <li>
+              <a
+                :href="TAMPERMONKEY_USER_JS_URL"
+                class="install-download"
+                target="_blank"
+                rel="noopener"
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path d="M7 1v8M3 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M1 11v1.5h12V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span v-html="t('fonts.try.tampermonkeyStep2')"></span>
+              </a>
+            </li>
+            <li v-html="t('fonts.try.tampermonkeyStep3')"></li>
+          </ol>
+        </div>
+
+        <!-- Stylus panel -->
+        <div
+          v-if="activeInstallTab === 'stylus'"
+          role="tabpanel"
+          aria-labelledby="install-tab-stylus"
+          class="install-panel"
+        >
+          <p class="install-panel__intro">{{ t('fonts.try.stylusIntro') }}</p>
+          <ol class="install-panel__steps">
+            <li v-html="t('fonts.try.stylusStep1')"></li>
+            <li>
+              <a
+                :href="STYLUS_USER_CSS_URL"
+                class="install-download"
+                target="_blank"
+                rel="noopener"
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path d="M7 1v8M3 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M1 11v1.5h12V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span v-html="t('fonts.try.stylusStep2')"></span>
+              </a>
+            </li>
+            <li v-html="t('fonts.try.stylusStep3')"></li>
+          </ol>
         </div>
       </section>
     </div>
@@ -455,6 +618,163 @@ const activeLigatures = computed(() =>
   white-space: nowrap;
 }
 
+/* ── Try on any website ────────────────────────────────────────────── */
+.try-section {
+  margin-top: 3rem;
+}
+
+.try-subtitle {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  max-width: 60ch;
+  margin: 0 0 1.75rem;
+}
+
+.try-screens {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  max-width: 860px;
+}
+
+.try-screen {
+  margin: 0;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.5rem 0.5rem 0;
+  overflow: hidden;
+}
+
+.try-screen img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  aspect-ratio: 16 / 9;
+}
+
+.try-screen figcaption {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 0.5rem 0 0.35rem;
+}
+
+/* ── Install tabs ──────────────────────────────────────────────────── */
+.install-tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.install-tabs button {
+  padding: 0.6rem 1rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.install-tabs button:hover {
+  color: var(--text);
+}
+
+.install-tabs button.active {
+  color: var(--color-altgr);
+  border-bottom-color: var(--color-altgr);
+}
+
+.install-panel {
+  padding: 0.25rem 0 0;
+}
+
+.install-panel__intro {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--text);
+  margin: 0 0 1rem;
+  max-width: 60ch;
+}
+
+.install-panel__steps {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--text);
+  margin: 0;
+  padding-left: 1.4rem;
+  max-width: 65ch;
+  line-height: 1.6;
+}
+
+.install-panel__steps li {
+  margin-bottom: 0.75rem;
+}
+
+.install-panel__steps :deep(code) {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  background: var(--bg-subtle);
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+}
+
+.install-panel__steps :deep(kbd) {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  background: var(--bg-subtle);
+  padding: 0.1rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+}
+
+.install-panel__steps :deep(a) {
+  color: var(--color-altgr);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--color-altgr) 40%, transparent);
+  text-underline-offset: 2px;
+  transition: text-decoration-color 0.15s;
+}
+
+.install-panel__steps :deep(a):hover {
+  text-decoration-color: var(--color-altgr);
+}
+
+.install-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.85rem;
+  background: color-mix(in srgb, var(--color-altgr) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-altgr) 30%, transparent);
+  border-radius: 6px;
+  color: var(--color-altgr);
+  font-weight: 500;
+  text-decoration: none !important;
+  transition: background 0.15s;
+}
+
+.install-download:hover {
+  background: color-mix(in srgb, var(--color-altgr) 15%, transparent);
+}
+
+.install-download svg {
+  flex-shrink: 0;
+}
+
 /* ── Responsive ────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
   .editable-area {
@@ -470,6 +790,11 @@ const activeLigatures = computed(() =>
 
   .col-rendered {
     font-size: 1.4rem;
+  }
+
+  .install-tabs button {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
   }
 }
 </style>
