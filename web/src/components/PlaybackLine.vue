@@ -93,29 +93,70 @@ const { t } = useI18n()
 }
 
 .playback-line__pending {
-  /* Highlighted dead-state indicator, the same visual vocabulary
-     macOS uses: a yellow-tinted box hugging the spacing accent
-     glyph, sitting at the caret position. Fades in so it doesn't
-     pop harshly when the trigger releases. */
+  /* Highlighted dead-state indicator — macOS paints a yellow accent
+     overlay at the caret when a dead key is pending. We get ~1.5 s
+     between the trigger release and the base letter commit, so the
+     animation has to land fast and stay visible for the whole
+     window. Two stages:
+       1. Drop-in with overshoot bounce (140 ms): the glyph falls
+          from above, slightly past its resting position, and lands.
+          Enough motion to catch the eye.
+       2. Continuous glow pulse (700 ms loop): a soft box-shadow
+          halo pulses around the box so the user keeps noticing the
+          accent while waiting for the base letter. Subtle scale
+          breath so it feels alive without moving the text around. */
   display: inline-block;
-  padding: 0 4px;
-  margin: 0 1px;
+  padding: 1px 5px;
+  margin: 0 2px;
   background: rgba(255, 206, 84, 0.35);
   color: var(--text);
-  border-radius: 3px;
-  font-weight: 600;
-  animation: playback-pending-fade-in 180ms ease-out;
+  border-radius: 4px;
+  font-weight: 700;
+  transform-origin: center bottom;
+  animation:
+    playback-pending-drop 140ms cubic-bezier(0.2, 1.6, 0.4, 1) both,
+    playback-pending-glow 700ms ease-in-out 140ms infinite;
 }
 
 @media (prefers-color-scheme: dark) {
   .playback-line__pending {
-    background: rgba(255, 206, 84, 0.25);
+    background: rgba(255, 206, 84, 0.22);
   }
 }
 
-@keyframes playback-pending-fade-in {
-  from { opacity: 0; transform: translateY(-2px); }
-  to   { opacity: 1; transform: none; }
+@keyframes playback-pending-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.4);
+  }
+  70% {
+    transform: translateY(3px) scale(1.12);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes playback-pending-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 206, 84, 0);
+    background: rgba(255, 206, 84, 0.30);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 12px 2px rgba(255, 206, 84, 0.55);
+    background: rgba(255, 206, 84, 0.55);
+    transform: scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .playback-line__pending {
+    animation: none;
+    /* Still show the highlight, just no motion/pulse */
+    background: rgba(255, 206, 84, 0.45);
+  }
 }
 
 .playback-line__caret {
