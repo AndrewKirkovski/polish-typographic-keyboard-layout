@@ -45,27 +45,36 @@ interface Tempo {
   spaceDwell: number      // space bar advance
 }
 
+// Fast tier: boring chars (Cyrillic, Latin, digits, direct Polish
+// diacritics, typographic marks) blast through with just enough pause
+// on the modifier for the viewer to see "Shift was held" — no ceremony.
+// Letter keycaps don't highlight (silent commit) so the letterHold only
+// controls how long the committed text sits before the mod releases.
 const FAST_TEMPO: Tempo = {
-  modPressHold: 120,
-  letterHold: 120,
-  letterReleaseGap: 90,
-  modReleaseGap: 70,
-  interChar: 140,
-  spaceDwell: 180,
+  modPressHold: 90,
+  letterHold: 60,
+  letterReleaseGap: 50,
+  modReleaseGap: 40,
+  interChar: 90,
+  spaceDwell: 140,
 }
 
+// Slow tier: dead-key compositions. Every visible press (Shift, AltGr,
+// dead-key trigger, base letter) holds for 0.6-0.7s so the viewer can
+// actually see each atomic action. A single dead-key char takes ~4-5s,
+// which is the whole point — the mechanic needs a full beat to land.
 const SLOW_TEMPO: Tempo = {
-  modPressHold: 280,
-  letterHold: 280,
-  letterReleaseGap: 220,
-  modReleaseGap: 160,
-  interChar: 380,
-  spaceDwell: 320,
+  modPressHold: 650,
+  letterHold: 650,
+  letterReleaseGap: 280,
+  modReleaseGap: 200,
+  interChar: 400,
+  spaceDwell: 350,
 }
 
 // Gap between a dead-key trigger and its paired letter — always slow
 // since dead-key sequences ARE the slow tier.
-const DEAD_GAP_MS = 320
+const DEAD_GAP_MS = 450
 
 const END_PHRASE_DWELL_MS = 2200
 const FADE_OUT_MS = 300
@@ -399,7 +408,45 @@ export function usePlayback(opts: UsePlaybackOptions) {
         break
     }
 
+    logStep(step)
     schedule(() => playMicro(micro, i + 1), step.delayAfter)
+  }
+
+  // Dev-only trace of every atomic action the player performs, so you
+  // can follow along in DevTools while the animation runs. Shows the
+  // micro-step kind, the key involved, what (if anything) got typed,
+  // and the full set of physical keys currently held — so "what am I
+  // looking at right now" is answerable without guessing.
+  function logStep(step: MicroStep): void {
+    if (!import.meta.env?.DEV) return
+    const held = Array.from(opts.pressedKeyIds.value).join('+') || '—'
+    const delay = step.delayAfter + 'ms'
+    switch (step.kind) {
+      case 'modPress':
+        // eslint-disable-next-line no-console
+        console.log(`%c[playback] ▼ MOD ${step.keyId}`, 'color:#c4362c', `held=${held}  hold=${delay}`)
+        break
+      case 'modRelease':
+        // eslint-disable-next-line no-console
+        console.log(`%c[playback] ▲ MOD ${step.keyId}`, 'color:#888', `held=${held}  hold=${delay}`)
+        break
+      case 'keyPress':
+        // eslint-disable-next-line no-console
+        console.log(`%c[playback] ▼ KEY ${step.keyId}`, 'color:#c4362c;font-weight:bold', `layer=${step.layer}  held=${held}  hold=${delay}`)
+        break
+      case 'keyRelease':
+        // eslint-disable-next-line no-console
+        console.log(`%c[playback] ▲ KEY ${step.keyId}`, 'color:#888;font-weight:bold', `typed=${JSON.stringify(step.typed)}  held=${held}  hold=${delay}`)
+        break
+      case 'commit':
+        // eslint-disable-next-line no-console
+        console.log(`%c[playback] · commit`, 'color:#555', `typed=${JSON.stringify(step.typed)}  held=${held}  hold=${delay}`)
+        break
+      case 'space':
+        // eslint-disable-next-line no-console
+        console.log(`%c[playback] · space`, 'color:#555', `hold=${delay}`)
+        break
+    }
   }
 
   function finishPhrase(): void {
