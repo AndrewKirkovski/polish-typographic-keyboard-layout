@@ -51,20 +51,22 @@
       "reducedMotionHint": "Animacja wyłączona — kliknij „Odtwórz demo”, by uruchomić.",
       "phrases": {
         "polish": [
-          "„Cześć, świecie!”",
+          "Chcesz walut? € £",
+          "A może strzałki? ← ↑ → ↓",
+          "Matematyka? ≠ × ≈ ± ∞",
+          "„Cześć, świecie!” — 2026.",
           "Zażółć gęślą jaźń.",
-          "— To pięć złotych.",
-          "Łódź, Kraków, Gdańsk…",
-          "„čas” po česku",
-          "Schön — für Grüße"
+          "Schön — für Grüße",
+          "„čas” po česku"
         ],
         "russian": [
-          "«Привет, мир!»",
-          "Ёлка — это ель.",
-          "Где № 5? — Здесь.",
-          "у\u0306 — кароткае",
-          "е\u0308 ≠ ё",
-          "ы\u0308 ы\u030B ь\u030C"
+          "Валюты? Пожалуйста: € £ ₽ ₴",
+          "Стрелки? ← ↑ → ↓",
+          "Математика? ≠ × ≈ ± ∞",
+          "«Привет, мир!» — 2026.",
+          "Ёлка, ёжик, № 5.",
+          "у\u0306 — кароткае (ў)",
+          "ы\u0308 ы\u030B ь\u030C — фантазия"
         ]
       }
     }
