@@ -112,74 +112,70 @@ const { t } = useI18n()
 }
 
 .playback-line__pending-inner {
-  /* Absolute anchor to the 0-width parent. Nudged 2px right of the
-     caret so it doesn't overlap the blinking cursor. */
+  /* Absolute anchor to the 0-width parent. Vertically we center
+     on the parent (no extra nudge) — the sized-down accent + slot
+     stack is now short enough to fit inside the glyph box directly,
+     aligning with the caron / body regions of the committed char
+     it's replacing. */
   position: absolute;
-  left: 2px;
+  left: 5px;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translate(0, calc(-50% - 1.5px));
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1px;
+  gap: 0;
   pointer-events: none;
   line-height: 1;
 }
 
 .playback-line__pending-accent {
-  /* Two-part dead-state indicator: accent glyph on top, dotted
-     slot underneath — no background, no shadow, no box. Reads as
-     part of the text, not a UI chrome element. */
+  /* Spacing accent glyph — at full 1em to match the visual size
+     of the accent on the committed char. Weight inherited from
+     the text so the strokes match too. */
   display: block;
-  font-size: 0.7em;
-  font-weight: 700;
+  font-size: 1em;
   line-height: 1;
   color: currentColor;
   animation: playback-pending-accent-drop 160ms cubic-bezier(0.2, 1.6, 0.4, 1) both;
 }
 
 .playback-line__pending-slot {
+  /* Dotted outline representing where the base letter will land.
+     Negative margin-top pulls the slot up into the accent's lower
+     region so the slot lands on the x-height band regardless of
+     how tall the accent glyph is. The two shapes are visually
+     distinct so the overlap reads fine. */
   display: block;
-  width: 0.45em;
-  height: 0.45em;
+  width: 0.4em;
+  height: 0.4em;
   border-radius: 50%;
-  border: 1.2px dashed currentColor;
+  border: 1px dashed currentColor;
   opacity: 0.55;
-  animation: playback-pending-slot-pulse 900ms ease-in-out infinite;
+  margin-top: -10px;
 }
 
 @keyframes playback-pending-accent-drop {
+  /* Pop in with a scale overshoot — no vertical motion. An earlier
+     version dropped from translateY(-8px) which looked like the glyph
+     snapping down, since the pending-inner parent is already offset
+     upward by 5px and the motion compounded into a visible jerk. */
   0% {
     opacity: 0;
-    transform: translateY(-8px) scale(0.6);
+    transform: scale(0.5);
   }
-  70% {
-    transform: translateY(1px) scale(1.15);
+  60% {
+    transform: scale(1.2);
   }
   100% {
     opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes playback-pending-slot-pulse {
-  0%, 100% {
-    opacity: 0.35;
     transform: scale(1);
-  }
-  50% {
-    opacity: 0.75;
-    transform: scale(1.12);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .playback-line__pending-accent,
-  .playback-line__pending-slot {
+  .playback-line__pending-accent {
     animation: none;
-  }
-  .playback-line__pending-slot {
-    opacity: 0.6;
   }
 }
 
