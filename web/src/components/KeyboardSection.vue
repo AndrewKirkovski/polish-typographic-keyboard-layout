@@ -17,6 +17,7 @@ const {
   pressedKeyIds,
   manualLayer,
   setManualLayer,
+  setPlaybackLayer,
   setCodeToKeyId,
 } = useModifierState()
 
@@ -35,7 +36,8 @@ const phrases = computed<readonly string[]>(() => {
 
 const playback = usePlayback({
   pressedKeyIds,
-  setManualLayer,
+  setPlaybackLayer,
+  manualLayer,
   layout: active,
   phrases,
 })

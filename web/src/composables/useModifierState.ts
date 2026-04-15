@@ -25,6 +25,16 @@ export function useModifierState() {
   /** Manual override from the layer toggle buttons (null = follow keyboard). */
   const manualLayer = ref<Layer | null>(null)
 
+  /**
+   * Layer forced by the playback animation while it drives the
+   * keyboard. Kept separate from `manualLayer` so the user's
+   * layer-switcher tabs don't flicker during playback — the player
+   * only influences which keycap glyphs render, not the tab state.
+   * Priority: manualLayer (user click) > hardware modifiers held
+   * (real keypress) > playbackLayer (animation) > base.
+   */
+  const playbackLayer = ref<Layer | null>(null)
+
   const keyboardLayer = computed<Layer>(() => {
     if (altGrHeld.value && shiftHeld.value) return 'shift_altgr'
     if (altGrHeld.value) return 'altgr'
@@ -32,10 +42,23 @@ export function useModifierState() {
     return 'base'
   })
 
-  const activeLayer = computed<Layer>(() => manualLayer.value ?? keyboardLayer.value)
+  const activeLayer = computed<Layer>(() => {
+    if (manualLayer.value !== null) return manualLayer.value
+    // Hardware modifiers take precedence over the animation if the
+    // user is actually holding something — bare Shift during playback
+    // should surface the shift layer instead of whatever the demo
+    // was about to show.
+    if (keyboardLayer.value !== 'base') return keyboardLayer.value
+    if (playbackLayer.value !== null) return playbackLayer.value
+    return 'base'
+  })
 
   function setManualLayer(layer: Layer | null) {
     manualLayer.value = layer
+  }
+
+  function setPlaybackLayer(layer: Layer | null) {
+    playbackLayer.value = layer
   }
 
   let suppressCtrlLeft = false
@@ -173,6 +196,8 @@ export function useModifierState() {
     pressedKeyIds,
     manualLayer,
     setManualLayer,
+    playbackLayer,
+    setPlaybackLayer,
     setCodeToKeyId,
   }
 }

@@ -83,11 +83,26 @@ const FADE_OUT_MS = 300
 const KEY_LSHIFT = '_lsh'
 const KEY_ALTGR = '_ra'
 
+// "Regular" Polish letters on the typographic layout — these are the
+// Polish-specific diacritic characters that a Polish typist expects to
+// reach directly, so typing them should feel routine. Everything ELSE
+// on the altgr / shift_altgr layers (em-dashes, curly quotes, ellipsis,
+// arrows, math marks, currency, etc.) is a typographic payoff that the
+// whole layout exists to demo — those get the slow tier even though
+// they're direct single-press chars.
+const POLISH_NATIVE_CHARS = new Set([
+  'ą', 'ć', 'ę', 'ł', 'ń', 'ó', 'ś', 'ź', 'ż',
+  'Ą', 'Ć', 'Ę', 'Ł', 'Ń', 'Ó', 'Ś', 'Ź', 'Ż',
+])
+
 const STORAGE_KEY = 'kbd.playback.enabled'
 
 export interface UsePlaybackOptions {
   pressedKeyIds: Ref<Set<string>>
-  setManualLayer: (layer: Layer | null) => void
+  /** Demo-owned layer override — does NOT flip the layer-switcher tabs. */
+  setPlaybackLayer: (layer: Layer | null) => void
+  /** User-owned layer override — watched for pause/resume. */
+  manualLayer: Ref<Layer | null>
   layout: Ref<LayoutData | null>
   phrases: Ref<readonly string[]>
 }
@@ -98,6 +113,10 @@ export function usePlayback(opts: UsePlaybackOptions) {
   const enabled = ref<boolean>(readStoredEnabled())
   const running = ref<boolean>(false)
   const sessionInterrupted = ref<boolean>(false)
+  // True when the player stopped itself because the user clicked a
+  // specific layer tab (Base / AltGr / Shift+AltGr). Cleared when
+  // they switch back to Auto, which triggers auto-resume.
+  const manualPaused = ref<boolean>(false)
   const prefersReducedMotion = ref<boolean>(false)
 
   // Visible demo text and fade state — what PlaybackLine.vue renders.
@@ -152,7 +171,7 @@ export function usePlayback(opts: UsePlaybackOptions) {
 
   function clearKeyboardState(): void {
     opts.pressedKeyIds.value = new Set()
-    opts.setManualLayer(null)
+    opts.setPlaybackLayer(null)
   }
 
   function clearDisplay(): void {
@@ -202,38 +221,54 @@ export function usePlayback(opts: UsePlaybackOptions) {
 
   /**
    * Expand a resolver Step[] into a flat MicroStep[] that the player
-   * can walk. Per-step tempo selection:
+   * can walk. Per-step tempo + highlight selection:
    *
-   *   - Fast by default (normal keys on the target layout).
-   *   - Slow for BOTH halves of a dead-key pair: the trigger step
-   *     (typed='') and the letter step immediately after it. Dead-key
-   *     compositions are the whole point of the slow tier — they
-   *     demonstrate a mechanic the user wouldn't otherwise see.
+   *   - FAST by default: base/shift letters, digits, direct Polish
+   *     diacritics on altgr (ąćęłńóśźż + caps), and their shift forms.
+   *     No letter-keycap highlight — silent commit into the text line.
+   *   - SLOW + letter highlight for both halves of a dead-key pair:
+   *     trigger (typed='') and the letter immediately after it.
+   *   - SLOW + no letter highlight for direct typographic payoff
+   *     chars on altgr / shift_altgr — em-dash, curly quotes, arrows,
+   *     currency, math marks. The whole layout exists to make these
+   *     first-class; slowing them down lets the viewer actually see
+   *     the modifier combo that produces them, without pretending
+   *     the letter key itself is the star.
    *
    * Between a dead-key trigger and its paired letter we always use
-   * DEAD_GAP_MS (slightly longer than the slow inter-char) so the
-   * trigger + letter read as a deliberate pair.
+   * DEAD_GAP_MS so the two halves read as one gesture.
    */
   function expandPhrase(steps: Step[]): MicroStep[] {
-    // Pre-compute a tempo per step. A step is slow iff it's part of a
-    // dead-key pair: either the trigger (typed==='' followed by a key
-    // step) or the letter that follows a trigger.
-    const tempos: Tempo[] = steps.map((step, i) => {
-      if (step.kind !== 'key') return FAST_TEMPO
+    interface StepMeta {
+      tempo: Tempo
+      highlightLetter: boolean
+    }
+    const metas: StepMeta[] = steps.map((step, i) => {
+      if (step.kind !== 'key') {
+        return { tempo: FAST_TEMPO, highlightLetter: false }
+      }
       const prev = steps[i - 1]
       const next = steps[i + 1]
-      const isTrigger =
-        step.typed === '' && next && next.kind === 'key'
-      const isPairedLetter =
-        prev && prev.kind === 'key' && prev.typed === ''
-      return isTrigger || isPairedLetter ? SLOW_TEMPO : FAST_TEMPO
+      const isTrigger = step.typed === '' && next && next.kind === 'key'
+      const isPairedLetter = prev && prev.kind === 'key' && prev.typed === ''
+      if (isTrigger || isPairedLetter) {
+        return { tempo: SLOW_TEMPO, highlightLetter: true }
+      }
+      const isAltgrLayer =
+        step.layer === 'altgr' || step.layer === 'shift_altgr'
+      const isTypographicPayoff =
+        isAltgrLayer && !POLISH_NATIVE_CHARS.has(step.typed)
+      if (isTypographicPayoff) {
+        return { tempo: SLOW_TEMPO, highlightLetter: false }
+      }
+      return { tempo: FAST_TEMPO, highlightLetter: false }
     })
 
     const micro: MicroStep[] = []
 
     for (let i = 0; i < steps.length; i++) {
       const step = steps[i]
-      const tempo = tempos[i]
+      const { tempo, highlightLetter } = metas[i]
       const isLast = i === steps.length - 1
       const next = steps[i + 1]
       const isDeadToLetter =
@@ -253,7 +288,6 @@ export function usePlayback(opts: UsePlaybackOptions) {
       }
 
       const { needShift, needAltGr } = modsForLayer(step.layer)
-      const highlightLetter = tempo === SLOW_TEMPO
 
       // Press modifiers in a fixed order (shift → altgr) so the visual
       // sequence reads the same regardless of which is needed.
@@ -321,18 +355,21 @@ export function usePlayback(opts: UsePlaybackOptions) {
   }
 
   /**
-   * Recompute manualLayer from whichever physical modifier keys are
-   * currently held. Called after every press/release so the keyboard
-   * visualisation shows the right layer glyphs on the letter keys.
+   * Recompute the layer the player wants the keycaps to show, based
+   * on whichever modifier keys the demo has "pressed" into
+   * pressedKeyIds. Writes to the playbackLayer ref only — the
+   * layer-switcher tabs stay on whatever the user last clicked
+   * (default Auto), so the demo never flips them behind the user's
+   * back.
    */
   function syncLayer(): void {
     const held = opts.pressedKeyIds.value
     const shift = held.has(KEY_LSHIFT) || held.has('_rsh')
     const altgr = held.has(KEY_ALTGR)
-    if (shift && altgr) opts.setManualLayer('shift_altgr')
-    else if (altgr) opts.setManualLayer('altgr')
-    else if (shift) opts.setManualLayer('shift')
-    else opts.setManualLayer(null)
+    if (shift && altgr) opts.setPlaybackLayer('shift_altgr')
+    else if (altgr) opts.setPlaybackLayer('altgr')
+    else if (shift) opts.setPlaybackLayer('shift')
+    else opts.setPlaybackLayer(null)
   }
 
   function pressKey(keyId: string): void {
@@ -476,6 +513,9 @@ export function usePlayback(opts: UsePlaybackOptions) {
     if (running.value) return
     if (!enabled.value) return
     if (sessionInterrupted.value) return
+    if (manualPaused.value) return
+    // If the user has a specific layer tab selected, leave them alone.
+    if (opts.manualLayer.value !== null) return
     if (!opts.layout.value) return
     if (opts.phrases.value.length === 0) return
     running.value = true
@@ -590,11 +630,34 @@ export function usePlayback(opts: UsePlaybackOptions) {
     },
   )
 
+  // Watch the user-owned layer tab. Switching to Base / AltGr /
+  // Shift+AltGr auto-pauses the demo so the user can stare at the
+  // layer they explicitly asked for. Switching back to Auto auto-
+  // resumes (if playback is still enabled and not session-interrupted).
+  watch(
+    () => opts.manualLayer.value,
+    (newVal) => {
+      if (newVal !== null) {
+        if (running.value) {
+          running.value = false
+          cancelTimer()
+          clearKeyboardState()
+          clearDisplay()
+        }
+        manualPaused.value = true
+      } else if (manualPaused.value) {
+        manualPaused.value = false
+        start()
+      }
+    },
+  )
+
   return {
     // State for PlaybackLine.vue to render
     enabled,
     running,
     sessionInterrupted,
+    manualPaused,
     prefersReducedMotion,
     currentText,
     fading,
