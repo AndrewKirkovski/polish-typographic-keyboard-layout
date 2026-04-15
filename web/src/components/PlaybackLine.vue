@@ -41,7 +41,10 @@ const { t } = useI18n()
         v-if="pendingAccent"
         class="playback-line__pending"
         :title="'Dead key held, waiting for a base letter'"
-      >{{ pendingAccent }}</span>
+      >
+        <span class="playback-line__pending-accent">{{ pendingAccent }}</span>
+        <span class="playback-line__pending-slot" aria-hidden="true"></span>
+      </span>
       <span
         class="playback-line__caret"
         :class="{ 'playback-line__caret--dim': !running }"
@@ -93,44 +96,52 @@ const { t } = useI18n()
 }
 
 .playback-line__pending {
-  /* Highlighted dead-state indicator — macOS paints a yellow accent
-     overlay at the caret when a dead key is pending. We get ~1.5 s
-     between the trigger release and the base letter commit, so the
-     animation has to land fast and stay visible for the whole
-     window. Two stages:
-       1. Drop-in with overshoot bounce (140 ms): the glyph falls
-          from above, slightly past its resting position, and lands.
-          Enough motion to catch the eye.
-       2. Continuous glow pulse (700 ms loop): a soft box-shadow
-          halo pulses around the box so the user keeps noticing the
-          accent while waiting for the base letter. Subtle scale
-          breath so it feels alive without moving the text around. */
-  display: inline-block;
-  padding: 1px 5px;
-  margin: 0 2px;
-  background: rgba(255, 206, 84, 0.35);
-  color: var(--text);
-  border-radius: 4px;
+  /* Two-part dead-state indicator:
+       - the spacing accent glyph (caron, diaeresis, breve, …) at
+         the top, marking which dead key is pending;
+       - a dotted-outline circle slot below it, symbolising the
+         empty "waiting for a base letter" placeholder the layout
+         is about to fill.
+     No background, no shadow, no box — just the glyph and the slot
+     drawn in the current text color so it reads as part of the text
+     rather than a separate UI chrome element. */
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  margin: 0 3px;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+.playback-line__pending-accent {
+  display: block;
+  font-size: 0.75em;
   font-weight: 700;
-  transform-origin: center bottom;
-  animation:
-    playback-pending-drop 140ms cubic-bezier(0.2, 1.6, 0.4, 1) both,
-    playback-pending-glow 700ms ease-in-out 140ms infinite;
+  line-height: 1;
+  color: currentColor;
+  /* Drop in with a subtle overshoot — no glow, no background, no
+     flashing; the pulse lives on the slot circle below. */
+  animation: playback-pending-accent-drop 160ms cubic-bezier(0.2, 1.6, 0.4, 1) both;
 }
 
-@media (prefers-color-scheme: dark) {
-  .playback-line__pending {
-    background: rgba(255, 206, 84, 0.22);
-  }
+.playback-line__pending-slot {
+  display: block;
+  width: 0.85em;
+  height: 0.85em;
+  border-radius: 50%;
+  border: 1.5px dashed currentColor;
+  opacity: 0.55;
+  animation: playback-pending-slot-pulse 900ms ease-in-out infinite;
 }
 
-@keyframes playback-pending-drop {
+@keyframes playback-pending-accent-drop {
   0% {
     opacity: 0;
-    transform: translateY(-14px) scale(0.4);
+    transform: translateY(-8px) scale(0.6);
   }
   70% {
-    transform: translateY(3px) scale(1.12);
+    transform: translateY(1px) scale(1.15);
   }
   100% {
     opacity: 1;
@@ -138,24 +149,24 @@ const { t } = useI18n()
   }
 }
 
-@keyframes playback-pending-glow {
+@keyframes playback-pending-slot-pulse {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(255, 206, 84, 0);
-    background: rgba(255, 206, 84, 0.30);
+    opacity: 0.35;
     transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 12px 2px rgba(255, 206, 84, 0.55);
-    background: rgba(255, 206, 84, 0.55);
-    transform: scale(1.06);
+    opacity: 0.75;
+    transform: scale(1.12);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .playback-line__pending {
+  .playback-line__pending-accent,
+  .playback-line__pending-slot {
     animation: none;
-    /* Still show the highlight, just no motion/pulse */
-    background: rgba(255, 206, 84, 0.45);
+  }
+  .playback-line__pending-slot {
+    opacity: 0.6;
   }
 }
 
