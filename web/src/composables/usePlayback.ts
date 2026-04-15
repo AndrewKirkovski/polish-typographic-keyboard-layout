@@ -223,17 +223,18 @@ export function usePlayback(opts: UsePlaybackOptions) {
    * Expand a resolver Step[] into a flat MicroStep[] that the player
    * can walk. Per-step tempo + highlight selection:
    *
-   *   - FAST by default: base/shift letters, digits, direct Polish
-   *     diacritics on altgr (ąćęłńóśźż + caps), and their shift forms.
-   *     No letter-keycap highlight — silent commit into the text line.
-   *   - SLOW + letter highlight for both halves of a dead-key pair:
-   *     trigger (typed='') and the letter immediately after it.
-   *   - SLOW + no letter highlight for direct typographic payoff
-   *     chars on altgr / shift_altgr — em-dash, curly quotes, arrows,
-   *     currency, math marks. The whole layout exists to make these
-   *     first-class; slowing them down lets the viewer actually see
-   *     the modifier combo that produces them, without pretending
-   *     the letter key itself is the star.
+   *   - FAST, no letter highlight: "normal" direct-press chars —
+   *     base/shift letters, digits, basic punctuation, direct Polish
+   *     diacritics on altgr (ąćęłńóśźż + caps). Silent commit into
+   *     the text line; highlighting these would imply effort where
+   *     there is none.
+   *   - SLOW, letter HIGHLIGHTED for the full letterHold: every
+   *     other key step. Dead-key trigger + paired letter pairs and
+   *     direct typographic payoff chars (em-dash, curly quotes,
+   *     ellipsis, arrows, currency, math marks) all fall here. The
+   *     viewer needs to see which physical key the modifier combo
+   *     mapped to, so both the keycap highlight AND the slower
+   *     tempo work together.
    *
    * Between a dead-key trigger and its paired letter we always use
    * DEAD_GAP_MS so the two halves read as one gesture.
@@ -259,7 +260,11 @@ export function usePlayback(opts: UsePlaybackOptions) {
       const isTypographicPayoff =
         isAltgrLayer && !POLISH_NATIVE_CHARS.has(step.typed)
       if (isTypographicPayoff) {
-        return { tempo: SLOW_TEMPO, highlightLetter: false }
+        // Highlight the letter keycap so the viewer can see WHICH
+        // key the AltGr combo lands on — otherwise the em-dash
+        // "appears out of nowhere" and the typographic feature
+        // stays invisible.
+        return { tempo: SLOW_TEMPO, highlightLetter: true }
       }
       return { tempo: FAST_TEMPO, highlightLetter: false }
     })
@@ -287,6 +292,22 @@ export function usePlayback(opts: UsePlaybackOptions) {
         continue
       }
 
+      // Fast tier: touch NOTHING on the keyboard. No Shift flash, no
+      // AltGr flash, no letter highlight — just a silent commit and
+      // an inter-char gap. Boring chars belong to the text line, not
+      // to the keyboard viz.
+      if (!highlightLetter) {
+        micro.push({
+          kind: 'commit',
+          typed: step.typed,
+          delayAfter: afterStepGap,
+        })
+        continue
+      }
+
+      // Slow tier: full press sequence with visible modifier holds
+      // and a highlighted letter keycap, so the viewer can see WHICH
+      // key the mod combo lands on.
       const { needShift, needAltGr } = modsForLayer(step.layer)
 
       // Press modifiers in a fixed order (shift → altgr) so the visual
@@ -308,31 +329,19 @@ export function usePlayback(opts: UsePlaybackOptions) {
         })
       }
 
-      // Letter: highlight the keycap only for dead-key sequences;
-      // otherwise just commit the character silently. See MicroStep
-      // comment for the rationale.
-      if (highlightLetter) {
-        micro.push({
-          kind: 'keyPress',
-          keyId: step.keyId,
-          layer: step.layer,
-          delayAfter: tempo.letterHold,
-        })
-        micro.push({
-          kind: 'keyRelease',
-          keyId: step.keyId,
-          typed: step.typed,
-          delayAfter:
-            needShift || needAltGr ? tempo.letterReleaseGap : afterStepGap,
-        })
-      } else {
-        micro.push({
-          kind: 'commit',
-          typed: step.typed,
-          delayAfter:
-            needShift || needAltGr ? tempo.letterReleaseGap : afterStepGap,
-        })
-      }
+      micro.push({
+        kind: 'keyPress',
+        keyId: step.keyId,
+        layer: step.layer,
+        delayAfter: tempo.letterHold,
+      })
+      micro.push({
+        kind: 'keyRelease',
+        keyId: step.keyId,
+        typed: step.typed,
+        delayAfter:
+          needShift || needAltGr ? tempo.letterReleaseGap : afterStepGap,
+      })
 
       // Release modifiers in reverse order.
       if (needAltGr) {
