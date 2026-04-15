@@ -1,13 +1,16 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useLayout } from '../composables/useLayout'
 import { KEYBOARD_ROWS, CODE_TO_KEY_ID } from '../composables/keyboardData'
 import { useModifierState } from '../composables/useModifierState'
 import type { Layer } from '../composables/useModifierState'
+import { usePlayback } from '../composables/usePlayback'
 import { trackLayerSwitch, trackVariantSwitch } from '../composables/useAnalytics'
 import KeyCap from './KeyCap.vue'
+import PlaybackLine from './PlaybackLine.vue'
 
-const { t } = useI18n()
+const { t, tm, rt } = useI18n()
 const { active, activeId, setActive } = useLayout()
 const {
   activeLayer,
@@ -19,6 +22,23 @@ const {
 
 // Wire up the code-to-key-id mapping so pressed keys light up.
 setCodeToKeyId(CODE_TO_KEY_ID)
+
+// Variant-specific phrase pool from i18n. `tm` returns the raw
+// message (the array); `rt` turns each entry into its runtime string
+// so NFD escape sequences like `у\u0306` resolve correctly.
+const phrases = computed<readonly string[]>(() => {
+  const key = `keyboard.playback.phrases.${activeId.value}`
+  const raw = tm(key)
+  if (!Array.isArray(raw)) return []
+  return raw.map((item) => rt(item as Parameters<typeof rt>[0]))
+})
+
+const playback = usePlayback({
+  pressedKeyIds,
+  setManualLayer,
+  layout: active,
+  phrases,
+})
 
 function onVariantClick(variant: 'polish' | 'russian') {
   if (activeId.value === variant) return
@@ -61,7 +81,47 @@ const LAYER_OPTIONS: { value: Layer | null; labelKey: string }[] = [
             @click="onVariantClick('russian')"
           >{{ t('keyboard.russian') }}</button>
         </div>
+
+        <button
+          type="button"
+          class="playback-toggle"
+          :class="{ 'playback-toggle--on': playback.enabled.value }"
+          :aria-pressed="playback.enabled.value"
+          :aria-label="t('keyboard.playback.aria')"
+          @click="playback.toggle()"
+        >
+          <svg
+            class="playback-toggle__icon"
+            width="10"
+            height="12"
+            viewBox="0 0 10 12"
+            aria-hidden="true"
+          >
+            <!-- Play glyph when off, pause glyph when on. Two sibling
+                 paths so we can swap via CSS without re-rendering. -->
+            <path
+              v-if="playback.enabled.value"
+              d="M2 1h2v10H2zm4 0h2v10H6z"
+              fill="currentColor"
+            />
+            <path v-else d="M1 1l8 5-8 5z" fill="currentColor" />
+          </svg>
+          <span class="playback-toggle__label">{{
+            playback.enabled.value
+              ? t('keyboard.playback.toggleOn')
+              : t('keyboard.playback.toggleOff')
+          }}</span>
+        </button>
       </div>
+
+      <PlaybackLine
+        :text="playback.currentText.value"
+        :fading="playback.fading.value"
+        :running="playback.running.value"
+        :reducedMotionHint="
+          playback.prefersReducedMotion.value && !playback.enabled.value
+        "
+      />
 
       <div class="keyboard-wrapper">
         <div class="keyboard">
@@ -130,6 +190,55 @@ const LAYER_OPTIONS: { value: Layer | null; labelKey: string }[] = [
   /* Controls belong to the keyboard, not the hero — make the gap to the
      keyboard much smaller than the gap to the hero subtitle above. */
   margin-bottom: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+
+/* ── Playback toggle ────────────────────────────────────────────────
+   Sits alongside the layout switcher inside .keyboard-controls. Hybrid
+   icon+text on desktop, icon-only on narrow screens. */
+
+.playback-toggle {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.playback-toggle:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.playback-toggle--on {
+  color: var(--text);
+  background: var(--bg-elevated);
+  border-color: var(--border-strong);
+}
+
+.playback-toggle__icon {
+  flex-shrink: 0;
+}
+
+@media (max-width: 560px) {
+  /* Icon-only on narrow screens to keep the controls row single-line. */
+  .playback-toggle__label {
+    display: none;
+  }
+  .playback-toggle {
+    padding: 6px 10px;
+  }
 }
 
 .layout-switcher {

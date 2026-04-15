@@ -43,6 +43,30 @@
       "deadAltgr": "AltGr (dead key)",
       "deadShAltgr": "Shift+AltGr (dead key)",
       "none": "No AltGr mapping"
+    },
+    "playback": {
+      "toggleOn": "Playing demo",
+      "toggleOff": "Play demo",
+      "aria": "Toggle keyboard playback demo",
+      "reducedMotionHint": "Animation off — click \"Play demo\" to start.",
+      "phrases": {
+        "polish": [
+          "„Hello” — it's 2024.",
+          "Żółć — ąęćńóśź.",
+          "Łódź → Kraków, Gdańsk…",
+          "„čas” po česku",
+          "Schön — für Grüße",
+          "České Budějovice"
+        ],
+        "russian": [
+          "«Привет, мир!»",
+          "Ёлка — это ель.",
+          "Где № 5? — Здесь.",
+          "у\u0306 — кароткае",
+          "е\u0308 ≠ ё",
+          "ы\u0308 ы\u030B ь\u030C"
+        ]
+      }
     }
   },
   "why": {

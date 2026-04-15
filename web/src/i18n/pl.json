@@ -43,6 +43,30 @@
       "deadAltgr": "AltGr (martwy klawisz)",
       "deadShAltgr": "Shift+AltGr (martwy klawisz)",
       "none": "Brak mapowania AltGr"
+    },
+    "playback": {
+      "toggleOn": "Odtwarzanie",
+      "toggleOff": "Odtwórz demo",
+      "aria": "Przełącz demo klawiatury",
+      "reducedMotionHint": "Animacja wyłączona — kliknij „Odtwórz demo”, by uruchomić.",
+      "phrases": {
+        "polish": [
+          "„Cześć, świecie!”",
+          "Zażółć gęślą jaźń.",
+          "— To pięć złotych.",
+          "Łódź, Kraków, Gdańsk…",
+          "„čas” po česku",
+          "Schön — für Grüße"
+        ],
+        "russian": [
+          "«Привет, мир!»",
+          "Ёлка — это ель.",
+          "Где № 5? — Здесь.",
+          "у\u0306 — кароткае",
+          "е\u0308 ≠ ё",
+          "ы\u0308 ы\u030B ь\u030C"
+        ]
+      }
     }
   },
   "why": {
