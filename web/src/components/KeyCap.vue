@@ -279,18 +279,20 @@ const layerClass = computed(() => {
 }
 
 /* ── Pressed key animation ───────────────────────────────────────────
-   A subtle scale-down + inset shadow simulates the physical press.
-   The glow uses the accent colour at low alpha for a satisfying
-   visual cue without being distracting. */
+   Subtle scale-down + highlight ring. The ring colour is a solid
+   blend of the accent with the surrounding surface (page bg for the
+   outer ring, elevated bg for the inset ring) via color-mix, rather
+   than the accent at reduced opacity. Solid colour renders cleanly
+   over anything underneath and avoids the compositing layer a
+   transparent ::after would create. */
 .key::after {
   content: '';
   position: absolute;
-  inset: -2px;
-  border-radius: calc(var(--key-radius) + 2px);
-  box-shadow: 0 0 0 2px var(--color-altgr), inset 0 0 0 2px var(--color-altgr);
-  opacity: 0;
+  inset: 2px;
+  border-radius: calc(var(--key-radius) - 2px);
+  box-shadow: 0 0 0 4px transparent;
   pointer-events: none;
-  transition: opacity 80ms ease-out;
+  transition: box-shadow 120ms ease-out;
 }
 
 .key--pressed {
@@ -299,7 +301,7 @@ const layerClass = computed(() => {
 }
 
 .key--pressed::after {
-  opacity: 0.4;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-altgr) 40%, var(--bg));
 }
 
 /* Tooltip body skin lives in style.css under .v-popper--theme-key-tooltip
