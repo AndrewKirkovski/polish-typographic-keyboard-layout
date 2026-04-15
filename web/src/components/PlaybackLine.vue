@@ -19,6 +19,7 @@ defineProps<{
   text: string
   fading: boolean
   running: boolean
+  pendingAccent: string
   reducedMotionHint: boolean
 }>()
 
@@ -36,6 +37,11 @@ const { t } = useI18n()
     </template>
     <template v-else>
       <span class="playback-line__text">{{ text }}</span>
+      <span
+        v-if="pendingAccent"
+        class="playback-line__pending"
+        :title="'Dead key held, waiting for a base letter'"
+      >{{ pendingAccent }}</span>
       <span
         class="playback-line__caret"
         :class="{ 'playback-line__caret--dim': !running }"
@@ -84,6 +90,32 @@ const { t } = useI18n()
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.playback-line__pending {
+  /* Highlighted dead-state indicator, the same visual vocabulary
+     macOS uses: a yellow-tinted box hugging the spacing accent
+     glyph, sitting at the caret position. Fades in so it doesn't
+     pop harshly when the trigger releases. */
+  display: inline-block;
+  padding: 0 4px;
+  margin: 0 1px;
+  background: rgba(255, 206, 84, 0.35);
+  color: var(--text);
+  border-radius: 3px;
+  font-weight: 600;
+  animation: playback-pending-fade-in 180ms ease-out;
+}
+
+@media (prefers-color-scheme: dark) {
+  .playback-line__pending {
+    background: rgba(255, 206, 84, 0.25);
+  }
+}
+
+@keyframes playback-pending-fade-in {
+  from { opacity: 0; transform: translateY(-2px); }
+  to   { opacity: 1; transform: none; }
 }
 
 .playback-line__caret {

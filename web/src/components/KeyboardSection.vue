@@ -120,6 +120,7 @@ const LAYER_OPTIONS: { value: Layer | null; labelKey: string }[] = [
         :text="playback.currentText.value"
         :fading="playback.fading.value"
         :running="playback.running.value"
+        :pendingAccent="playback.pendingAccent.value"
         :reducedMotionHint="
           playback.prefersReducedMotion.value && !playback.enabled.value
         "

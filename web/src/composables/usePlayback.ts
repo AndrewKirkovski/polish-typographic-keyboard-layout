@@ -95,6 +95,33 @@ const POLISH_NATIVE_CHARS = new Set([
   'Ą', 'Ć', 'Ę', 'Ł', 'Ń', 'Ó', 'Ś', 'Ź', 'Ż',
 ])
 
+// Unicode combining mark → spacing accent glyph shown as the
+// "pending" dead-key indicator after the trigger is released and
+// before the base letter lands. Mirrors the highlighted accent
+// overlay macOS shows at the caret when a dead key is live.
+const MARK_TO_SPACING_ACCENT: Record<string, string> = {
+  '\u0300': '\u0060', // grave         `
+  '\u0301': '\u00B4', // acute         ´
+  '\u0302': '\u02C6', // circumflex    ˆ
+  '\u0303': '\u02DC', // tilde         ˜
+  '\u0304': '\u00AF', // macron        ¯
+  '\u0306': '\u02D8', // breve         ˘
+  '\u0307': '\u02D9', // dot above     ˙
+  '\u0308': '\u00A8', // diaeresis     ¨
+  '\u030A': '\u02DA', // ring          ˚
+  '\u030B': '\u02DD', // double acute  ˝
+  '\u030C': '\u02C7', // caron         ˇ
+  '\u0326': '\u00B8', // cedilla       ¸
+  '\u0327': '\u00B8',
+}
+
+function pendingAccentFor(composed: string): string {
+  const nfd = composed.normalize('NFD')
+  if (nfd.length < 2) return ''
+  const mark = nfd[1]
+  return MARK_TO_SPACING_ACCENT[mark] ?? mark
+}
+
 const STORAGE_KEY = 'kbd.playback.enabled'
 
 export interface UsePlaybackOptions {
@@ -122,6 +149,11 @@ export function usePlayback(opts: UsePlaybackOptions) {
   // Visible demo text and fade state — what PlaybackLine.vue renders.
   const currentText = ref<string>('')
   const fading = ref<boolean>(false)
+  // The spacing-accent glyph shown "hovering" at the caret between
+  // a dead-key trigger release and the paired letter's commit.
+  // macOS does this to make the invisible dead-state visible.
+  // Empty string means no pending accent.
+  const pendingAccent = ref<string>('')
 
   const phraseIdx = ref<number>(0)
 
@@ -177,6 +209,7 @@ export function usePlayback(opts: UsePlaybackOptions) {
   function clearDisplay(): void {
     currentText.value = ''
     fading.value = false
+    pendingAccent.value = ''
   }
 
   // ── micro-step expansion ────────────────────────────────────────
@@ -208,7 +241,18 @@ export function usePlayback(opts: UsePlaybackOptions) {
     | { kind: 'modPress'; keyId: string; layer: Layer; delayAfter: number }
     | { kind: 'modRelease'; keyId: string; delayAfter: number }
     | { kind: 'keyPress'; keyId: string; layer: Layer; delayAfter: number }
-    | { kind: 'keyRelease'; keyId: string; typed: string; delayAfter: number }
+    | {
+        kind: 'keyRelease'
+        keyId: string
+        typed: string
+        // If set, becomes the pending-accent glyph at commit time
+        // (for a dead-key trigger: shows "dead state is active").
+        setPending?: string
+        // If true, clears the pending accent on commit (for the
+        // paired letter of a dead-key pair: "accent consumed").
+        clearPending?: boolean
+        delayAfter: number
+      }
     | { kind: 'commit'; typed: string; delayAfter: number }
     | { kind: 'space'; delayAfter: number }
 
@@ -329,6 +373,22 @@ export function usePlayback(opts: UsePlaybackOptions) {
         })
       }
 
+      // If this key step is a dead-key trigger (typed='') followed by
+      // a letter, arrange for the spacing-accent glyph to appear at
+      // the caret when the trigger commits, visualising the dead
+      // state. The pending accent then hovers through the DEAD_GAP_MS
+      // and the base letter's press sequence, until the base letter
+      // releases and "consumes" it.
+      const isTriggerHere = step.typed === '' && next && next.kind === 'key'
+      const isPairedLetterHere =
+        step.typed !== '' &&
+        i > 0 &&
+        steps[i - 1].kind === 'key' &&
+        (steps[i - 1] as { typed?: string }).typed === ''
+      const setPending = isTriggerHere
+        ? pendingAccentFor((next as { typed?: string }).typed ?? '')
+        : undefined
+
       micro.push({
         kind: 'keyPress',
         keyId: step.keyId,
@@ -341,6 +401,8 @@ export function usePlayback(opts: UsePlaybackOptions) {
         typed: step.typed,
         delayAfter:
           needShift || needAltGr ? tempo.letterReleaseGap : afterStepGap,
+        ...(setPending ? { setPending } : {}),
+        ...(isPairedLetterHere ? { clearPending: true } : {}),
       })
 
       // Release modifiers in reverse order.
@@ -444,6 +506,8 @@ export function usePlayback(opts: UsePlaybackOptions) {
       case 'keyRelease':
         releaseKey(step.keyId)
         if (step.typed) currentText.value += step.typed
+        if (step.setPending !== undefined) pendingAccent.value = step.setPending
+        if (step.clearPending) pendingAccent.value = ''
         syncLayer()
         break
       case 'commit':
@@ -670,6 +734,7 @@ export function usePlayback(opts: UsePlaybackOptions) {
     prefersReducedMotion,
     currentText,
     fading,
+    pendingAccent,
     // Commands
     start,
     stop,
