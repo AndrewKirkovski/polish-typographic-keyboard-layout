@@ -20,7 +20,25 @@ const REPO_ROOT = resolve(__dir, '../../..');
 const TEMPLATE = resolve(__dir, '../templates/og-template.html');
 const FONTS_DIR = resolve(__dir, '../fonts');
 const VERSION_FILE = resolve(REPO_ROOT, 'VERSION');
-const OUT_PATH = resolve(REPO_ROOT, 'web/public/og-image.png');
+const OUT_DIR = resolve(REPO_ROOT, 'web/public');
+
+const OG_LOCALES = {
+  en: {
+    subtitle: 'Typography symbols at your fingertips &mdash; for Polish and Russian keyboards',
+    cta: 'Download Free &mdash; Windows &amp; macOS',
+    platforms: 'Windows &bull; macOS &bull; Open Source',
+  },
+  pl: {
+    subtitle: 'Symbole typograficzne pod palcami &mdash; dla polskiej i rosyjskiej klawiatury',
+    cta: 'Pobierz za darmo &mdash; Windows i macOS',
+    platforms: 'Windows &bull; macOS &bull; Open Source',
+  },
+  ru: {
+    subtitle: 'Типографские символы под рукой &mdash; для польской и русской раскладки',
+    cta: 'Скачать бесплатно &mdash; Windows и macOS',
+    platforms: 'Windows &bull; macOS &bull; Open Source',
+  },
+};
 
 const FONT_PLACEHOLDERS = {
   __DM_SERIF_DISPLAY_REGULAR__: 'DMSerifDisplay-Regular.ttf',
@@ -30,7 +48,6 @@ const FONT_PLACEHOLDERS = {
 };
 
 const FONTS_OG_TEMPLATE = resolve(__dir, '../templates/og-fonts-template.html');
-const FONTS_OG_OUT = resolve(REPO_ROOT, 'web/public/og-fonts.png');
 const FONTS_DIST = resolve(REPO_ROOT, 'dist');
 
 const FONTS_OG_PLACEHOLDERS = {
@@ -52,63 +69,91 @@ function inlineFonts(html) {
 
 export async function buildOgImage() {
   const version = readFileSync(VERSION_FILE, 'utf-8').trim();
-  // VERSION may be `0.3` or `0.3.1` — show major.minor for compactness.
   const versionLabel = `v${version.split('.').slice(0, 2).join('.')}`;
 
-  const html = inlineFonts(readFileSync(TEMPLATE, 'utf-8'));
+  const baseHtml = inlineFonts(readFileSync(TEMPLATE, 'utf-8'));
 
   const browser = await chromium.launch();
   try {
-    const page = await browser.newPage({
-      viewport: { width: 1200, height: 630 },
-      // No deviceScaleFactor — output must match the 1200×630 og:image meta.
-    });
-    // setContent loads the HTML inline; no file:// URL needed for hermetic
-    // rendering, and base64 data URIs work without any web origin.
-    await page.setContent(html, { waitUntil: 'load' });
-    await page.evaluate(() => document.fonts.ready);
-    await page.evaluate((label) => {
-      const el = document.getElementById('version');
-      if (el) el.textContent = label;
-    }, versionLabel);
-    const png = await page.screenshot({
-      type: 'png',
-      omitBackground: false,
-      clip: { x: 0, y: 0, width: 1200, height: 630 },
-    });
-    writeFileSync(OUT_PATH, png);
-    console.log(`  og-image.png  ${png.length.toLocaleString()} bytes  (${versionLabel})`);
-    return OUT_PATH;
+    for (const [locale, strings] of Object.entries(OG_LOCALES)) {
+      // Replace the hardcoded English text with the locale-specific strings.
+      const html = baseHtml
+        .replace('Typography symbols at your fingertips &mdash; for Polish and Russian keyboards', strings.subtitle)
+        .replace('Download Free &mdash; Windows &amp; macOS', strings.cta)
+        .replace('Windows &bull; macOS &bull; Open Source', strings.platforms);
+
+      const page = await browser.newPage({
+        viewport: { width: 1200, height: 630 },
+      });
+      await page.setContent(html, { waitUntil: 'load' });
+      await page.evaluate(() => document.fonts.ready);
+      await page.evaluate((label) => {
+        const el = document.getElementById('version');
+        if (el) el.textContent = label;
+      }, versionLabel);
+      const png = await page.screenshot({
+        type: 'png',
+        omitBackground: false,
+        clip: { x: 0, y: 0, width: 1200, height: 630 },
+      });
+      const outPath = resolve(OUT_DIR, `og-image-${locale}.png`);
+      writeFileSync(outPath, png);
+      console.log(`  og-image-${locale}.png  ${png.length.toLocaleString()} bytes  (${versionLabel})`);
+      await page.close();
+    }
   } finally {
     await browser.close();
   }
 }
 
+const FONTS_OG_LOCALES = {
+  en: {
+    subtitle: 'Polish pronunciation fonts &mdash; Cyrillic &amp; IPA hints',
+    footer: 'polish-typographic.com/fonts',
+  },
+  pl: {
+    subtitle: 'Czcionki wymowy polskiej &mdash; podpowiedzi cyrylicą i IPA',
+    footer: 'polish-typographic.com/pl/fonts',
+  },
+  ru: {
+    subtitle: 'Шрифты произношения польского &mdash; кириллица и IPA',
+    footer: 'polish-typographic.com/ru/fonts',
+  },
+};
+
 export async function buildFontsOgImage() {
-  let html = readFileSync(FONTS_OG_TEMPLATE, 'utf-8');
+  let baseHtml = readFileSync(FONTS_OG_TEMPLATE, 'utf-8');
   for (const [placeholder, filepath] of Object.entries(FONTS_OG_PLACEHOLDERS)) {
     try {
       const buf = readFileSync(filepath);
-      html = html.split(placeholder).join(`data:font/ttf;base64,${buf.toString('base64')}`);
+      baseHtml = baseHtml.split(placeholder).join(`data:font/ttf;base64,${buf.toString('base64')}`);
     } catch {
-      console.log(`  SKIP og-fonts.png: ${filepath} not found (build fonts first)`);
+      console.log(`  SKIP og-fonts: ${filepath} not found (build fonts first)`);
       return null;
     }
   }
 
   const browser = await chromium.launch();
   try {
-    const page = await browser.newPage({ viewport: { width: 1200, height: 630 } });
-    await page.setContent(html, { waitUntil: 'load' });
-    await page.evaluate(() => document.fonts.ready);
-    const png = await page.screenshot({
-      type: 'png',
-      omitBackground: false,
-      clip: { x: 0, y: 0, width: 1200, height: 630 },
-    });
-    writeFileSync(FONTS_OG_OUT, png);
-    console.log(`  og-fonts.png  ${png.length.toLocaleString()} bytes`);
-    return FONTS_OG_OUT;
+    for (const [locale, strings] of Object.entries(FONTS_OG_LOCALES)) {
+      const html = baseHtml
+        // Template uses literal em dash (U+2014), not &mdash; entity
+        .replace('Polish pronunciation fonts \u2014 Cyrillic &amp; IPA hints', strings.subtitle)
+        .replace('polish-typographic.com/fonts', strings.footer);
+
+      const page = await browser.newPage({ viewport: { width: 1200, height: 630 } });
+      await page.setContent(html, { waitUntil: 'load' });
+      await page.evaluate(() => document.fonts.ready);
+      const png = await page.screenshot({
+        type: 'png',
+        omitBackground: false,
+        clip: { x: 0, y: 0, width: 1200, height: 630 },
+      });
+      const outPath = resolve(OUT_DIR, `og-fonts-${locale}.png`);
+      writeFileSync(outPath, png);
+      console.log(`  og-fonts-${locale}.png  ${png.length.toLocaleString()} bytes`);
+      await page.close();
+    }
   } finally {
     await browser.close();
   }

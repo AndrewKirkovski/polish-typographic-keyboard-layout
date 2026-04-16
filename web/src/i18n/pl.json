@@ -233,11 +233,11 @@
       "chromeStep3": "Otwórz <code>chrome://extensions</code> i włącz <strong>Tryb dewelopera</strong> w prawym górnym rogu.",
       "chromeStep4": "Kliknij <strong>Załaduj rozpakowane</strong> i wskaż folder <code>chrome-mv3</code>. Rozszerzenie startuje wyłączone — kliknij ikonę na pasku, aby globalnie przełączyć na <em>Włączone</em>, albo zostaw <em>Wyłączone</em> i korzystaj tylko z wyjątków per-strona.",
       "tampermonkeyIntro": "Dla zaawansowanych użytkowników, którzy już mają Tampermonkey. Jeden skrypt, tryby przełączane z menu Tampermonkey.",
-      "tampermonkeyStep1": "Zainstaluj <a href=\"https://www.tampermonkey.net/\" target=\"_blank\" rel=\"noopener\">rozszerzenie Tampermonkey</a>, jeśli jeszcze nie masz.",
+      "tampermonkeyStep1": "Zainstaluj <a href=\"https://www.tampermonkey.net/\" target=\"_blank\" rel=\"noopener noreferrer nofollow\">rozszerzenie Tampermonkey</a>, jeśli jeszcze nie masz.",
       "tampermonkeyStep2": "Zainstaluj <code>szpargalka-sans.user.js</code>",
       "tampermonkeyStep3": "Skrypt startuje wyłączony. Kliknij ikonę Tampermonkey → najedź na <em>Szpargalka Sans</em> → kliknij pozycję, aby przełączyć na <strong>Włączone</strong>; kliknij ponownie, aby wyłączyć. Aktualny stan ma ✓ obok.",
       "stylusIntro": "Najlżejsza ścieżka — czysty user-CSS, bez JavaScriptu. Działa w każdej przeglądarce kompatybilnej ze Stylusem.",
-      "stylusStep1": "Zainstaluj <a href=\"https://add0n.com/stylus.html\" target=\"_blank\" rel=\"noopener\">rozszerzenie Stylus</a> dla swojej przeglądarki.",
+      "stylusStep1": "Zainstaluj <a href=\"https://add0n.com/stylus.html\" target=\"_blank\" rel=\"noopener noreferrer nofollow\">rozszerzenie Stylus</a> dla swojej przeglądarki.",
       "stylusStep2": "Zainstaluj <code>szpargalka-sans.user.css</code>",
       "stylusStep3": "Stylus otworzy okno importu — kliknij <strong>Zainstaluj styl</strong>. Gotowe. Styl możesz w każdej chwili włączyć lub wyłączyć w popupie Stylusa — po instalacji jest aktywny, więc wyłącz go, jeśli wolisz sięgać po niego tylko od czasu do czasu."
     }

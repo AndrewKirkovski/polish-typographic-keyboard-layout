@@ -14,6 +14,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(__dirname, '..')
 const DIST = resolve(ROOT, 'dist')
 const BASE_URL = 'https://polish-typographic.com'
+const APP_VERSION = readFileSync(resolve(ROOT, '..', 'VERSION'), 'utf-8').trim()
 
 const LOCALES = [
   { code: 'en', path: '/', lang: 'en', ogLocale: 'en_US' },
@@ -42,14 +43,12 @@ const FONT_META = {
   },
 }
 
-// Translated meta content per locale. The descriptions lead with the
-// real differentiator (US+POL = type Polish on Windows without adding
-// Polish as a separate input language) instead of the generic "lots of
-// typographic symbols" framing.
+// Translated meta content per locale.
 const META = {
   en: {
     title: 'Kirkouski Typographic — Polish characters on AltGr without an extra input language',
     description: 'Type Polish characters via AltGr without adding Polish as a separate input language on Windows. Plus em dashes, curly quotes, currency, arrows, math, and 80+ typographic symbols. Polish, Russian, and US+POL variants for Windows and macOS.',
+    keywords: 'keyboard layout, typographic, Polish keyboard, AltGr, em dash, curly quotes, Windows keyboard layout, macOS keylayout, Birman, Kirkouski, Polish characters, US keyboard, typographic symbols',
     ogTitle: 'Kirkouski Typographic — Polish characters without an extra input language',
     ogDescription: 'Type Polish characters on Windows without adding Polish to your input languages — US+POL Typographic registers under English (US). Plus em dashes, curly quotes, math, and 80+ symbols on AltGr.',
     twitterDescription: 'Type Polish characters on Windows without adding Polish to your input languages — US+POL Typographic registers under English (US). Plus em dashes, curly quotes, math, and 80+ symbols on AltGr.',
@@ -57,6 +56,7 @@ const META = {
   pl: {
     title: 'Kirkouski Typographic — polskie znaki na AltGr bez dodatkowego języka wprowadzania',
     description: 'Pisz polskie znaki przez AltGr bez dodawania polskiego jako osobnego języka wprowadzania w Windows. Dodatkowo pauzy, cudzysłowy, waluty, strzałki, znaki matematyczne i 80+ symboli typograficznych. Warianty polski, rosyjski i US+POL dla Windows i macOS.',
+    keywords: 'układ klawiatury, typograficzny, polskie znaki, ogonki, AltGr, półpauza, cudzysłów drukarski, klawiatura Windows, macOS, Birman, Kirkouski, Polish Programmers, QWERTY',
     ogTitle: 'Kirkouski Typographic — polskie znaki bez dodatkowego języka wprowadzania',
     ogDescription: 'Pisz polskie znaki w Windows bez dodawania polskiego do języków wprowadzania — układ US+POL Typographic rejestruje się pod angielskim (US). Plus pauzy, cudzysłowy, matematyka i 80+ symboli na AltGr.',
     twitterDescription: 'Pisz polskie znaki w Windows bez dodawania polskiego do języków wprowadzania — układ US+POL Typographic rejestruje się pod angielskim (US). Plus pauzy, cudzysłowy, matematyka i 80+ symboli na AltGr.',
@@ -64,10 +64,101 @@ const META = {
   ru: {
     title: 'Kirkouski Typographic — польские символы на AltGr без отдельного языка ввода',
     description: 'Печатай польские символы через AltGr без добавления польского как отдельного языка ввода в Windows. Плюс тире, кавычки, валюты, стрелки, математика и 80+ типографских символов. Польский, русский и US+POL для Windows и macOS.',
+    keywords: 'раскладка клавиатуры, типографская, польские символы, AltGr, тире, кавычки, Windows раскладка, macOS, Birman, Kirkouski, ЙЦУКЕН, типографические символы',
     ogTitle: 'Kirkouski Typographic — польские символы без отдельного языка ввода',
     ogDescription: 'Печатай польские символы в Windows без добавления польского в языки ввода — раскладка US+POL Typographic регистрируется под английским (US). Плюс тире, кавычки, математика и 80+ символов на AltGr.',
     twitterDescription: 'Печатай польские символы в Windows без добавления польского в языки ввода — раскладка US+POL Typographic регистрируется под английским (US). Плюс тире, кавычки, математика и 80+ символов на AltGr.',
   },
+}
+
+// Per-locale JSON-LD structured data: SoftwareApplication + FAQPage.
+// Generated per locale and injected into <head> at build time so each
+// locale page has matching structured data in its own language.
+const FAQ = {
+  en: [
+    { q: 'How do I type an em dash on a Polish keyboard in Windows?', a: 'Press AltGr + - (minus key). The Kirkouski Typographic layout puts em dash, en dash, and other typographic symbols directly on AltGr — no Alt codes needed.' },
+    { q: 'How do I type Polish characters on a US keyboard without switching layouts?', a: 'Install the US+POL Typographic variant. It registers under English (US) so Win+Space stays clean — Polish ogonki (ą ć ę ł ń ó ś ź ż) are on AltGr.' },
+    { q: 'Does this work with Polish Programmers QWERTY?', a: 'Yes. The Polish variant is built on the standard Polish Programmers QWERTY layout. Typographic symbols are added on AltGr and Shift+AltGr layers only.' },
+    { q: 'Will this add a new input language to Win+Space?', a: 'The US+POL variant does not — it registers under English (US). The standard Polish and Russian variants do add their respective input language.' },
+    { q: 'Does this work on macOS?', a: 'Yes. Download the .bundle, place it in ~/Library/Keyboard Layouts/, clear the quarantine xattr, and log out/in. macOS keyboard layouts are not tied to system language.' },
+  ],
+  pl: [
+    { q: 'Jak wpisać pauzę na polskiej klawiaturze w Windows?', a: 'Naciśnij AltGr + - (klawisz minus). Układ Kirkouski Typographic umieszcza pauzę, półpauzę i inne symbole typograficzne bezpośrednio na AltGr — bez kodów Alt.' },
+    { q: 'Jak pisać polskie znaki na klawiaturze US bez przełączania układów?', a: 'Zainstaluj wariant US+POL Typographic. Rejestruje się pod angielskim (US), więc Win+Space pozostaje krótkie — ogonki (ą ć ę ł ń ó ś ź ż) są na AltGr.' },
+    { q: 'Czy działa z układem Polish Programmers QWERTY?', a: 'Tak. Wariant polski bazuje na standardowym układzie Polish Programmers QWERTY. Symbole typograficzne dodane są wyłącznie na warstwy AltGr i Shift+AltGr.' },
+    { q: 'Czy doda nowy język wprowadzania do Win+Space?', a: 'Wariant US+POL nie — rejestruje się pod angielskim (US). Standardowe warianty polski i rosyjski dodają odpowiedni język wprowadzania.' },
+    { q: 'Czy działa na macOS?', a: 'Tak. Pobierz .bundle, umieść go w ~/Library/Keyboard Layouts/, usuń kwarantannę xattr i wyloguj/zaloguj się. Układy klawiatury macOS nie są powiązane z językiem systemu.' },
+  ],
+  ru: [
+    { q: 'Как набрать длинное тире на польской клавиатуре в Windows?', a: 'Нажмите AltGr + - (клавиша минус). Раскладка Kirkouski Typographic размещает тире, короткое тире и другие типографские символы прямо на AltGr — без Alt-кодов.' },
+    { q: 'Как печатать польские символы на клавиатуре US без переключения раскладок?', a: 'Установите вариант US+POL Typographic. Он регистрируется под английским (US), поэтому Win+Space остаётся коротким — огонки (ą ć ę ł ń ó ś ź ż) на AltGr.' },
+    { q: 'Работает ли с раскладкой Polish Programmers QWERTY?', a: 'Да. Польский вариант построен на стандартной Polish Programmers QWERTY. Типографские символы добавлены только на слои AltGr и Shift+AltGr.' },
+    { q: 'Добавит ли новый язык ввода в Win+Space?', a: 'Вариант US+POL не добавит — регистрируется под английским (US). Стандартные польский и русский варианты добавляют свой язык ввода.' },
+    { q: 'Работает ли на macOS?', a: 'Да. Скачайте .bundle, поместите в ~/Library/Keyboard Layouts/, снимите карантин xattr и перезайдите. Раскладки macOS не привязаны к языку системы.' },
+  ],
+}
+
+const APP_SCHEMA = {
+  en: { name: 'Kirkouski Typographic Keyboard Layout', description: 'Keyboard layout that registers under English (US) so you can type Polish characters via AltGr without adding Polish as a separate input language on Windows. Includes em dashes, curly quotes, currency symbols, arrows, math, and 80+ typographic characters. Polish, Russian, and US+POL variants for Windows and macOS.' },
+  pl: { name: 'Kirkouski Typographic — układ klawiatury', description: 'Układ klawiatury rejestrujący się pod angielskim (US), dzięki czemu polskie znaki są dostępne przez AltGr bez dodawania polskiego jako osobnego języka wprowadzania. Pauzy, cudzysłowy, waluty, strzałki, matematyka i 80+ symboli typograficznych. Warianty polski, rosyjski i US+POL dla Windows i macOS.' },
+  ru: { name: 'Kirkouski Typographic — раскладка клавиатуры', description: 'Раскладка, регистрирующаяся под английским (US), позволяющая набирать польские символы через AltGr без добавления польского как отдельного языка ввода. Тире, кавычки, валюты, стрелки, математика и 80+ типографских символов. Польский, русский и US+POL для Windows и macOS.' },
+}
+
+function buildJsonLd(locale, path) {
+  const app = APP_SCHEMA[locale]
+  const faq = FAQ[locale]
+  const softwareApp = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: app.name,
+    description: app.description,
+    inLanguage: locale,
+    applicationCategory: 'UtilitiesApplication',
+    operatingSystem: 'Windows, macOS',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    author: { '@type': 'Person', name: 'Andrew Kirkouski' },
+    license: 'https://opensource.org/licenses/MIT',
+    url: `${BASE_URL}${path}`,
+    downloadUrl: 'https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/releases/latest',
+    softwareVersion: APP_VERSION,
+    isBasedOn: { '@type': 'SoftwareApplication', name: 'Ilya Birman Typography Layout', url: 'https://ilyabirman.ru/typography-layout/' },
+  }
+  const faqPage = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faq.map(f => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  }
+  return `<script type="application/ld+json">\n    ${JSON.stringify(softwareApp)}\n    </script>\n    <script type="application/ld+json">\n    ${JSON.stringify(faqPage)}\n    </script>`
+}
+
+function buildFontJsonLd(locale, path) {
+  const fm = FONT_META[locale]
+  const app = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Szpargalka Sans',
+    description: fm.description,
+    inLanguage: locale,
+    applicationCategory: 'DesignApplication',
+    operatingSystem: 'Windows, macOS, Linux',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    author: { '@type': 'Person', name: 'Andrew Kirkouski' },
+    license: 'https://opensource.org/licenses/MIT',
+    url: `${BASE_URL}${path}`,
+  }
+  const breadcrumbs = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${BASE_URL}${locale === 'en' ? '/' : `/${locale}/`}` },
+      { '@type': 'ListItem', position: 2, name: fm.title.split('—')[0].trim(), item: `${BASE_URL}${path}` },
+    ],
+  }
+  return `<script type="application/ld+json">\n    ${JSON.stringify(app)}\n    </script>\n    <script type="application/ld+json">\n    ${JSON.stringify(breadcrumbs)}\n    </script>`
 }
 
 // Hreflang links to inject into <head>
@@ -122,6 +213,8 @@ async function main() {
         /<meta property="og:locale" content="[^"]*"/,
         `<meta property="og:locale" content="${locale.ogLocale}"`
       )
+      // Per-locale OG image
+      .replace(/og-image\.png/g, `og-image-${locale.code}.png`)
       // Twitter
       .replace(
         /<meta name="twitter:title" content="[^"]*"/,
@@ -135,6 +228,16 @@ async function main() {
       .replace(
         /<link rel="canonical" href="[^"]*"/,
         `<link rel="canonical" href="${BASE_URL}${locale.path}"`
+      )
+      // Per-locale keywords
+      .replace(
+        /<meta name="keywords" content="[^"]*"/,
+        `<meta name="keywords" content="${meta.keywords}"`
+      )
+      // Per-locale JSON-LD (replaces the placeholder comment in index.html)
+      .replace(
+        '<!-- JSON-LD structured data injected per-locale by prerender.mjs -->',
+        buildJsonLd(locale.code, locale.path)
       )
       // Add hreflang links before </head>
       .replace('</head>', `    ${HREFLANG}\n  </head>`)
@@ -163,10 +266,20 @@ async function main() {
       .replace(/<meta property="og:description" content="[^"]*"/, `<meta property="og:description" content="${fm.description}"`)
       .replace(/<meta property="og:url" content="[^"]*"/, `<meta property="og:url" content="${BASE_URL}${fp.path}"`)
       .replace(/<meta property="og:locale" content="[^"]*"/, `<meta property="og:locale" content="${fp.ogLocale}"`)
-      .replace(/og-image\.png/g, 'og-fonts.png')
+      .replace(/og-image\.png/g, `og-fonts-${fp.code}.png`)
       .replace(/<meta name="twitter:title" content="[^"]*"/, `<meta name="twitter:title" content="${fm.title}"`)
       .replace(/<meta name="twitter:description" content="[^"]*"/, `<meta name="twitter:description" content="${fm.description}"`)
       .replace(/<link rel="canonical" href="[^"]*"/, `<link rel="canonical" href="${BASE_URL}${fp.path}"`)
+      // Per-locale keywords (reuse main locale keywords for fonts pages)
+      .replace(
+        /<meta name="keywords" content="[^"]*"/,
+        `<meta name="keywords" content="${META[fp.code].keywords}, pronunciation font, Szpargalka Sans"`
+      )
+      // Per-locale JSON-LD (font-specific SoftwareApplication + BreadcrumbList)
+      .replace(
+        '<!-- JSON-LD structured data injected per-locale by prerender.mjs -->',
+        buildFontJsonLd(fp.code, fp.path)
+      )
       .replace('</head>', `    ${FONT_HREFLANG}\n  </head>`)
 
     const outDir = fp.code === 'en' ? resolve(DIST, 'fonts') : resolve(DIST, fp.code, 'fonts')

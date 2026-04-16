@@ -88,7 +88,7 @@ onMounted(async () => {
       <div class="dev-banner" role="note">
         <p>
           {{ t('banner.development') }}
-          <a href="https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/issues" target="_blank" rel="noopener">{{ t('banner.issues') }}</a>
+          <a href="https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/issues" target="_blank" rel="noopener noreferrer nofollow">{{ t('banner.issues') }}</a>
         </p>
       </div>
       <template v-if="isFontsPage">

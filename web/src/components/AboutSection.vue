@@ -71,7 +71,7 @@ async function copyLink() {
       <div class="about-content">
         <p>
           {{ basedParts.before }}
-          <a href="https://ilyabirman.ru/typography-layout/" target="_blank" rel="noopener">
+          <a href="https://ilyabirman.ru/typography-layout/" target="_blank" rel="noopener noreferrer nofollow">
             {{ t('about.birmanLink') }}
           </a>
           {{ basedParts.after }}
@@ -83,7 +83,7 @@ async function copyLink() {
           <a
             href="https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout"
             target="_blank"
-            rel="noopener"
+            rel="noopener noreferrer nofollow"
             class="action-btn action-btn--github"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -94,7 +94,7 @@ async function copyLink() {
           <a
             href="https://ko-fi.com/ryotsuke"
             target="_blank"
-            rel="noopener"
+            rel="noopener noreferrer nofollow"
             class="action-btn action-btn--kofi"
           >
             <iconify-icon icon="simple-icons:kofi" width="20" aria-hidden="true"></iconify-icon>
@@ -126,7 +126,7 @@ async function copyLink() {
               :title="link.label"
               :aria-label="link.label"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener noreferrer nofollow"
               class="share-btn"
             >
               <iconify-icon :icon="link.icon" width="18" aria-hidden="true"></iconify-icon>

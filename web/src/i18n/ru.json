@@ -233,11 +233,11 @@
       "chromeStep3": "Откройте <code>chrome://extensions</code> и включите <strong>Режим разработчика</strong> в правом верхнем углу.",
       "chromeStep4": "Нажмите <strong>Загрузить распакованное</strong> и выберите папку <code>chrome-mv3</code>. Расширение стартует выключенным — нажмите иконку на панели, чтобы глобально переключить на <em>Вкл</em>, или оставьте <em>Выкл</em> и пользуйтесь только переопределениями для конкретных сайтов.",
       "tampermonkeyIntro": "Для опытных пользователей, у которых уже установлен Tampermonkey. Один скрипт, переключение режимов через меню Tampermonkey.",
-      "tampermonkeyStep1": "Установите <a href=\"https://www.tampermonkey.net/\" target=\"_blank\" rel=\"noopener\">расширение Tampermonkey</a>, если у вас его ещё нет.",
+      "tampermonkeyStep1": "Установите <a href=\"https://www.tampermonkey.net/\" target=\"_blank\" rel=\"noopener noreferrer nofollow\">расширение Tampermonkey</a>, если у вас его ещё нет.",
       "tampermonkeyStep2": "Установите <code>szpargalka-sans.user.js</code>",
       "tampermonkeyStep3": "Скрипт стартует выключенным. Нажмите иконку Tampermonkey → наведите на <em>Szpargalka Sans</em> → кликните по пункту, чтобы переключить на <strong>Вкл</strong>; кликните ещё раз, чтобы выключить. Текущее состояние отмечено ✓.",
       "stylusIntro": "Самый лёгкий путь — чистый user-CSS, без JavaScript. Работает в любом браузере с расширением Stylus.",
-      "stylusStep1": "Установите <a href=\"https://add0n.com/stylus.html\" target=\"_blank\" rel=\"noopener\">расширение Stylus</a> для вашего браузера.",
+      "stylusStep1": "Установите <a href=\"https://add0n.com/stylus.html\" target=\"_blank\" rel=\"noopener noreferrer nofollow\">расширение Stylus</a> для вашего браузера.",
       "stylusStep2": "Установите <code>szpargalka-sans.user.css</code>",
       "stylusStep3": "Stylus откроет окно импорта — нажмите <strong>Установить стиль</strong>. Готово. Стиль можно в любой момент включить или выключить через popup Stylus — после установки он активен, так что выключите его, если хотите вспоминать о нём только иногда."
     }

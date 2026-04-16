@@ -77,7 +77,7 @@ const pdfFiles = computed(() => [
               <a
                 :href="file.url"
                 target="_blank"
-                rel="noopener"
+                rel="noopener noreferrer nofollow"
                 @click="trackDownload(platform.id as 'windows' | 'macos', file.file)"
               >
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
@@ -103,7 +103,7 @@ const pdfFiles = computed(() => [
               <a
                 :href="pdf.url"
                 target="_blank"
-                rel="noopener"
+                rel="noopener noreferrer nofollow"
                 @click="trackDownload('pdf', pdf.file)"
               >
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">

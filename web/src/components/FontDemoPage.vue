@@ -204,7 +204,7 @@ const activeLigatures = computed(() =>
             class="font-download-card"
             :class="{ 'font-download-card--active': activeTab === 'cyrillic' }"
             target="_blank"
-            rel="noopener"
+            rel="noopener noreferrer nofollow"
             @click="trackDownload('font', FONT_FILES.cyrillic, { variant: 'cyrillic' })"
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
@@ -219,7 +219,7 @@ const activeLigatures = computed(() =>
             class="font-download-card"
             :class="{ 'font-download-card--active': activeTab === 'ipa' }"
             target="_blank"
-            rel="noopener"
+            rel="noopener noreferrer nofollow"
             @click="trackDownload('font', FONT_FILES.ipa, { variant: 'ipa' })"
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
@@ -303,7 +303,7 @@ const activeLigatures = computed(() =>
                 :href="CHROME_EXTENSION_ZIP_URL"
                 class="install-download"
                 target="_blank"
-                rel="noopener"
+                rel="noopener noreferrer nofollow"
                 @click="trackDownload('font', 'szpargalka-sans-chrome.zip', { variant: 'extension-chrome' })"
               >
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
@@ -334,7 +334,7 @@ const activeLigatures = computed(() =>
                 :href="TAMPERMONKEY_USER_JS_URL"
                 class="install-download"
                 target="_blank"
-                rel="noopener"
+                rel="noopener noreferrer nofollow"
               >
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                   <path d="M7 1v8M3 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -362,7 +362,7 @@ const activeLigatures = computed(() =>
                 :href="STYLUS_USER_CSS_URL"
                 class="install-download"
                 target="_blank"
-                rel="noopener"
+                rel="noopener noreferrer nofollow"
               >
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                   <path d="M7 1v8M3 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
