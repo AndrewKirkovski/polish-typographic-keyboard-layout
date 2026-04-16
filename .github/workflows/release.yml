@@ -100,6 +100,7 @@ jobs:
       - name: Build Szpargalka Sans TTF from sources
         run: |
           pip install fonttools
+          mkdir -p dist
           python polish_liga.py --variant cyrillic --input scripts/assets/fonts/NotoSans-Regular.ttf --output dist/SzpargalkaSans-Regular.ttf
 
       - name: Bake TTF into extension as base64 data URI
