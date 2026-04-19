@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Install or uninstall Kirkouski Typographic keyboard layouts on Windows.
 
@@ -45,6 +45,15 @@ trap {
 
 $ErrorActionPreference = "Stop"
 
+# Debug prints kick in whenever the script is launched — they give the user
+# something to paste when the script misbehaves. Using -f format operator so
+# there's no ambiguity with string interpolation rules.
+Write-Host ("[debug] install.ps1 starting")
+Write-Host ("[debug] PS version  : {0}" -f $PSVersionTable.PSVersion)
+Write-Host ("[debug] Script path : {0}" -f $MyInvocation.MyCommand.Path)
+Write-Host ("[debug] CWD         : {0}" -f $PWD.Path)
+Write-Host ("[debug] Params      : Uninstall={0} HardCleanup={1} Force={2} Layout={3}" -f $Uninstall, $HardCleanup, $Force, $Layout)
+
 # -- Layout definitions -------------------------------------------------
 $Layouts = @{
     "polish" = @{
@@ -70,6 +79,7 @@ $RegBase = "HKLM:\SYSTEM\CurrentControlSet\Control\Keyboard Layouts"
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
     [Security.Principal.WindowsBuiltInRole]::Administrator
 )
+Write-Host ("[debug] isAdmin     : {0}" -f $isAdmin)
 
 if (-not $isAdmin) {
     # Build the command to re-run this script elevated
@@ -91,12 +101,16 @@ if (-not $isAdmin) {
     Write-Host "Requesting administrator privileges..." -ForegroundColor Yellow
     try {
         Start-Process powershell.exe -ArgumentList $elevatedCmd -Verb RunAs -Wait
+        Write-Host ""
+        Write-Host "(elevated window finished)" -ForegroundColor DarkGray
     } catch {
         Write-Host ""
         Write-Host "ERROR: Administrator privileges required. Elevation was cancelled." -ForegroundColor Red
         Write-Host ""
-        Read-Host "Press Enter to close"
     }
+    # Always pause before exit so the non-admin parent window doesn't close
+    # instantly when launched via double-click.
+    Read-Host "Press Enter to close"
     exit
 }
 
@@ -115,6 +129,29 @@ function Find-InstalledLayout {
     param([string]$DllName)
     return Get-ChildItem $RegBase -ErrorAction SilentlyContinue | Where-Object {
         (Get-ItemProperty $_.PSPath -Name "Layout File" -ErrorAction SilentlyContinue)."Layout File" -eq $DllName
+    }
+}
+
+function Find-ResidualTrace {
+    # Returns registry entries that look like Kirkouski (by DLL name or "Kirkouski" in Layout Text)
+    # and leftover DLL paths in System32/SysWOW64. Used to detect partial uninstalls and stale
+    # entries that Find-InstalledLayout's strict match can miss.
+    $dllNames = @("pltypo.dll", "rutypo.dll", "ustypo.dll")
+    $regMatches = @(Get-ChildItem $RegBase -ErrorAction SilentlyContinue | Where-Object {
+        $lf = (Get-ItemProperty $_.PSPath -Name "Layout File" -ErrorAction SilentlyContinue)."Layout File"
+        $lt = (Get-ItemProperty $_.PSPath -Name "Layout Text" -ErrorAction SilentlyContinue)."Layout Text"
+        ($lf -in $dllNames) -or ($lt -like "*Kirkouski*")
+    })
+    $systemDlls = @()
+    foreach ($dll in $dllNames) {
+        foreach ($dir in @("System32", "SysWOW64")) {
+            $path = Join-Path $env:SystemRoot (Join-Path $dir $dll)
+            if (Test-Path $path) { $systemDlls += $path }
+        }
+    }
+    return @{
+        RegEntries = $regMatches
+        SystemDlls = $systemDlls
     }
 }
 
@@ -377,6 +414,9 @@ $distDir = $scriptDir
 if (-not (Test-Path (Join-Path $distDir "pltypo.dll")) -and (Test-Path (Join-Path $distDir "dist"))) {
     $distDir = Join-Path $scriptDir "dist"
 }
+Write-Host ("[debug] scriptDir   : {0}" -f $scriptDir)
+Write-Host ("[debug] distDir     : {0}" -f $distDir)
+Write-Host ("[debug] targets     : {0}" -f ($targets -join ', '))
 
 $installedLayouts = @()
 $availableLayouts = @()
@@ -385,6 +425,7 @@ foreach ($target in $targets) {
     $cfg = $Layouts[$target]
     $existing = Find-InstalledLayout -DllName $cfg.DllName
     $dllAvailable = Test-Path (Join-Path $distDir $cfg.DllName)
+    Write-Host ("[debug]   {0}: installed={1} dllAvailable={2}" -f $target, [bool]$existing, $dllAvailable)
 
     if ($existing) {
         $regKey = ($existing | Select-Object -First 1).PSChildName
@@ -393,6 +434,18 @@ foreach ($target in $targets) {
         $availableLayouts += @{ Target = $target; Config = $cfg }
     }
 }
+Write-Host ("[debug] counts      : installed={0} available={1}" -f $installedLayouts.Count, $availableLayouts.Count)
+
+# -- Detect residual traces (stale reg entries, leftover System32/SysWOW64 DLLs) --
+# Traces beyond what Find-InstalledLayout matched: used so the menu can always
+# offer Hard cleanup when *something* is there to clean, even if reg + DLL don't
+# line up cleanly (e.g. uninstall failed midway, or layout was registered under
+# an unexpected Layout File value).
+$residuals = Find-ResidualTrace
+$installedRegKeys = @($installedLayouts | ForEach-Object { $_.RegKey })
+$staleRegEntries = @($residuals.RegEntries | Where-Object { $_.PSChildName -notin $installedRegKeys })
+$hasTraces = ($installedLayouts.Count -gt 0) -or ($staleRegEntries.Count -gt 0) -or ($residuals.SystemDlls.Count -gt 0)
+Write-Host ("[debug] residuals   : regAll={0} stale={1} system_dlls={2} hasTraces={3}" -f $residuals.RegEntries.Count, $staleRegEntries.Count, $residuals.SystemDlls.Count, $hasTraces)
 
 # -- Show status --------------------------------------------------------
 if ($installedLayouts.Count -gt 0) {
@@ -411,8 +464,21 @@ if ($availableLayouts.Count -gt 0) {
     Write-Host ""
 }
 
-if ($installedLayouts.Count -eq 0 -and $availableLayouts.Count -eq 0) {
-    Write-Host "  No layouts installed, no DLL files found in this directory." -ForegroundColor Yellow
+if ($staleRegEntries.Count -gt 0 -or $residuals.SystemDlls.Count -gt 0) {
+    Write-Host "  Residual traces detected (not cleanly registered):" -ForegroundColor Yellow
+    foreach ($entry in $staleRegEntries) {
+        $lf = (Get-ItemProperty $entry.PSPath -Name "Layout File" -ErrorAction SilentlyContinue)."Layout File"
+        $lt = (Get-ItemProperty $entry.PSPath -Name "Layout Text" -ErrorAction SilentlyContinue)."Layout Text"
+        Write-Host ("    - stale reg : [{0}] File={1} Text={2}" -f $entry.PSChildName, $lf, $lt) -ForegroundColor Yellow
+    }
+    foreach ($dll in $residuals.SystemDlls) {
+        Write-Host "    - leftover DLL : $dll" -ForegroundColor Yellow
+    }
+    Write-Host ""
+}
+
+if (-not $hasTraces -and $availableLayouts.Count -eq 0) {
+    Write-Host "  No layouts installed, no residual traces, no DLL files found." -ForegroundColor Yellow
     Write-Host "  Build first: python build.py windows"
     Write-Host ""
     Read-Host "Press Enter to close"
@@ -438,6 +504,11 @@ if ($installedLayouts.Count -gt 0 -and $availableLayouts.Count -eq 0) {
 
 if ($installedLayouts.Count -gt 0) {
     $options += @{ Key = "U"; Label = "Uninstall"; Action = "uninstall" }
+}
+
+# Hard cleanup is always offered when ANY trace exists — registered or not —
+# so users with stale reg entries or leftover System32 DLLs can still clean up.
+if ($hasTraces) {
     $options += @{ Key = "H"; Label = "Hard cleanup (remove all traces)"; Action = "hard_cleanup" }
 }
 
@@ -459,7 +530,7 @@ Write-Host ""
 switch ($selectedAction) {
     "install" {
         foreach ($l in $availableLayouts) {
-            $result = Invoke-Install -Target $l.Target -DistDir $distDir
+            $null = Invoke-Install -Target $l.Target -DistDir $distDir
         }
     }
     "install_all" {
@@ -470,7 +541,7 @@ switch ($selectedAction) {
         foreach ($target in $targets) {
             $cfg = $Layouts[$target]
             if (Test-Path (Join-Path $distDir $cfg.DllName)) {
-                $result = Invoke-Install -Target $target -DistDir $distDir
+                $null = Invoke-Install -Target $target -DistDir $distDir
                 Write-Host ""
             }
         }
@@ -479,7 +550,7 @@ switch ($selectedAction) {
         foreach ($l in $installedLayouts) {
             Invoke-Uninstall -Target $l.Target
             Write-Host ""
-            $result = Invoke-Install -Target $l.Target -DistDir $distDir
+            $null = Invoke-Install -Target $l.Target -DistDir $distDir
             Write-Host ""
         }
     }
