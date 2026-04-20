@@ -17,6 +17,23 @@ function langHref(lang: typeof langs[0]) {
   return lang.href + hash
 }
 
+// Anchor nav (Keyboard / Download / About) only works when the homepage
+// is currently rendered — the target sections live in App.vue's home
+// route, not in the standalone /fonts page. When we're on a subpage,
+// prefix the anchor with the locale-matching homepage so the browser
+// navigates home and then scrolls to the section.
+function navHref(hash: string): string {
+  if (typeof window === 'undefined') return hash
+  const path = window.location.pathname
+  const onHome =
+    path === '/' ||
+    path === '/pl' || path === '/pl/' ||
+    path === '/ru' || path === '/ru/'
+  if (onHome) return hash
+  const homeRoot = locale.value === 'en' ? '/' : `/${locale.value}/`
+  return homeRoot + hash
+}
+
 function switchLang(e: Event, lang: typeof langs[0]) {
   e.preventDefault()
   if (locale.value === lang.code) return
@@ -42,9 +59,9 @@ function closeMenu() {
         <span class="logo-text">Kirkouski</span>
       </a>
       <nav id="site-nav" class="nav" :class="{ open: menuOpen }">
-        <a href="#keyboard" @click="closeMenu">{{ t('nav.keyboard') }}</a>
-        <a href="#download" @click="closeMenu">{{ t('nav.download') }}</a>
-        <a href="#about" @click="closeMenu">{{ t('nav.about') }}</a>
+        <a :href="navHref('#keyboard')" @click="closeMenu">{{ t('nav.keyboard') }}</a>
+        <a :href="navHref('#download')" @click="closeMenu">{{ t('nav.download') }}</a>
+        <a :href="navHref('#about')" @click="closeMenu">{{ t('nav.about') }}</a>
         <div class="lang-switcher lang-switcher--mobile">
           <a
             v-for="lang in langs"
