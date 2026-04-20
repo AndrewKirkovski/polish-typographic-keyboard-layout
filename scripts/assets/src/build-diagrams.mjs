@@ -113,14 +113,14 @@ const DIAGRAMS = {
     style ZIP ${OUTPUT}
 `,
 
-  // macOS: JSON → keylayout → bundle → per-locale dmg + zip
+  // macOS: JSON → keylayout → bundle → single trilingual dmg + zip
   'pipeline-macos': `flowchart LR
     JSON("Full layout JSON")
     KL["build_keylayout.py"]
     ICNS("assets/icons/*.icns")
     DMGBG("assets/dmg/*")
     BUNDLE["build_macos_bundle.py"]
-    DMG(["DMG × EN/PL/RU (macOS only)"])
+    DMG(["DMG (trilingual, macOS only)"])
     ZIP(["zip"])
 
     JSON --> KL --> BUNDLE

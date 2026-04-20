@@ -1,18 +1,32 @@
-"""Build unsigned macOS DMGs (one per language) for Kirkouski Typographic.
+"""Build a single unsigned macOS DMG for Kirkouski Typographic.
 
-Dual-Finder-window UX: the bundle on the left, ReadMe PDF on the right, over a
-localized background graphic. Target install location is user scope
-(~/Library/Keyboard Layouts/), no admin required — that's why this replaces
-the previous .pkg (which targeted system scope with admin).
+One DMG ships all three locales' install instructions. The bundle inside
+already localizes the layout display-name via en/pl/ru.lproj (picked by
+macOS based on the user's system language). For the install-time UX inside
+the DMG itself we pack:
 
-On macOS: invokes dmgbuild + hdiutil verify, produces .dmg + .sha256 sidecar.
-On Windows: validates inputs and writes dmgbuild settings files per language,
-skips the actual DMG assembly. This lets the user iterate on design and
-content from Windows before tagging a release — CI does the real build.
+  * Three ReadMe PDFs inside a `Read Me.localized/` folder. Finder auto-
+    localizes the folder's display name via `.localized/<lang>.strings`.
+    Users on a Polish system see the folder named "Czytaj"; Russian users
+    see "Прочтите". Inside the folder all three PDFs are always present —
+    any user can open any language's copy.
+  * The three per-locale background PNGs under `.background/`. `.DS_Store`
+    displays the English one by default (Finder does NOT auto-select DMG
+    backgrounds by locale — that's a volume-window property, not a bundle
+    resource). Shipping all three keeps the localized variants together
+    and lets a curious user browse `.background/` directly.
+
+Target install location is user scope (~/Library/Keyboard Layouts/), no
+admin required — that's why this flow replaces the old .pkg (system scope,
+admin prompt).
+
+On macOS: invokes dmgbuild + hdiutil verify, produces .dmg + .sha256.
+On Windows/Linux: validates inputs and writes the dmgbuild settings file,
+skips actual assembly. Lets the user iterate on design + content before
+pushing a tag; CI runs the real build on macos-latest.
 
 Usage:
-    python build_dmg.py              # all languages (en, pl, ru)
-    python build_dmg.py en pl        # specific languages
+    python build_dmg.py
 """
 import hashlib
 import os
@@ -24,6 +38,25 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 LANGUAGES = ["en", "pl", "ru"]
 DMG_VOLUME_NAME = "Kirkouski Typographic"
 BUNDLE_NAME = "Kirkouski Typographic.bundle"
+
+# Finder displays the `Read Me.localized/` folder under these names when the
+# user's system language matches. The raw folder name on disk is always
+# "Read Me.localized" — the `.strings` files inside `.localized/` remap it.
+READMELOCALIZED_DIRNAME = "Read Me.localized"
+READMELOCALIZED_DISPLAY = {
+    "en": "Read Me",
+    "pl": "Czytaj",
+    "ru": "Прочтите",
+}
+
+# Each language gets its own PDF filename inside the localized folder so a
+# user who opens e.g. a Russian system's localized folder still sees three
+# files and can pick any.
+READMELOCALIZED_PDF = {
+    "en": "Read Me.pdf",
+    "pl": "Przeczytaj.pdf",
+    "ru": "Прочтите.pdf",
+}
 
 
 def _read_version():
@@ -38,10 +71,9 @@ VERSION = _read_version()
 def _validate_inputs():
     """Fail loudly if any committed input is missing before we start.
 
-    We check the bundle (built by build_macos_bundle.py) and the per-language
-    background + ReadMe assets that live under assets/dmg/. If any are
-    missing the user gets one error listing all of them, instead of trickling
-    failures across three language runs.
+    We check the bundle (built by build_macos_bundle.py) and the per-locale
+    background + ReadMe assets under assets/dmg/. Single error report
+    listing everything missing beats discovering drift mid-build.
     """
     required = [os.path.join(SCRIPT_DIR, "build", "macos", BUNDLE_NAME)]
     for lang in LANGUAGES:
@@ -55,64 +87,97 @@ def _validate_inputs():
         print(
             "Hint: run `python build.py macos` first to produce the bundle,\n"
             "and ensure assets/dmg/ contains background-<lang>.png + readme-<lang>.pdf\n"
-            "for each language in en/pl/ru.",
+            "for each of en/pl/ru.",
             file=sys.stderr,
         )
         sys.exit(1)
 
 
-def _stage_payload(lang):
-    """Copy the bundle + language-specific ReadMe into build/dmg/<lang>/payload/.
+def _stage_payload():
+    """Build build/dmg/payload/ with everything the single DMG ships.
 
-    The ReadMe is renamed to a neutral "ReadMe.pdf" inside the DMG so the
-    dmgbuild settings.py doesn't need to know the source language — makes the
-    settings file identical across languages apart from the background path.
+    Layout:
+        payload/
+          Kirkouski Typographic.bundle/   (verbatim copy of the built bundle)
+          Read Me.localized/
+            .localized/
+              en.strings                  "Read Me.localized" = "Read Me";
+              pl.strings                  ... = "Czytaj";
+              ru.strings                  ... = "Прочтите";
+            Read Me.pdf                   (EN content)
+            Przeczytaj.pdf                (PL content)
+            Прочтите.pdf                  (RU content)
+
+    The `.background/` directory lives elsewhere — dmgbuild writes it from
+    the `background=` attribute in settings.py, and we copy the other two
+    background PNGs into it via a post-processing step inside settings.py.
 
     Returns the absolute payload directory path.
     """
-    payload_root = os.path.join(SCRIPT_DIR, "build", "dmg", lang, "payload")
+    payload_root = os.path.join(SCRIPT_DIR, "build", "dmg", "payload")
     if os.path.isdir(payload_root):
         shutil.rmtree(payload_root)
     os.makedirs(payload_root)
 
+    # Bundle — copied whole.
     bundle_src = os.path.join(SCRIPT_DIR, "build", "macos", BUNDLE_NAME)
     bundle_dst = os.path.join(payload_root, BUNDLE_NAME)
     shutil.copytree(bundle_src, bundle_dst)
 
-    readme_src = os.path.join(SCRIPT_DIR, "assets", "dmg", f"readme-{lang}.pdf")
-    readme_dst = os.path.join(payload_root, "ReadMe.pdf")
-    shutil.copy2(readme_src, readme_dst)
+    # Read Me.localized/ — folder with auto-localized display name + 3 PDFs.
+    readme_dir = os.path.join(payload_root, READMELOCALIZED_DIRNAME)
+    os.makedirs(readme_dir)
+    localized_meta = os.path.join(readme_dir, ".localized")
+    os.makedirs(localized_meta)
+    for lang, display in READMELOCALIZED_DISPLAY.items():
+        # .strings files use UTF-16 LE with BOM, same rule as InfoPlist.strings.
+        content = f'"{READMELOCALIZED_DIRNAME}" = "{display}";\n'
+        with open(os.path.join(localized_meta, f"{lang}.strings"), "wb") as f:
+            f.write(b"\xff\xfe" + content.encode("utf-16-le"))
+    for lang, pdf_name in READMELOCALIZED_PDF.items():
+        src = os.path.join(SCRIPT_DIR, "assets", "dmg", f"readme-{lang}.pdf")
+        shutil.copy2(src, os.path.join(readme_dir, pdf_name))
 
     return payload_root
 
 
-def _write_settings(lang, payload_root):
-    """Generate build/dmg/<lang>/settings.py consumed by dmgbuild on macOS.
+def _write_settings(payload_root):
+    """Generate build/dmg/settings.py consumed by dmgbuild on macOS.
 
-    All paths are emitted with forward slashes so the file is valid on macOS
-    even when generated on Windows. We deliberately omit the usual
-    /Applications symlink (or any symlink) because Gatekeeper blocks drops
-    onto alias folders in quarantined DMGs — the background graphic tells
-    the user to drop the bundle on ~/Library/Keyboard Layouts/ instead.
+    Paths are emitted with forward slashes so the file runs under macOS even
+    when generated on Windows. `symlinks = {}` is deliberate — Gatekeeper
+    blocks drops onto alias folders in quarantined DMGs, so the background
+    graphic instructs the user to drop the bundle on ~/Library/Keyboard
+    Layouts/ instead.
+
+    The settings file also lists the two non-default background PNGs so
+    dmgbuild copies them into `.background/` alongside the one `.DS_Store`
+    references. Finder doesn't pick among them automatically — English is
+    the default display — but all three are present for users who want to
+    inspect or extract them.
     """
-    settings_dir = os.path.join(SCRIPT_DIR, "build", "dmg", lang)
+    settings_dir = os.path.join(SCRIPT_DIR, "build", "dmg")
     os.makedirs(settings_dir, exist_ok=True)
     settings_path = os.path.join(settings_dir, "settings.py")
 
     bundle_path = os.path.join(payload_root, BUNDLE_NAME).replace("\\", "/")
-    readme_path = os.path.join(payload_root, "ReadMe.pdf").replace("\\", "/")
-    bg_path = os.path.join(SCRIPT_DIR, "assets", "dmg", f"background-{lang}.png").replace("\\", "/")
+    readme_localized_path = os.path.join(payload_root, READMELOCALIZED_DIRNAME).replace("\\", "/")
+    bg_default = os.path.join(SCRIPT_DIR, "assets", "dmg", "background-en.png").replace("\\", "/")
+    bg_pl = os.path.join(SCRIPT_DIR, "assets", "dmg", "background-pl.png").replace("\\", "/")
+    bg_ru = os.path.join(SCRIPT_DIR, "assets", "dmg", "background-ru.png").replace("\\", "/")
 
     content = f'''# Generated by build_dmg.py — do not edit by hand.
+import os, shutil
+
 format = "UDZO"
 # HFS+ is dmgbuild's documented default and works on every macOS version.
-# APFS would require macOS 10.13+ on the *reader* side too, with no meaningful
-# size gain for a small keyboard-layout bundle. Keep HFS+ for widest reach.
+# APFS would require macOS 10.13+ on the reader side with no meaningful size
+# gain for a small keyboard-layout bundle. Keep HFS+ for widest reach.
 filesystem = "HFS+"
 
 files = [
     {bundle_path!r},
-    {readme_path!r},
+    {readme_localized_path!r},
 ]
 
 # Deliberately empty — Gatekeeper blocks drops onto alias folders in
@@ -120,15 +185,24 @@ files = [
 # bundle on ~/Library/Keyboard Layouts/ instead of an in-DMG symlink.
 symlinks = {{}}
 
-background = {bg_path!r}
+# English background is the default Finder renders. dmgbuild writes it to
+# `.background/background.png` inside the mounted volume; a post_mount_hook
+# below copies the Polish and Russian variants next to it.
+background = {bg_default!r}
+
+def post_mount_hook(volume_path):
+    bg_dir = os.path.join(volume_path, ".background")
+    os.makedirs(bg_dir, exist_ok=True)
+    shutil.copy2({bg_pl!r}, os.path.join(bg_dir, "background-pl.png"))
+    shutil.copy2({bg_ru!r}, os.path.join(bg_dir, "background-ru.png"))
 
 window_rect = ((200, 120), (600, 400))
 icon_size = 96
 text_size = 12
 
 icon_locations = {{
-    {BUNDLE_NAME!r}: (150, 200),
-    "ReadMe.pdf":    (450, 200),
+    {BUNDLE_NAME!r}:             (150, 200),
+    {READMELOCALIZED_DIRNAME!r}: (450, 200),
 }}
 
 default_view = "icon-view"
@@ -146,41 +220,11 @@ show_sidebar = False
     return settings_path
 
 
-def _build_one(lang):
-    """Stage payload + write settings for a single language.
-
-    On macOS, continues on to invoke dmgbuild. On Windows (or any non-Darwin
-    host) it returns None after staging — the inputs are ready for CI to
-    finish the build.
-    """
-    print(f"\n{'=' * 60}\n  DMG: {lang}\n{'=' * 60}")
-    payload_root = _stage_payload(lang)
-
-    # Strip xattrs on macOS before dmgbuild reads the tree (no-op on Windows).
-    # Extended attributes from e.g. Finder drag-and-drop end up baked into the
-    # image and surface as Gatekeeper quarantine warnings on download.
-    current_platform: str = str(sys.platform)
-    if current_platform == "darwin":
-        subprocess.run(["xattr", "-cr", payload_root], check=False)
-
-    settings_path = _write_settings(lang, payload_root)
-    print(f"  payload:  {payload_root}")
-    print(f"  settings: {settings_path}")
-
-    if current_platform != "darwin":
-        print(f"  SKIP: DMG assembly requires macOS (detected {current_platform}); inputs staged OK.")
-        return None
-
-    return _build_one_darwin(lang, settings_path)
-
-
-def _build_one_darwin(lang, settings_path):
-    """macOS-only half of the per-language build: dmgbuild + hdiutil + sha256."""
+def _build_darwin(settings_path):
+    """macOS-only half of the build: dmgbuild + hdiutil + sha256."""
     dist_dir = os.path.join(SCRIPT_DIR, "dist")
     os.makedirs(dist_dir, exist_ok=True)
-    dmg_path = os.path.join(
-        dist_dir, f"kirkouski-typographic-v{VERSION}-macos-{lang}.dmg"
-    )
+    dmg_path = os.path.join(dist_dir, f"kirkouski-typographic-v{VERSION}-macos.dmg")
     if os.path.exists(dmg_path):
         os.remove(dmg_path)
 
@@ -190,7 +234,7 @@ def _build_one_darwin(lang, settings_path):
         text=True,
     )
     if result.returncode != 0:
-        print(f"\nFAILED: dmgbuild ({lang})", file=sys.stderr)
+        print("\nFAILED: dmgbuild", file=sys.stderr)
         if result.stdout:
             print(result.stdout[-500:], file=sys.stderr)
         if result.stderr:
@@ -205,7 +249,7 @@ def _build_one_darwin(lang, settings_path):
         text=True,
     )
     if verify.returncode != 0:
-        print(f"\nFAILED: hdiutil verify ({lang})", file=sys.stderr)
+        print("\nFAILED: hdiutil verify", file=sys.stderr)
         if verify.stdout:
             print(verify.stdout[-500:], file=sys.stderr)
         if verify.stderr:
@@ -232,32 +276,32 @@ def _build_one_darwin(lang, settings_path):
     return dmg_path
 
 
-def build_all(languages=None):
-    """Build DMGs for the given languages (default: all of en/pl/ru)."""
-    if languages is None:
-        languages = LANGUAGES
+def build():
+    """Stage the single DMG's payload + settings, then (on macOS) assemble it."""
     _validate_inputs()
-    results = []
-    for lang in languages:
-        if lang not in LANGUAGES:
-            print(f"Unknown language: {lang}", file=sys.stderr)
-            sys.exit(1)
-        results.append((lang, _build_one(lang)))
+    print(f"\n{'=' * 60}\n  DMG: kirkouski-typographic-v{VERSION}-macos.dmg\n{'=' * 60}")
+    payload_root = _stage_payload()
 
+    # Strip xattrs on macOS before dmgbuild reads the tree (no-op on Windows).
+    # Extended attributes from Finder / drag-and-drop otherwise end up baked
+    # into the image and trigger Gatekeeper quarantine warnings on download.
     current_platform: str = str(sys.platform)
     if current_platform == "darwin":
-        print(f"\n{'=' * 60}\n  DMG BUILD COMPLETE — v{VERSION}\n{'=' * 60}")
-        for lang, path in results:
-            if path:
-                print(f"  {lang}: {path}")
-    else:
-        print(f"\n{'=' * 60}\n  DMG inputs staged (not assembled — requires macOS)\n{'=' * 60}")
+        subprocess.run(["xattr", "-cr", payload_root], check=False)
+
+    settings_path = _write_settings(payload_root)
+    print(f"  payload:  {payload_root}")
+    print(f"  settings: {settings_path}")
+
+    if current_platform != "darwin":
+        print(f"  SKIP: DMG assembly requires macOS (detected {current_platform}); inputs staged OK.")
+        return None
+
+    return _build_darwin(settings_path)
 
 
 def main():
-    args = list(sys.argv[1:])
-    langs = args if args else None
-    build_all(langs)
+    build()
 
 
 if __name__ == "__main__":

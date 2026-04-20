@@ -13,7 +13,9 @@ Usage:
 
 Notes on DMG: replaces the previous .pkg (which targeted system scope with
 admin). The DMG targets user scope (~/Library/Keyboard Layouts/), so no
-admin prompt — per-language DMGs (en/pl/ru) with localized background + ReadMe.
+admin prompt. Single trilingual DMG: one artifact ships a `Read Me.localized/`
+folder (Finder auto-localizes the display name via `.strings`) containing
+EN/PL/RU ReadMe PDFs, plus per-locale background PNGs under `.background/`.
 
 When no platform args are given, windows + macos + klc + dmg (macOS staging)
 all run. DMG assembly itself requires macOS; on Windows the dmg step only
@@ -184,8 +186,8 @@ def main():
             print(f"Unknown argument: {arg}")
             print("Usage: python build.py [windows|macos|klc|assets|dmg] [polish|russian|us]")
             print("")
-            print("Builds DLLs, keylayouts + .bundle, Inno Setup installer, macOS DMGs (EN/PL/RU), and zip archives.")
-            print("`dmg` alone stages per-language DMG payloads without rebuilding other platforms (useful on Windows).")
+            print("Builds DLLs, keylayouts + .bundle, Inno Setup installer, macOS trilingual DMG, and zip archives.")
+            print("`dmg` alone stages DMG payload without rebuilding other platforms (useful on Windows).")
             print("`assets` (re)generates icons, favicons, and OG image via the scripts/assets pipeline.")
             print("Prerequisites: Python 3.10+, MSVC Build Tools (windows), Inno Setup 6 (windows installer), pnpm (assets)")
             sys.exit(1)

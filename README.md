@@ -143,10 +143,8 @@ The `assets` target shells out to `pnpm --dir scripts/assets build`. Outputs (ic
 | `kirkouski-typographic-vX.Y-windows-setup.exe` | Inno Setup installer (Add/Remove Programs, UAC) |
 | `kirkouski-typographic-vX.Y-windows.zip` | DLLs + install.ps1 for manual install |
 | `kirkouski-typographic-vX.Y-macos.zip` | `.bundle` (primary) + loose `.keylayout` files (fallback) |
-| `kirkouski-typographic-vX.Y-macos-en.dmg` | macOS disk image, English ReadMe + background (built on macOS only) |
-| `kirkouski-typographic-vX.Y-macos-pl.dmg` | macOS disk image, Polish ReadMe + background (built on macOS only) |
-| `kirkouski-typographic-vX.Y-macos-ru.dmg` | macOS disk image, Russian ReadMe + background (built on macOS only) |
-| `kirkouski-typographic-vX.Y-macos-<lang>.dmg.sha256` | SHA-256 sidecar for each DMG |
+| `kirkouski-typographic-vX.Y-macos.dmg` | macOS disk image — trilingual install UX (EN/PL/RU ReadMe PDFs in a Finder-localized folder + all three background images); built on macOS only |
+| `kirkouski-typographic-vX.Y-macos.dmg.sha256` | SHA-256 sidecar for the DMG |
 | `windows-vX.Y/` | Loose Windows files |
 | `macos-vX.Y/Kirkouski Typographic.bundle/` | macOS bundle — primary install artifact |
 | `macos-vX.Y/*.keylayout` | Loose macOS keylayout files (fallback) |

@@ -107,8 +107,7 @@
     "pdfPolishColor": "Польская (цвет)",
     "pdfPolishBw": "Польская (Ч/Б)",
     "pdfRussianColor": "Русская (цвет)",
-    "pdfRussianBw": "Русская (Ч/Б)",
-    "alsoAvailable": "Также доступно"
+    "pdfRussianBw": "Русская (Ч/Б)"
   },
   "install": {
     "title": "Установка",

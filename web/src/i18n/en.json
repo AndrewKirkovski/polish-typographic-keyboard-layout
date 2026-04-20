@@ -107,8 +107,7 @@
     "pdfPolishColor": "Polish (color)",
     "pdfPolishBw": "Polish (B/W)",
     "pdfRussianColor": "Russian (color)",
-    "pdfRussianBw": "Russian (B/W)",
-    "alsoAvailable": "Also available"
+    "pdfRussianBw": "Russian (B/W)"
   },
   "install": {
     "title": "Installation",

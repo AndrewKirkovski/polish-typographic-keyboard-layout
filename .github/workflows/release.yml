@@ -58,7 +58,7 @@ jobs:
             dist/SzpargalkaSans-Regular.ttf
             dist/PolishPhoneticsSans-Regular.ttf
 
-  # ── macOS: keylayouts + bundle + per-language DMGs + zip ─────────────
+  # ── macOS: keylayouts + bundle + single trilingual DMG + zip ─────────
   build-macos:
     runs-on: macos-latest
     steps:
@@ -71,7 +71,7 @@ jobs:
       - name: Install dmgbuild
         run: pip install dmgbuild
 
-      - name: Build macOS (keylayouts + bundle + DMGs + zip)
+      - name: Build macOS (keylayouts + bundle + DMG + zip)
         run: python build.py macos
 
       - name: List outputs
@@ -83,8 +83,8 @@ jobs:
           name: macos-release
           path: |
             dist/kirkouski-typographic-*-macos.zip
-            dist/kirkouski-typographic-*-macos-*.dmg
-            dist/kirkouski-typographic-*-macos-*.dmg.sha256
+            dist/kirkouski-typographic-*-macos.dmg
+            dist/kirkouski-typographic-*-macos.dmg.sha256
             dist/macos-v*/
 
   # ── Chrome extension: bake Szpargalka TTF into base64 + zip ─────────
@@ -167,8 +167,8 @@ jobs:
             release/kirkouski-typographic-*-windows-setup.exe
             release/kirkouski-typographic-*-windows.zip
             release/kirkouski-typographic-*-macos.zip
-            release/kirkouski-typographic-*-macos-*.dmg
-            release/kirkouski-typographic-*-macos-*.dmg.sha256
+            release/kirkouski-typographic-*-macos.dmg
+            release/kirkouski-typographic-*-macos.dmg.sha256
             release/*_typographic_*.pdf
             release/SzpargalkaSans-Regular.ttf
             release/PolishPhoneticsSans-Regular.ttf
