@@ -25,7 +25,7 @@
  *     cancellation is a one-liner (clearTimeout on the tracked id).
  */
 
-import { ref, watch, onMounted, onBeforeUnmount, type Ref } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount, type Ref } from 'vue'
 import type { LayoutData } from './useLayout'
 import { resolvePhrase, type Step, type Layer } from './useCharToSteps'
 
@@ -130,6 +130,12 @@ export interface UsePlaybackOptions {
   setPlaybackLayer: (layer: Layer | null) => void
   /** User-owned layer override — watched for pause/resume. */
   manualLayer: Ref<Layer | null>
+  /**
+   * Flip the user's layer-switcher tab. Called by `toggle()` to return
+   * to Auto before restarting, so clicking "Play demo" from a paused-
+   * by-layer-tab state actually does something.
+   */
+  setManualLayer: (layer: Layer | null) => void
   layout: Ref<LayoutData | null>
   phrases: Ref<readonly string[]>
 }
@@ -642,17 +648,32 @@ export function usePlayback(opts: UsePlaybackOptions) {
     }
   }
 
-  // Toggle is the user-visible on/off click. Persists to localStorage
-  // and clears sessionInterrupted so the user can explicitly restart
-  // after an auto-stop.
+  // Toggle is the user-visible on/off click. Label/icon in the button
+  // reflect `active` below (true iff the player is actually producing
+  // output right now), so toggle behaviour must match that view: click
+  // while active → stop; click while idle → start (and clear whichever
+  // flag stopped it — a hardware-key interrupt, a manual layer pause,
+  // or a previous explicit off). Without this symmetry, after an
+  // interrupt the button still said "Playing demo" while nothing was
+  // playing, and the first click would flip `enabled` off instead of
+  // restarting as intended.
   function toggle(): void {
-    enabled.value = !enabled.value
-    writeStoredEnabled(enabled.value)
-    if (enabled.value) {
-      sessionInterrupted.value = false
-      start()
-    } else {
+    if (active.value) {
+      enabled.value = false
+      writeStoredEnabled(false)
       stop('toggle')
+    } else {
+      enabled.value = true
+      writeStoredEnabled(true)
+      sessionInterrupted.value = false
+      // Return the user's layer tab to Auto if they paused the demo
+      // by clicking a specific layer. The manualLayer watcher sees
+      // this change and clears `manualPaused` for us, then start()'s
+      // manualLayer guard passes.
+      if (opts.manualLayer.value !== null) {
+        opts.setManualLayer(null)
+      }
+      start()
     }
   }
 
@@ -750,9 +771,21 @@ export function usePlayback(opts: UsePlaybackOptions) {
     },
   )
 
+  // Derived "is the player actually doing anything right now?" — true
+  // iff the user has it enabled AND nothing has paused/stopped it. This
+  // is what the toggle button label should track: when a hardware key
+  // interrupts or a manual layer tab pauses, `active` flips false even
+  // though `enabled` is still true, so the button correctly reads
+  // "Play demo" (click to resume).
+  const active = computed(() =>
+    running.value
+    || (enabled.value && !sessionInterrupted.value && !manualPaused.value)
+  )
+
   return {
     // State for PlaybackLine.vue to render
     enabled,
+    active,
     running,
     sessionInterrupted,
     manualPaused,

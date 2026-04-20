@@ -38,6 +38,7 @@ const playback = usePlayback({
   pressedKeyIds,
   setPlaybackLayer,
   manualLayer,
+  setManualLayer,
   layout: active,
   phrases,
 })
@@ -87,8 +88,8 @@ const LAYER_OPTIONS: { value: Layer | null; labelKey: string }[] = [
         <button
           type="button"
           class="playback-toggle"
-          :class="{ 'playback-toggle--on': playback.enabled.value }"
-          :aria-pressed="playback.enabled.value"
+          :class="{ 'playback-toggle--on': playback.active.value }"
+          :aria-pressed="playback.active.value"
           :aria-label="t('keyboard.playback.aria')"
           @click="playback.toggle()"
         >
@@ -102,14 +103,14 @@ const LAYER_OPTIONS: { value: Layer | null; labelKey: string }[] = [
             <!-- Play glyph when off, pause glyph when on. Two sibling
                  paths so we can swap via CSS without re-rendering. -->
             <path
-              v-if="playback.enabled.value"
+              v-if="playback.active.value"
               d="M2 1h2v10H2zm4 0h2v10H6z"
               fill="currentColor"
             />
             <path v-else d="M1 1l8 5-8 5z" fill="currentColor" />
           </svg>
           <span class="playback-toggle__label">{{
-            playback.enabled.value
+            playback.active.value
               ? t('keyboard.playback.toggleOn')
               : t('keyboard.playback.toggleOff')
           }}</span>

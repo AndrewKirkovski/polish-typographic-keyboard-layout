@@ -5,7 +5,7 @@
 ; Based on installation logic from lelegard/winkbdlayouts (MIT).
 
 #ifndef VERSION
-  #define VERSION "0.9"
+  #define VERSION "0.10"
 #endif
 
 [Setup]

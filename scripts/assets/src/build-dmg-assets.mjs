@@ -1,8 +1,18 @@
-// Render DMG assets for Workstream 3 (macOS DMG build, per-language).
+// Render DMG assets for the macOS DMG build.
 //
 // Outputs, per language {en,pl,ru}, committed under assets/dmg/:
-//   background-<lang>.png   1200×800 PNG (600×400 CSS @ 2x device scale)
-//   readme-<lang>.pdf       A5 portrait PDF
+//   background-<lang>.png       600×400 PNG (1x — matches the DMG window
+//                               at logical size so Finder opens the window
+//                               at 600×400 points instead of 600×400 pixels
+//                               at 2x density, which would make the window
+//                               oversized on Retina).
+//   background-<lang>@2x.png    1200×800 PNG (2x — crisp rep for Retina
+//                               displays). build_dmg.py combines the pair
+//                               into a multi-rep TIFF via `tiffutil
+//                               -cathidpicheck` on macOS CI, which is what
+//                               Finder reads to pick the right rep for the
+//                               current display scale factor.
+//   readme-<lang>.pdf           A5 portrait PDF.
 //
 // Mirrors the hermetic-rendering idioms from build-og.mjs:
 //   - chromium.launch() once, reuse across locales
@@ -134,29 +144,42 @@ export async function buildDmgAssets() {
   const browser = await chromium.launch();
   try {
     for (const [lang, strings] of Object.entries(LOCALES)) {
-      // --- Background PNG (600×400 logical design, rendered at 1200×800).
+      // --- Background PNGs (both 1x and 2x reps).
       // Chromium's `deviceScaleFactor` doesn't reliably upscale the
-      // screenshot raster in headless 1.59 — it only affects
-      // `window.devicePixelRatio`. CSS `zoom: 2` on <body> is the
-      // dependable way to double the raster: we render into a 1200×800
-      // viewport and rely on the template's `body { zoom: 2 }` rule to
-      // blow up the 600×400 design cleanly.
+      // screenshot raster in headless Playwright — it only affects
+      // `window.devicePixelRatio`. CSS `zoom: N` on <body> is the
+      // dependable way to control the raster: we match viewport to the
+      // desired output size and override the body zoom per rep.
+      // The template bakes `zoom: 2` in by default for the 2x case; a
+      // `<style>` injection overrides it to `zoom: 1` for the 1x case.
       const bgHtml = substitute(bgInlined, strings);
-      const bgPage = await browser.newPage({
-        viewport: { width: 1200, height: 800 },
-      });
-      await bgPage.setContent(bgHtml, { waitUntil: 'load' });
-      // Resolve to `undefined` — FontFaceSet itself serializes unreliably
-      // across Playwright versions on Windows.
-      await bgPage.evaluate(() => document.fonts.ready.then(() => undefined));
-      const bgPng = await bgPage.screenshot({
-        type: 'png',
-        clip: { x: 0, y: 0, width: 1200, height: 800 },
-      });
-      const bgPath = resolve(OUT_DIR, `background-${lang}.png`);
-      writeFileSync(bgPath, bgPng);
-      console.log(`  background-${lang}.png  ${bgPng.length.toLocaleString()} bytes`);
-      await bgPage.close();
+      const zoomOverride = '<style>body { zoom: __ZOOM__ !important; }</style>';
+
+      const bgReps = [
+        { suffix: '',     width: 600,  height: 400, zoom: '1' },
+        { suffix: '@2x',  width: 1200, height: 800, zoom: '2' },
+      ];
+      for (const rep of bgReps) {
+        const html = bgHtml.replace(
+          '</head>',
+          `${zoomOverride.replace('__ZOOM__', rep.zoom)}</head>`,
+        );
+        const page = await browser.newPage({
+          viewport: { width: rep.width, height: rep.height },
+        });
+        await page.setContent(html, { waitUntil: 'load' });
+        // Resolve to `undefined` — FontFaceSet itself serializes unreliably
+        // across Playwright versions on Windows.
+        await page.evaluate(() => document.fonts.ready.then(() => undefined));
+        const png = await page.screenshot({
+          type: 'png',
+          clip: { x: 0, y: 0, width: rep.width, height: rep.height },
+        });
+        const path = resolve(OUT_DIR, `background-${lang}${rep.suffix}.png`);
+        writeFileSync(path, png);
+        console.log(`  background-${lang}${rep.suffix}.png  ${png.length.toLocaleString()} bytes`);
+        await page.close();
+      }
 
       // --- ReadMe PDF (A5 portrait)
       const readmeHtml = substitute(readmeInlined, strings);

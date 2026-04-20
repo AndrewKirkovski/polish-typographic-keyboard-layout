@@ -17,6 +17,7 @@ import { buildOgImage, buildFontsOgImage } from './build-og.mjs';
 import { buildWebIcons } from './build-web-icons.mjs';
 import { buildDiagrams } from './build-diagrams.mjs';
 import { buildDmgAssets } from './build-dmg-assets.mjs';
+import { buildBundleIcon } from './build-bundle-icon.mjs';
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dir, '../../..');
@@ -61,6 +62,10 @@ async function main() {
   if (target === 'all') {
     console.log('Building macOS icons:');
     buildIcons([], { svgOnly });
+    if (!svgOnly) {
+      console.log('Building bundle/DMG icon:');
+      buildBundleIcon();
+    }
     console.log('Building web favicons:');
     buildWebIcons();
     console.log('Building README diagrams:');
@@ -74,6 +79,16 @@ async function main() {
   } else if (target === 'icons') {
     console.log('Building macOS icons:');
     buildIcons(variantArgs, { svgOnly });
+    // Bundle icon only goes through an SVG→ICNS rasterisation stage, so
+    // it's only meaningful when we're rasterising (i.e. not svg-only) and
+    // the user didn't ask for a specific variant.
+    if (!variantArgs.length && !svgOnly) {
+      console.log('Building bundle/DMG icon:');
+      buildBundleIcon();
+    }
+  } else if (target === 'bundle-icon') {
+    console.log('Building bundle/DMG icon:');
+    buildBundleIcon();
   } else if (target === 'web') {
     console.log('Building web favicons:');
     buildWebIcons();
@@ -92,7 +107,7 @@ async function main() {
     buildIcons([target], { svgOnly });
   } else {
     console.error(`unknown target: ${target}`);
-    console.error('usage: node src/build.mjs [all|icons|web|diagrams|og|dmg-assets|<variant>] [variant...] [--svg-only]');
+    console.error('usage: node src/build.mjs [all|icons|bundle-icon|web|diagrams|og|dmg-assets|<variant>] [variant...] [--svg-only]');
     process.exit(1);
   }
 }

@@ -72,12 +72,17 @@ def _validate_inputs():
     """Fail loudly if any committed input is missing before we start.
 
     We check the bundle (built by build_macos_bundle.py) and the per-locale
-    background + ReadMe assets under assets/dmg/. Single error report
-    listing everything missing beats discovering drift mid-build.
+    background + ReadMe assets under assets/dmg/. Background ships as two
+    reps (1x and @2x) per locale so macOS CI can build a Retina-aware TIFF
+    via `tiffutil -cathidpicheck`.
     """
-    required = [os.path.join(SCRIPT_DIR, "build", "macos", BUNDLE_NAME)]
+    required = [
+        os.path.join(SCRIPT_DIR, "build", "macos", BUNDLE_NAME),
+        os.path.join(SCRIPT_DIR, "assets", "icons", "Kirkouski.icns"),
+    ]
     for lang in LANGUAGES:
         required.append(os.path.join(SCRIPT_DIR, "assets", "dmg", f"background-{lang}.png"))
+        required.append(os.path.join(SCRIPT_DIR, "assets", "dmg", f"background-{lang}@2x.png"))
         required.append(os.path.join(SCRIPT_DIR, "assets", "dmg", f"readme-{lang}.pdf"))
     missing = [p for p in required if not os.path.exists(p)]
     if missing:
@@ -86,11 +91,40 @@ def _validate_inputs():
             print(f"  {p}", file=sys.stderr)
         print(
             "Hint: run `python build.py macos` first to produce the bundle,\n"
-            "and ensure assets/dmg/ contains background-<lang>.png + readme-<lang>.pdf\n"
-            "for each of en/pl/ru.",
+            "and ensure assets/dmg/ contains background-<lang>.png + @2x.png\n"
+            "+ readme-<lang>.pdf for each of en/pl/ru.",
             file=sys.stderr,
         )
         sys.exit(1)
+
+
+def _combine_retina_tiff(lang, out_dir):
+    """Combine 1x + 2x PNGs into a single multi-rep TIFF via macOS tiffutil.
+
+    Finder reads the @1x rep for the window geometry (so the window opens
+    at 600×400 points, not 600×400 pixels at 2x scale) and the @2x rep for
+    sharp rendering on Retina displays. The magic flag is
+    `-cathidpicheck`, which concatenates the inputs and verifies the 2x
+    has exactly twice the pixel dimensions of the 1x.
+
+    Returns the absolute path to the written TIFF.
+    """
+    png1x = os.path.join(SCRIPT_DIR, "assets", "dmg", f"background-{lang}.png")
+    png2x = os.path.join(SCRIPT_DIR, "assets", "dmg", f"background-{lang}@2x.png")
+    tiff = os.path.join(out_dir, f"background-{lang}.tiff")
+    result = subprocess.run(
+        ["tiffutil", "-cathidpicheck", png1x, png2x, "-out", tiff],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        print(f"\nFAILED: tiffutil -cathidpicheck ({lang})", file=sys.stderr)
+        if result.stdout:
+            print(result.stdout[-500:], file=sys.stderr)
+        if result.stderr:
+            print(result.stderr[-500:], file=sys.stderr)
+        sys.exit(result.returncode)
+    return tiff
 
 
 def _stage_payload():
@@ -141,20 +175,19 @@ def _stage_payload():
     return payload_root
 
 
-def _write_settings(payload_root):
+def _write_settings(payload_root, bg_paths):
     """Generate build/dmg/settings.py consumed by dmgbuild on macOS.
+
+    `bg_paths` is a dict with keys 'default', 'pl', 'ru' pointing at the
+    images to reference from the settings file. On macOS these are Retina
+    TIFFs produced by _combine_retina_tiff; on Windows (validation-only)
+    they fall back to the 1x PNGs so the settings file is still writeable.
 
     Paths are emitted with forward slashes so the file runs under macOS even
     when generated on Windows. `symlinks = {}` is deliberate — Gatekeeper
     blocks drops onto alias folders in quarantined DMGs, so the background
     graphic instructs the user to drop the bundle on ~/Library/Keyboard
     Layouts/ instead.
-
-    The settings file also lists the two non-default background PNGs so
-    dmgbuild copies them into `.background/` alongside the one `.DS_Store`
-    references. Finder doesn't pick among them automatically — English is
-    the default display — but all three are present for users who want to
-    inspect or extract them.
     """
     settings_dir = os.path.join(SCRIPT_DIR, "build", "dmg")
     os.makedirs(settings_dir, exist_ok=True)
@@ -162,9 +195,13 @@ def _write_settings(payload_root):
 
     bundle_path = os.path.join(payload_root, BUNDLE_NAME).replace("\\", "/")
     readme_localized_path = os.path.join(payload_root, READMELOCALIZED_DIRNAME).replace("\\", "/")
-    bg_default = os.path.join(SCRIPT_DIR, "assets", "dmg", "background-en.png").replace("\\", "/")
-    bg_pl = os.path.join(SCRIPT_DIR, "assets", "dmg", "background-pl.png").replace("\\", "/")
-    bg_ru = os.path.join(SCRIPT_DIR, "assets", "dmg", "background-ru.png").replace("\\", "/")
+    bg_default = bg_paths["default"].replace("\\", "/")
+    bg_pl = bg_paths["pl"].replace("\\", "/")
+    bg_ru = bg_paths["ru"].replace("\\", "/")
+    bg_ext = os.path.splitext(bg_default)[1].lstrip(".")
+    bg_pl_name = f"background-pl.{bg_ext}"
+    bg_ru_name = f"background-ru.{bg_ext}"
+    volume_icon = os.path.join(SCRIPT_DIR, "assets", "icons", "Kirkouski.icns").replace("\\", "/")
 
     content = f'''# Generated by build_dmg.py — do not edit by hand.
 import os, shutil
@@ -185,16 +222,27 @@ files = [
 # bundle on ~/Library/Keyboard Layouts/ instead of an in-DMG symlink.
 symlinks = {{}}
 
-# English background is the default Finder renders. dmgbuild writes it to
-# `.background/background.png` inside the mounted volume; a post_mount_hook
-# below copies the Polish and Russian variants next to it.
+# English background is the default Finder renders. On macOS this is a
+# multi-rep TIFF (1x + @2x) so Finder reads the @1x rep for the window
+# geometry (600×400 points) and the @2x rep for crisp Retina rendering.
+# On Windows the settings file points at a plain PNG — that branch exists
+# only for validation; CI regenerates the file with the TIFF paths.
+# dmgbuild writes this as `.background/<basename>` inside the mounted
+# volume; a post_mount_hook below copies the Polish and Russian variants
+# into the same folder for completeness.
 background = {bg_default!r}
+
+# Volume icon — shown in Finder sidebar when the DMG is mounted, on the
+# desktop if the user has "Show mounted volumes" enabled, and by macOS's
+# disk image file icon in Finder. Same brand-K icon as the bundle itself
+# so the whole install story is visually consistent.
+icon = {volume_icon!r}
 
 def post_mount_hook(volume_path):
     bg_dir = os.path.join(volume_path, ".background")
     os.makedirs(bg_dir, exist_ok=True)
-    shutil.copy2({bg_pl!r}, os.path.join(bg_dir, "background-pl.png"))
-    shutil.copy2({bg_ru!r}, os.path.join(bg_dir, "background-ru.png"))
+    shutil.copy2({bg_pl!r}, os.path.join(bg_dir, {bg_pl_name!r}))
+    shutil.copy2({bg_ru!r}, os.path.join(bg_dir, {bg_ru_name!r}))
 
 window_rect = ((200, 120), (600, 400))
 icon_size = 96
@@ -286,10 +334,29 @@ def build():
     # Extended attributes from Finder / drag-and-drop otherwise end up baked
     # into the image and trigger Gatekeeper quarantine warnings on download.
     current_platform: str = str(sys.platform)
+    settings_dir = os.path.join(SCRIPT_DIR, "build", "dmg")
+    os.makedirs(settings_dir, exist_ok=True)
     if current_platform == "darwin":
         subprocess.run(["xattr", "-cr", payload_root], check=False)
+        # Build the multi-rep TIFFs (1x + @2x per locale) so Finder opens
+        # the window at 600×400 points while rendering sharply on Retina.
+        bg_paths = {
+            "default": _combine_retina_tiff("en", settings_dir),
+            "pl":      _combine_retina_tiff("pl", settings_dir),
+            "ru":      _combine_retina_tiff("ru", settings_dir),
+        }
+    else:
+        # Windows validation-only build: reference the 1x PNGs so the
+        # settings file is still well-formed. CI rewrites this file with
+        # the TIFF paths when the real build runs on macos-latest.
+        assets = os.path.join(SCRIPT_DIR, "assets", "dmg")
+        bg_paths = {
+            "default": os.path.join(assets, "background-en.png"),
+            "pl":      os.path.join(assets, "background-pl.png"),
+            "ru":      os.path.join(assets, "background-ru.png"),
+        }
 
-    settings_path = _write_settings(payload_root)
+    settings_path = _write_settings(payload_root, bg_paths)
     print(f"  payload:  {payload_root}")
     print(f"  settings: {settings_path}")
 

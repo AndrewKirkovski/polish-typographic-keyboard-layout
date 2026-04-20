@@ -11,6 +11,7 @@
     "build:diagrams": "node src/build.mjs diagrams",
     "build:og": "node src/build.mjs og",
     "build:dmg-assets": "node src/build.mjs dmg-assets",
+    "build:bundle-icon": "node src/build.mjs bundle-icon",
     "build:svg": "node src/build.mjs icons --svg-only"
   },
   "devDependencies": {

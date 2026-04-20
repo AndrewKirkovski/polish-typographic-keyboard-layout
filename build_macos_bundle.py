@@ -132,6 +132,13 @@ def build_info_plist(version):
         f"\t<string>{xml_escape(BUNDLE_NAME)}</string>",
         "\t<key>CFBundleVersion</key>",
         f"\t<string>{xml_escape(version)}</string>",
+        # Tells Finder which .icns to use as the bundle's own icon (the
+        # one shown for the folder/package in the DMG Finder window and
+        # in ~/Library/Keyboard Layouts/). Resources/Kirkouski.icns is
+        # the shared brand-K icon; filename without extension per
+        # Apple's convention.
+        "\t<key>CFBundleIconFile</key>",
+        "\t<string>Kirkouski</string>",
     ]
     for layout in LAYOUTS:
         lines += [
@@ -244,6 +251,18 @@ def build_bundle():
         os.makedirs(lproj_dir, exist_ok=True)
         with open(os.path.join(lproj_dir, "InfoPlist.strings"), "wb") as f:
             f.write(build_infoplist_strings(lang))
+
+    # Bundle icon — the brand "K" shown for the bundle folder itself in
+    # Finder (the DMG window, ~/Library/Keyboard Layouts/, etc.). Filename
+    # must match CFBundleIconFile in Info.plist (without extension).
+    bundle_icon_src = os.path.join(SCRIPT_DIR, "assets", "icons", "Kirkouski.icns")
+    if not os.path.isfile(bundle_icon_src):
+        print(
+            f"ERROR: missing {bundle_icon_src} — run `cd scripts/assets && pnpm build:bundle-icon`",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    shutil.copy2(bundle_icon_src, os.path.join(resources, "Kirkouski.icns"))
 
     # Per-layout files. Filenames in Resources/ MUST match the KLInfo_<...>
     # keys in Info.plist exactly, otherwise macOS won't pair them.
