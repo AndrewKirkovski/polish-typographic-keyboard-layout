@@ -107,7 +107,8 @@
     "pdfPolishColor": "Polski (kolor)",
     "pdfPolishBw": "Polski (B/W)",
     "pdfRussianColor": "Rosyjski (kolor)",
-    "pdfRussianBw": "Rosyjski (B/W)"
+    "pdfRussianBw": "Rosyjski (B/W)",
+    "alsoAvailable": "Dostępne również"
   },
   "install": {
     "title": "Instalacja",
@@ -132,12 +133,12 @@
     },
     "macos": {
       "tab": "macOS",
-      "subtab_pkg": "Instalator",
+      "subtab_dmg": "Obraz dysku",
       "subtab_zip": "ZIP",
-      "pkg": {
-        "step1": "Pobierz i uruchom instalator .pkg — automatycznie skopiuje bundle klawiatury we właściwe miejsce",
-        "step2": "Wyloguj się i zaloguj ponownie (pełne wylogowanie, nie tylko ekran blokady)",
-        "step3": "Otwórz Ustawienia systemowe > Klawiatura > Źródła wprowadzania > + i dodaj układy Kirkouski Typographic"
+      "dmg": {
+        "step1": "Kliknij dwukrotnie pobrany plik .dmg — otworzy się okno Findera z bundle'em Kirkouski Typographic i plikiem ReadMe PDF",
+        "step2": "W Finderze naciśnij ⇧⌘G, wklej ~/Library/Keyboard Layouts/ i przeciągnij bundle do tego folderu (dokładną ścieżkę pokazuje obraz tła)",
+        "step3": "Wyloguj się i zaloguj ponownie, a następnie otwórz Ustawienia systemowe > Klawiatura > Źródła wprowadzania > + > Polski (lub Rosyjski) > Kirkouski Typographic > Dodaj"
       },
       "zip": {
         "step1": "Pobierz .zip, rozpakuj i przenieś Kirkouski Typographic.bundle do {userPath} (bieżący użytkownik) lub {systemPath} (wszyscy użytkownicy)",

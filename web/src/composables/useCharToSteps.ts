@@ -229,14 +229,6 @@ function resolveDeadKeySequence(
   ]
 }
 
-/**
- * Back-compat wrapper: accepts a single character. Prefer resolveCluster
- * or resolvePhrase in new code.
- */
-export function resolveChar(layout: LayoutData, ch: string): Step[] | null {
-  return resolveCluster(layout, ch)
-}
-
 // Module-private segmenter cache. `Intl.Segmenter` is ~0.5ms to
 // instantiate on first use; reuse one per resolver call is fine.
 let segmenter: Intl.Segmenter | null = null
@@ -301,6 +293,3 @@ export function resolvePhrase(layout: LayoutData, phrase: string): Step[] {
   return steps
 }
 
-// Exposed for the .local/ smoke test so it can reuse the same shape
-// without re-implementing the reverse-map logic in JS.
-export const __internal = { buildCharMap, COMBINING_MARK_TO_STATE, LAYER_ORDER }

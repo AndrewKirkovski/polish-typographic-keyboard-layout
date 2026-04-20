@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { detectOS } from '../composables/useOS'
 import { trackDownload } from '../composables/useAnalytics'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const VERSION = __APP_VERSION__
 const RELEASE_TAG = `v${VERSION}`
@@ -15,11 +15,34 @@ const detectedOS = detectOS()
 const isMobile = typeof navigator !== 'undefined'
   && /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
 
+// The macOS build produces three per-locale DMGs. Pick the DMG matching
+// the current UI locale as the primary download; expose the other two as
+// "also available" links so users who speak a non-UI language can still
+// grab their localized installer. The ZIP remains a platform-agnostic
+// fallback for unusual setups.
+type DmgLang = 'en' | 'pl' | 'ru'
+const DMG_LANGS: readonly DmgLang[] = ['en', 'pl', 'ru'] as const
+const DMG_LABELS: Record<DmgLang, string> = {
+  en: 'English',
+  pl: 'Polski',
+  ru: 'Русский',
+}
+
+function dmgFile(lang: DmgLang): string {
+  return `kirkouski-typographic-v${VERSION}-macos-${lang}.dmg`
+}
+
 const platforms = computed(() => {
   const winInstaller = `kirkouski-typographic-v${VERSION}-windows-setup.exe`
   const winZip = `kirkouski-typographic-v${VERSION}-windows.zip`
-  const macPkg = `kirkouski-typographic-v${VERSION}-macos.pkg`
   const macZip = `kirkouski-typographic-v${VERSION}-macos.zip`
+
+  const uiLang = (locale.value as string).slice(0, 2) as DmgLang
+  const primaryLang: DmgLang = DMG_LANGS.includes(uiLang) ? uiLang : 'en'
+  const otherLangs = DMG_LANGS.filter(l => l !== primaryLang)
+
+  const primaryDmg = dmgFile(primaryLang)
+
   const win = {
     id: 'windows',
     name: t('download.windows'),
@@ -27,15 +50,31 @@ const platforms = computed(() => {
       { label: t('download.installer'), file: winInstaller, url: `${RELEASE_DL}/${winInstaller}` },
       { label: 'ZIP', file: winZip, url: `${RELEASE_DL}/${winZip}` },
     ],
+    extras: [],
     primary: !isMobile && detectedOS === 'windows',
   }
   const mac = {
     id: 'macos',
     name: t('download.macos'),
     files: [
-      { label: t('download.installer'), file: macPkg, url: `${RELEASE_DL}/${macPkg}` },
+      {
+        label: `${t('download.installer')} (${DMG_LABELS[primaryLang]})`,
+        file: primaryDmg,
+        url: `${RELEASE_DL}/${primaryDmg}`,
+        sha256Url: `${RELEASE_DL}/${primaryDmg}.sha256`,
+      },
       { label: 'ZIP', file: macZip, url: `${RELEASE_DL}/${macZip}` },
     ],
+    extras: otherLangs.map(l => {
+      const f = dmgFile(l)
+      return {
+        lang: l,
+        label: DMG_LABELS[l],
+        file: f,
+        url: `${RELEASE_DL}/${f}`,
+        sha256Url: `${RELEASE_DL}/${f}.sha256`,
+      }
+    }),
     primary: !isMobile && detectedOS === 'macos',
   }
   return detectedOS === 'windows' ? [win, mac] : [mac, win]
@@ -87,8 +126,36 @@ const pdfFiles = computed(() => [
                 <span class="file-name">{{ file.file }}</span>
                 <span class="file-label">{{ file.label }}</span>
               </a>
+              <a
+                v-if="'sha256Url' in file && file.sha256Url"
+                class="sha256-link"
+                :href="file.sha256Url"
+                target="_blank"
+                rel="noopener noreferrer nofollow"
+                :aria-label="`${file.file}.sha256`"
+              >.sha256</a>
             </li>
           </ul>
+          <div v-if="platform.extras && platform.extras.length" class="download-card__extras">
+            <span class="extras-label">{{ t('download.alsoAvailable') }}</span>
+            <ul class="extras-list">
+              <li v-for="extra in platform.extras" :key="extra.file">
+                <a
+                  :href="extra.url"
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  @click="trackDownload(platform.id as 'windows' | 'macos', extra.file)"
+                >{{ extra.label }} DMG</a>
+                <a
+                  class="sha256-link"
+                  :href="extra.sha256Url"
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  :aria-label="`${extra.file}.sha256`"
+                >.sha256</a>
+              </li>
+            </ul>
+          </div>
         </div>
 
         <div class="download-card download-card--full">
@@ -196,6 +263,12 @@ const pdfFiles = computed(() => [
   margin-top: 0.75rem;
 }
 
+.download-card__files li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .download-card__files a {
   display: flex;
   align-items: center;
@@ -207,11 +280,70 @@ const pdfFiles = computed(() => [
   text-decoration: none;
   transition: background 0.15s;
   overflow: hidden;
+  flex: 1;
+  min-width: 0;
 }
 
 .download-card__files a:hover {
   background: var(--bg);
   opacity: 1;
+}
+
+.sha256-link {
+  flex: 0 0 auto !important;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 0.4rem 0.5rem !important;
+  color: var(--text-muted) !important;
+  background: transparent !important;
+  display: inline-block !important;
+}
+
+.sha256-link:hover {
+  color: var(--text) !important;
+  background: var(--bg-subtle) !important;
+}
+
+.download-card__extras {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--border);
+}
+
+.extras-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.extras-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+}
+
+.extras-list li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.extras-list a {
+  font-size: 0.85rem;
+  color: var(--color-altgr);
+  text-decoration: none;
+}
+
+.extras-list a:hover {
+  text-decoration: underline;
+}
+
+.extras-list .sha256-link {
+  padding: 0 0.25rem !important;
 }
 
 .download-card__files svg {

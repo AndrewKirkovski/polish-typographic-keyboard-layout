@@ -5,8 +5,8 @@ import { detectOS } from '../composables/useOS'
 
 const { t } = useI18n()
 
-type InstallTab = 'win-exe' | 'win-zip' | 'mac-pkg' | 'mac-zip'
-const activeTab = ref<InstallTab>(detectOS() === 'macos' ? 'mac-pkg' : 'win-exe')
+type InstallTab = 'win-exe' | 'win-zip' | 'mac-dmg' | 'mac-zip'
+const activeTab = ref<InstallTab>(detectOS() === 'macos' ? 'mac-dmg' : 'win-exe')
 </script>
 
 <template>
@@ -19,7 +19,7 @@ const activeTab = ref<InstallTab>(detectOS() === 'macos' ? 'mac-pkg' : 'win-exe'
           v-for="tab in ([
             { id: 'win-exe', label: `${t('install.windows.tab')} · ${t('install.windows.subtab_exe')}` },
             { id: 'win-zip', label: `${t('install.windows.tab')} · ${t('install.windows.subtab_zip')}` },
-            { id: 'mac-pkg', label: `${t('install.macos.tab')} · ${t('install.macos.subtab_pkg')}` },
+            { id: 'mac-dmg', label: `${t('install.macos.tab')} · ${t('install.macos.subtab_dmg')}` },
             { id: 'mac-zip', label: `${t('install.macos.tab')} · ${t('install.macos.subtab_zip')}` },
           ] as const)"
           :key="tab.id"
@@ -75,19 +75,19 @@ const activeTab = ref<InstallTab>(detectOS() === 'macos' ? 'mac-pkg' : 'win-exe'
         </p>
       </div>
 
-      <!-- ── macOS PKG ─────────────────────────────────────────────── -->
-      <div v-if="activeTab === 'mac-pkg'" id="panel-mac-pkg" role="tabpanel" aria-labelledby="tab-mac-pkg" class="install-steps">
+      <!-- ── macOS DMG ─────────────────────────────────────────────── -->
+      <div v-if="activeTab === 'mac-dmg'" id="panel-mac-dmg" role="tabpanel" aria-labelledby="tab-mac-dmg" class="install-steps">
         <div class="step">
           <span class="step-num">1</span>
-          <p>{{ t('install.macos.pkg.step1') }}</p>
+          <p>{{ t('install.macos.dmg.step1') }}</p>
         </div>
         <div class="step">
           <span class="step-num">2</span>
-          <p>{{ t('install.macos.pkg.step2') }}</p>
+          <p>{{ t('install.macos.dmg.step2') }}</p>
         </div>
         <div class="step">
           <span class="step-num">3</span>
-          <p>{{ t('install.macos.pkg.step3') }}</p>
+          <p>{{ t('install.macos.dmg.step3') }}</p>
         </div>
       </div>
 

@@ -5,14 +5,12 @@ import { fileURLToPath } from 'node:url';
 import { extractGlyph } from './extract-glyph.mjs';
 
 const __dir = dirname(fileURLToPath(import.meta.url));
-const FONT = resolve(__dir, '../fonts/DMSerifDisplay-Italic.ttf');
+const FONT = resolve(__dir, '../fonts/DMSans-Regular.ttf');
 
 const SIZE = 1024;
 const RADIUS = 192;
 const LETTER_EM = 600;
-const LETTER_BASELINE_NUDGE = 20;
 const LETTER_GAP = 20;
-const ITALIC_SHIFT = -16;
 
 /**
  * @param {{ gradient: [string,string], letter: string }} variant
@@ -37,8 +35,8 @@ export function buildIconSvg(variant) {
   }
   const glyphH = maxBottom - maxTop;
 
-  const startX = (SIZE - totalW) / 2 + ITALIC_SHIFT;
-  const ty = +((SIZE - glyphH) / 2 - maxTop + LETTER_BASELINE_NUDGE).toFixed(3);
+  const startX = (SIZE - totalW) / 2;
+  const ty = +((SIZE - glyphH) / 2 - maxTop).toFixed(3);
 
   let paths = '';
   let curX = startX;

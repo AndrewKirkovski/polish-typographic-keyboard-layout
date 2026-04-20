@@ -16,6 +16,7 @@ import { packIcns } from './pack-icns.mjs';
 import { buildOgImage, buildFontsOgImage } from './build-og.mjs';
 import { buildWebIcons } from './build-web-icons.mjs';
 import { buildDiagrams } from './build-diagrams.mjs';
+import { buildDmgAssets } from './build-dmg-assets.mjs';
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dir, '../../..');
@@ -68,6 +69,8 @@ async function main() {
     await buildOgImage();
     console.log('Building fonts OG image:');
     await buildFontsOgImage();
+    console.log('Building DMG assets:');
+    await buildDmgAssets();
   } else if (target === 'icons') {
     console.log('Building macOS icons:');
     buildIcons(variantArgs, { svgOnly });
@@ -80,13 +83,16 @@ async function main() {
   } else if (target === 'og') {
     console.log('Building OG image:');
     await buildOgImage();
+  } else if (target === 'dmg-assets') {
+    console.log('Building DMG assets:');
+    await buildDmgAssets();
   } else if (Object.prototype.hasOwnProperty.call(VARIANTS, target)) {
     // shorthand: `node src/build.mjs polish`
     console.log('Building icons:');
     buildIcons([target], { svgOnly });
   } else {
     console.error(`unknown target: ${target}`);
-    console.error('usage: node src/build.mjs [all|icons|web|diagrams|og|<variant>] [variant...] [--svg-only]');
+    console.error('usage: node src/build.mjs [all|icons|web|diagrams|og|dmg-assets|<variant>] [variant...] [--svg-only]');
     process.exit(1);
   }
 }

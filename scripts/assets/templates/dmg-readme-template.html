@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* Fonts inlined as base64 data URIs by build-dmg-assets.mjs at render
+     time so the generated PDF is hermetic — no network, no system-font
+     drift, identical bytes in CI and local. Noto Sans is included as a
+     Cyrillic-safe fallback for RU body copy. */
+  @font-face {
+    font-family: 'DM Serif Display';
+    font-style: normal;
+    font-weight: 400;
+    src: url(__DM_SERIF_DISPLAY_REGULAR__) format('truetype');
+  }
+  @font-face {
+    font-family: 'DM Sans';
+    font-style: normal;
+    font-weight: 400;
+    src: url(__DM_SANS_REGULAR__) format('truetype');
+  }
+  @font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 400;
+    src: url(__JETBRAINS_MONO_REGULAR__) format('truetype');
+  }
+  @font-face {
+    font-family: 'Noto Sans';
+    font-style: normal;
+    font-weight: 400;
+    src: url(__NOTO_SANS_REGULAR__) format('truetype');
+  }
+
+  @page {
+    size: A5 portrait;
+    margin: 0;
+  }
+
+  html, body {
+    width: 148mm;
+    min-height: 210mm;
+  }
+
+  body {
+    background: #faf9f6;
+    color: #1a1816;
+    font-family: 'DM Sans', 'Noto Sans', sans-serif;
+    font-size: 11pt;
+    line-height: 1.5;
+    padding: 18mm 16mm 16mm 16mm;
+    position: relative;
+  }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8pt;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #c4362c;
+    margin-bottom: 6mm;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', 'Noto Sans', Georgia, serif;
+    font-weight: 400;
+    font-size: 24pt;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: #1a1816;
+    margin-bottom: 4mm;
+  }
+
+  .rule {
+    width: 100%;
+    height: 1px;
+    background: #6b6560;
+    opacity: 0.3;
+    margin: 5mm 0 7mm 0;
+  }
+
+  section {
+    margin-bottom: 6mm;
+  }
+
+  section h2 {
+    font-family: 'DM Serif Display', 'Noto Sans', Georgia, serif;
+    font-weight: 400;
+    font-size: 14pt;
+    line-height: 1.2;
+    color: #1a1816;
+    margin-bottom: 2mm;
+  }
+
+  section p {
+    font-family: 'DM Sans', 'Noto Sans', sans-serif;
+    font-size: 11pt;
+    line-height: 1.55;
+    color: #1a1816;
+  }
+
+  .footer {
+    position: absolute;
+    left: 16mm;
+    right: 16mm;
+    bottom: 10mm;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9pt;
+    color: #6b6560;
+  }
+</style>
+</head>
+<body>
+  <div class="eyebrow">Kirkouski Typographic</div>
+  <h1>__TITLE__</h1>
+  <div class="rule"></div>
+
+  <section>
+    <h2>__SECTION_INSTALL_TITLE__</h2>
+    <p>__SECTION_INSTALL_BODY__</p>
+  </section>
+
+  <section>
+    <h2>__SECTION_ENABLE_TITLE__</h2>
+    <p>__SECTION_ENABLE_BODY__</p>
+  </section>
+
+  <section>
+    <h2>__SECTION_UNINSTALL_TITLE__</h2>
+    <p>__SECTION_UNINSTALL_BODY__</p>
+  </section>
+
+  <div class="footer">
+    <span>polish-typographic.com</span>
+    <span>v__VERSION__</span>
+  </div>
+</body>
+</html>

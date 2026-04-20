@@ -5,10 +5,19 @@ Unified entry point for building all platform outputs.
 Usage:
     python build.py                     # build everything
     python build.py windows             # Windows DLLs only
-    python build.py macos               # macOS keylayouts only
+    python build.py macos               # macOS keylayouts + bundle + DMGs
     python build.py klc                 # Windows KLC files only (for MSKLC fallback)
+    python build.py dmg                 # stage DMG payloads only (no platform rebuild)
     python build.py windows polish      # specific platform + layout
     python build.py macos russian       # specific platform + layout
+
+Notes on DMG: replaces the previous .pkg (which targeted system scope with
+admin). The DMG targets user scope (~/Library/Keyboard Layouts/), so no
+admin prompt — per-language DMGs (en/pl/ru) with localized background + ReadMe.
+
+When no platform args are given, windows + macos + klc + dmg (macOS staging)
+all run. DMG assembly itself requires macOS; on Windows the dmg step only
+stages inputs.
 """
 import subprocess
 import sys
@@ -136,58 +145,6 @@ def build_inno():
         sys.exit(result.returncode)
 
 
-def build_pkg():
-    """Build macOS .pkg installer (macOS only).
-
-    Wraps the .bundle (not loose .keylayout files) so PackageKit installs
-    a complete bundle with icons + Info.plist into ~/Library/Keyboard Layouts/.
-    `pkgbuild` is a macOS-only tool — silently skip on other platforms.
-    """
-    # Indirect through `str()` so static analysers don't narrow sys.platform
-    # to the host literal and mark the macOS body as unreachable.
-    current_platform: str = str(sys.platform)
-    if current_platform != "darwin":
-        print("SKIP: .pkg can only be built on macOS")
-        return
-    _build_pkg_darwin()
-
-
-def _build_pkg_darwin():
-    dist_dir = os.path.join(SCRIPT_DIR, "dist")
-    pkg_out = os.path.join(dist_dir, f"kirkouski-typographic-v{VERSION}-macos.pkg")
-    bundle_src = os.path.join(SCRIPT_DIR, "build", "macos", "Kirkouski Typographic.bundle")
-    if not os.path.isdir(bundle_src):
-        print(f"SKIP: bundle not built — run `python build.py macos` first ({bundle_src})")
-        return
-
-    # Stage payload: /Library/Keyboard Layouts/Kirkouski Typographic.bundle
-    payload_root = os.path.join(SCRIPT_DIR, "build", "pkg-payload")
-    payload_target = os.path.join(payload_root, "Library", "Keyboard Layouts", "Kirkouski Typographic.bundle")
-    if os.path.isdir(payload_root):
-        shutil.rmtree(payload_root)
-    os.makedirs(os.path.dirname(payload_target), exist_ok=True)
-    shutil.copytree(bundle_src, payload_target)
-
-    print(f"\n{'='*60}")
-    print("  Building macOS .pkg installer")
-    print(f"{'='*60}\n")
-
-    result = subprocess.run([
-        "pkgbuild",
-        "--root", payload_root,
-        "--identifier", "com.kirkouski.keyboardlayout.typographic",
-        "--version", VERSION,
-        "--install-location", "/",
-        pkg_out,
-    ])
-    if result.returncode != 0:
-        print("\nFAILED: pkgbuild")
-        sys.exit(result.returncode)
-    print(f"  -> {pkg_out}")
-
-    shutil.rmtree(payload_root, ignore_errors=True)
-
-
 def build_zips():
     """Create distribution zip files."""
     dist_dir = os.path.join(SCRIPT_DIR, "dist")
@@ -219,13 +176,16 @@ def main():
             platforms.append("klc")
         elif arg == "assets":
             platforms.append("assets")
+        elif arg == "dmg":
+            platforms.append("dmg")
         elif arg in ("polish", "russian", "us"):
             layouts.append(arg)
         else:
             print(f"Unknown argument: {arg}")
-            print("Usage: python build.py [windows|macos|klc|assets] [polish|russian|us]")
+            print("Usage: python build.py [windows|macos|klc|assets|dmg] [polish|russian|us]")
             print("")
-            print("Builds DLLs, keylayouts + .bundle, Inno Setup installer, .pkg (macOS only), and zip archives.")
+            print("Builds DLLs, keylayouts + .bundle, Inno Setup installer, macOS DMGs (EN/PL/RU), and zip archives.")
+            print("`dmg` alone stages per-language DMG payloads without rebuilding other platforms (useful on Windows).")
             print("`assets` (re)generates icons, favicons, and OG image via the scripts/assets pipeline.")
             print("Prerequisites: Python 3.10+, MSVC Build Tools (windows), Inno Setup 6 (windows installer), pnpm (assets)")
             sys.exit(1)
@@ -242,6 +202,8 @@ def main():
             build_klc(layouts)
         elif platform == "assets":
             build_assets()
+        elif platform == "dmg":
+            pass  # handled by the post-loop build_dmg hook
 
     # Organize dist with nice filenames
     dist_dir = os.path.join(SCRIPT_DIR, "dist")
@@ -250,8 +212,10 @@ def main():
     # Build installers and zips
     if "windows" in platforms:
         build_inno()
-    if "macos" in platforms:
-        build_pkg()
+    if "macos" in platforms or "dmg" in platforms:
+        # DMG assembly only runs on macOS; on Windows this stages payloads and
+        # writes settings files so the CI build is reproducible.
+        run(["build_dmg.py"], "Building macOS DMGs (EN/PL/RU)")
     build_zips()
 
     # Summary
@@ -302,7 +266,9 @@ def organize_dist(dist_dir, platforms):
             if os.path.isfile(src):
                 shutil.move(src, os.path.join(mac_dir, f"{nice}-v{VERSION}.keylayout"))
         # The .bundle is the primary install artifact — copy (not move) so
-        # build/ keeps a clean source for the .pkg builder.
+        # build/macos/ stays intact as the canonical staging location for
+        # build_dmg.py's _stage_payload(), which copies the bundle into
+        # build/dmg/<lang>/payload/ for dmgbuild.
         bundle_src = os.path.join(SCRIPT_DIR, "build", "macos", "Kirkouski Typographic.bundle")
         if os.path.isdir(bundle_src):
             bundle_dst = os.path.join(mac_dir, "Kirkouski Typographic.bundle")

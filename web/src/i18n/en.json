@@ -107,7 +107,8 @@
     "pdfPolishColor": "Polish (color)",
     "pdfPolishBw": "Polish (B/W)",
     "pdfRussianColor": "Russian (color)",
-    "pdfRussianBw": "Russian (B/W)"
+    "pdfRussianBw": "Russian (B/W)",
+    "alsoAvailable": "Also available"
   },
   "install": {
     "title": "Installation",
@@ -132,12 +133,12 @@
     },
     "macos": {
       "tab": "macOS",
-      "subtab_pkg": "Installer",
+      "subtab_dmg": "Disk image",
       "subtab_zip": "ZIP",
-      "pkg": {
-        "step1": "Download and run the .pkg installer — it copies the keyboard bundle to the correct location automatically",
-        "step2": "Log out and log back in (a full logout, not just the lock screen)",
-        "step3": "Open System Settings > Keyboard > Input Sources > + and add the Polish/Russian Kirkouski Typographic layouts"
+      "dmg": {
+        "step1": "Double-click the downloaded .dmg — a Finder window opens with the Kirkouski Typographic bundle and a ReadMe PDF",
+        "step2": "In Finder press ⇧⌘G, paste ~/Library/Keyboard Layouts/, and drag the bundle into that folder (the background image shows the exact path)",
+        "step3": "Log out and back in, then open System Settings > Keyboard > Input Sources > + > Polish (or Russian) > Kirkouski Typographic > Add"
       },
       "zip": {
         "step1": "Download the .zip, unzip, and move Kirkouski Typographic.bundle to {userPath} (current user) or {systemPath} (all users)",

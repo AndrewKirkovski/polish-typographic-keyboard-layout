@@ -1,5 +1,5 @@
 {
-  "name": "Russian Typographic by Kirkouski v0.7",
+  "name": "Russian Typographic by Kirkouski v0.8",
   "layers": {
     "altgr": {
       "`": {
@@ -192,9 +192,9 @@
         "source": "BI"
       },
       "B": {
-        "char": "ß",
-        "name": "LATIN SMALL LETTER SHARP S",
-        "source": "BI"
+        "char": "і",
+        "name": "CYRILLIC SMALL LETTER BYELORUSSIAN-UKRAINIAN I",
+        "source": "RU"
       },
       "N": null,
       "M": {
@@ -405,9 +405,9 @@
         "source": "BI"
       },
       "B": {
-        "char": "ẞ",
-        "name": "LATIN CAPITAL LETTER SHARP S",
-        "source": "BI"
+        "char": "І",
+        "name": "CYRILLIC CAPITAL LETTER BYELORUSSIAN-UKRAINIAN I",
+        "source": "RU"
       },
       "N": null,
       "M": {

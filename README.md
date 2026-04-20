@@ -126,7 +126,7 @@ The `assets` target shells out to `pnpm --dir scripts/assets build`. Outputs (ic
 
 ![Windows pipeline](assets/diagrams/pipeline-windows.svg)
 
-**macOS** — Layout JSON + committed `.icns` icons → `.keylayout` → `.bundle` → `.pkg` (macOS-only) + ZIP:
+**macOS** — Layout JSON + committed `.icns` icons → `.keylayout` → `.bundle` → per-language `.dmg` (EN/PL/RU, macOS-only) + ZIP:
 
 ![macOS pipeline](assets/diagrams/pipeline-macos.svg)
 
@@ -143,7 +143,10 @@ The `assets` target shells out to `pnpm --dir scripts/assets build`. Outputs (ic
 | `kirkouski-typographic-vX.Y-windows-setup.exe` | Inno Setup installer (Add/Remove Programs, UAC) |
 | `kirkouski-typographic-vX.Y-windows.zip` | DLLs + install.ps1 for manual install |
 | `kirkouski-typographic-vX.Y-macos.zip` | `.bundle` (primary) + loose `.keylayout` files (fallback) |
-| `kirkouski-typographic-vX.Y-macos.pkg` | macOS installer (built on macOS only) |
+| `kirkouski-typographic-vX.Y-macos-en.dmg` | macOS disk image, English ReadMe + background (built on macOS only) |
+| `kirkouski-typographic-vX.Y-macos-pl.dmg` | macOS disk image, Polish ReadMe + background (built on macOS only) |
+| `kirkouski-typographic-vX.Y-macos-ru.dmg` | macOS disk image, Russian ReadMe + background (built on macOS only) |
+| `kirkouski-typographic-vX.Y-macos-<lang>.dmg.sha256` | SHA-256 sidecar for each DMG |
 | `windows-vX.Y/` | Loose Windows files |
 | `macos-vX.Y/Kirkouski Typographic.bundle/` | macOS bundle — primary install artifact |
 | `macos-vX.Y/*.keylayout` | Loose macOS keylayout files (fallback) |

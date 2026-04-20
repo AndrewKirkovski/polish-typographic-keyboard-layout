@@ -16,8 +16,8 @@ import './style.css'
 
 function detectLocale(): string {
   const path = window.location.pathname
-  if (path.startsWith('/pl')) return 'pl'
-  if (path.startsWith('/ru')) return 'ru'
+  if (path === '/pl' || path.startsWith('/pl/')) return 'pl'
+  if (path === '/ru' || path.startsWith('/ru/')) return 'ru'
   return 'en'
 }
 

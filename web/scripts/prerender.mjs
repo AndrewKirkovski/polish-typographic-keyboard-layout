@@ -214,7 +214,7 @@ async function main() {
         `<meta property="og:locale" content="${locale.ogLocale}"`
       )
       // Per-locale OG image
-      .replace(/og-image\.png/g, `og-image-${locale.code}.png`)
+      .replace(/og-image-en\.png/g, `og-image-${locale.code}.png`)
       // Twitter
       .replace(
         /<meta name="twitter:title" content="[^"]*"/,
@@ -266,7 +266,7 @@ async function main() {
       .replace(/<meta property="og:description" content="[^"]*"/, `<meta property="og:description" content="${fm.description}"`)
       .replace(/<meta property="og:url" content="[^"]*"/, `<meta property="og:url" content="${BASE_URL}${fp.path}"`)
       .replace(/<meta property="og:locale" content="[^"]*"/, `<meta property="og:locale" content="${fp.ogLocale}"`)
-      .replace(/og-image\.png/g, `og-fonts-${fp.code}.png`)
+      .replace(/og-image-en\.png/g, `og-fonts-${fp.code}.png`)
       .replace(/<meta name="twitter:title" content="[^"]*"/, `<meta name="twitter:title" content="${fm.title}"`)
       .replace(/<meta name="twitter:description" content="[^"]*"/, `<meta name="twitter:description" content="${fm.description}"`)
       .replace(/<link rel="canonical" href="[^"]*"/, `<link rel="canonical" href="${BASE_URL}${fp.path}"`)

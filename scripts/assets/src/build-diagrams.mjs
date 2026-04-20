@@ -113,25 +113,28 @@ const DIAGRAMS = {
     style ZIP ${OUTPUT}
 `,
 
-  // macOS: JSON → keylayout → bundle → pkg/zip
+  // macOS: JSON → keylayout → bundle → per-locale dmg + zip
   'pipeline-macos': `flowchart LR
     JSON("Full layout JSON")
     KL["build_keylayout.py"]
     ICNS("assets/icons/*.icns")
+    DMGBG("assets/dmg/*")
     BUNDLE["build_macos_bundle.py"]
-    PKG([".pkg (macOS only)"])
+    DMG(["DMG × EN/PL/RU (macOS only)"])
     ZIP(["zip"])
 
     JSON --> KL --> BUNDLE
     ICNS --> BUNDLE
-    BUNDLE --> PKG
+    BUNDLE --> DMG
+    DMGBG --> DMG
     BUNDLE --> ZIP
 
     style JSON ${SOURCE}
     style ICNS ${SOURCE}
+    style DMGBG ${SOURCE}
     style KL ${PROCESS}
     style BUNDLE ${PROCESS}
-    style PKG ${OUTPUT}
+    style DMG ${OUTPUT}
     style ZIP ${OUTPUT}
 `,
 

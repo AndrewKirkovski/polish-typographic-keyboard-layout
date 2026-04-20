@@ -82,6 +82,25 @@ LAYOUTS = [
 BUNDLE_NAME = "Kirkouski Typographic"
 BUNDLE_IDENTIFIER = "com.kirkouski.keyboardlayout.typographic"
 
+# Localized display names for the bundle's Resources/<lang>.lproj/InfoPlist.strings.
+# macOS uses these to show the layout name in the user's system language when
+# browsing input sources. Keys are the raw filenames from KEYBOARD_NAMES
+# (English baseline); values are the translated display strings.
+LPROJ_TRANSLATIONS = {
+    "en": {
+        "Polish – Kirkouski Typographic": "Polish – Kirkouski Typographic",
+        "Russian – Kirkouski Typographic": "Russian – Kirkouski Typographic",
+    },
+    "pl": {
+        "Polish – Kirkouski Typographic": "Polski – Kirkouski Typograficzny",
+        "Russian – Kirkouski Typographic": "Rosyjski – Kirkouski Typograficzny",
+    },
+    "ru": {
+        "Polish – Kirkouski Typographic": "Польский – Kirkouski Typographic",
+        "Russian – Kirkouski Typographic": "Русский – Kirkouski Typographic",
+    },
+}
+
 
 def _read_version():
     """Read project version from the repo-root VERSION file (matches the
@@ -149,16 +168,29 @@ def build_version_plist(version):
     )
 
 
-def build_infoplist_strings():
-    """Localized display names. Must be UTF-16 LE with BOM."""
+def build_infoplist_strings(lang: str):
+    """Localized display names for Resources/<lang>.lproj/InfoPlist.strings.
+
+    UTF-16 LE with BOM (mandatory — macOS's plist/.strings loader rejects
+    UTF-8 here, and the BOM tells it which endianness to use).
+
+    The KEY in each line is the raw English filename (what macOS sees on
+    disk); the VALUE is the translated display string for that locale.
+    """
+    translations = LPROJ_TRANSLATIONS[lang]
     lines = []
     for layout in LAYOUTS:
+        src_name = layout["display_name"]
+        dst_name = translations.get(src_name, src_name)
         # Escape backslashes and quotes for the .strings format.
-        name = layout["display_name"].replace("\\", "\\\\").replace('"', '\\"')
-        lines.append(f'"{name}" = "{name}";')
+        src_esc = src_name.replace("\\", "\\\\").replace('"', '\\"')
+        dst_esc = dst_name.replace("\\", "\\\\").replace('"', '\\"')
+        lines.append(f'"{src_esc}" = "{dst_esc}";')
     text = "\n".join(lines) + "\n"
-    # Python's "utf-16" codec writes a BOM, which is what macOS requires.
-    return text.encode("utf-16")
+    # Explicit LE + manual BOM: byte-identical on all hosts (the generic
+    # "utf-16" codec picks host-native endianness, which is LE on every real
+    # current host but not strictly guaranteed).
+    return b"\xff\xfe" + text.encode("utf-16-le")
 
 
 def _validate_layouts() -> None:
@@ -193,12 +225,11 @@ def build_bundle():
     bundle_root = os.path.join(SCRIPT_DIR, "build", "macos", f"{BUNDLE_NAME}.bundle")
     contents = os.path.join(bundle_root, "Contents")
     resources = os.path.join(contents, "Resources")
-    lproj = os.path.join(resources, "en.lproj")
 
     # Clean any prior build to avoid stale files lingering.
     if os.path.isdir(bundle_root):
         shutil.rmtree(bundle_root)
-    os.makedirs(lproj, exist_ok=True)
+    os.makedirs(resources, exist_ok=True)
 
     # Plists.
     with open(os.path.join(contents, "Info.plist"), "w", encoding="utf-8") as f:
@@ -206,9 +237,13 @@ def build_bundle():
     with open(os.path.join(contents, "version.plist"), "w", encoding="utf-8") as f:
         f.write(build_version_plist(version))
 
-    # Localized strings — UTF-16 LE with BOM, mandatory.
-    with open(os.path.join(lproj, "InfoPlist.strings"), "wb") as f:
-        f.write(build_infoplist_strings())
+    # Localized strings — one .lproj per supported UI language. Each
+    # InfoPlist.strings is UTF-16 LE with BOM (mandatory for macOS).
+    for lang in LPROJ_TRANSLATIONS:
+        lproj_dir = os.path.join(resources, f"{lang}.lproj")
+        os.makedirs(lproj_dir, exist_ok=True)
+        with open(os.path.join(lproj_dir, "InfoPlist.strings"), "wb") as f:
+            f.write(build_infoplist_strings(lang))
 
     # Per-layout files. Filenames in Resources/ MUST match the KLInfo_<...>
     # keys in Info.plist exactly, otherwise macOS won't pair them.

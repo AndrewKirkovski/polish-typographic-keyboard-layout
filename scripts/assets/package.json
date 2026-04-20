@@ -10,6 +10,7 @@
     "build:web": "node src/build.mjs web",
     "build:diagrams": "node src/build.mjs diagrams",
     "build:og": "node src/build.mjs og",
+    "build:dmg-assets": "node src/build.mjs dmg-assets",
     "build:svg": "node src/build.mjs icons --svg-only"
   },
   "devDependencies": {

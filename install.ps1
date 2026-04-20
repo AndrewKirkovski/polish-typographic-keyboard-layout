@@ -444,8 +444,14 @@ Write-Host ("[debug] counts      : installed={0} available={1}" -f $installedLay
 $residuals = Find-ResidualTrace
 $installedRegKeys = @($installedLayouts | ForEach-Object { $_.RegKey })
 $staleRegEntries = @($residuals.RegEntries | Where-Object { $_.PSChildName -notin $installedRegKeys })
-$hasTraces = ($installedLayouts.Count -gt 0) -or ($staleRegEntries.Count -gt 0) -or ($residuals.SystemDlls.Count -gt 0)
-Write-Host ("[debug] residuals   : regAll={0} stale={1} system_dlls={2} hasTraces={3}" -f $residuals.RegEntries.Count, $staleRegEntries.Count, $residuals.SystemDlls.Count, $hasTraces)
+# Orphan DLLs = System32/SysWOW64 DLLs NOT backing a currently-installed layout.
+# A DLL backing an installed layout is expected presence, not a residual.
+$installedDllNames = @($installedLayouts | ForEach-Object { $_.Config.DllName })
+$orphanSystemDlls = @($residuals.SystemDlls | Where-Object {
+    (Split-Path $_ -Leaf) -notin $installedDllNames
+})
+$hasTraces = ($installedLayouts.Count -gt 0) -or ($staleRegEntries.Count -gt 0) -or ($orphanSystemDlls.Count -gt 0)
+Write-Host ("[debug] residuals   : regAll={0} stale={1} system_dlls={2} orphan_dlls={3} hasTraces={4}" -f $residuals.RegEntries.Count, $staleRegEntries.Count, $residuals.SystemDlls.Count, $orphanSystemDlls.Count, $hasTraces)
 
 # -- Show status --------------------------------------------------------
 if ($installedLayouts.Count -gt 0) {
@@ -464,15 +470,15 @@ if ($availableLayouts.Count -gt 0) {
     Write-Host ""
 }
 
-if ($staleRegEntries.Count -gt 0 -or $residuals.SystemDlls.Count -gt 0) {
-    Write-Host "  Residual traces detected (not cleanly registered):" -ForegroundColor Yellow
+if ($staleRegEntries.Count -gt 0 -or $orphanSystemDlls.Count -gt 0) {
+    Write-Host "  Detected DLLs / reg entries (not matching any installed layout):" -ForegroundColor Yellow
     foreach ($entry in $staleRegEntries) {
         $lf = (Get-ItemProperty $entry.PSPath -Name "Layout File" -ErrorAction SilentlyContinue)."Layout File"
         $lt = (Get-ItemProperty $entry.PSPath -Name "Layout Text" -ErrorAction SilentlyContinue)."Layout Text"
         Write-Host ("    - stale reg : [{0}] File={1} Text={2}" -f $entry.PSChildName, $lf, $lt) -ForegroundColor Yellow
     }
-    foreach ($dll in $residuals.SystemDlls) {
-        Write-Host "    - leftover DLL : $dll" -ForegroundColor Yellow
+    foreach ($dll in $orphanSystemDlls) {
+        Write-Host "    - orphan DLL : $dll" -ForegroundColor Yellow
     }
     Write-Host ""
 }

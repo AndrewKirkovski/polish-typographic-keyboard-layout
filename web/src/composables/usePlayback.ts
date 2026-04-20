@@ -156,6 +156,10 @@ export function usePlayback(opts: UsePlaybackOptions) {
   const pendingAccent = ref<string>('')
 
   const phraseIdx = ref<number>(0)
+  // Tracks consecutive unreachable phrases. Reset on each successful
+  // play. If it reaches the pool size, every phrase is unreachable
+  // and the player stops instead of looping infinitely.
+  let consecutiveSkips = 0
 
   // Active timer id (number in browser, NodeJS.Timeout in node types).
   // Tracked so stop() can cancel whatever's in flight.
@@ -175,8 +179,13 @@ export function usePlayback(opts: UsePlaybackOptions) {
   }
 
   function writeStoredEnabled(value: boolean): void {
-    if (typeof localStorage === 'undefined') return
-    localStorage.setItem(STORAGE_KEY, value ? '1' : '0')
+    try {
+      localStorage.setItem(STORAGE_KEY, value ? '1' : '0')
+    } catch {
+      // Safari private browsing throws QuotaExceededError on setItem.
+      // Swallow silently — the toggle still works for this session,
+      // it just won't persist across reloads.
+    }
   }
 
   // ── timer helpers ────────────────────────────────────────────────
@@ -465,19 +474,35 @@ export function usePlayback(opts: UsePlaybackOptions) {
       return
     }
 
-    const phrase = opts.phrases.value[phraseIdx.value % opts.phrases.value.length]
+    const poolSize = opts.phrases.value.length
+    const phrase = opts.phrases.value[phraseIdx.value % poolSize]
     const steps = resolvePhrase(layout, phrase)
     if (steps.length === 0) {
-      // Empty or fully-unreachable phrase — skip forward to avoid stalling.
+      // Empty or fully-unreachable phrase — skip forward. Guard against
+      // infinite recursion: if we've cycled through every phrase in the
+      // pool without finding a resolvable one, stop.
+      consecutiveSkips++
+      if (consecutiveSkips >= poolSize) {
+        running.value = false
+        consecutiveSkips = 0
+        return
+      }
       advanceAndContinue()
       return
     }
 
     const micro = expandPhrase(steps)
     if (micro.length === 0) {
+      consecutiveSkips++
+      if (consecutiveSkips >= poolSize) {
+        running.value = false
+        consecutiveSkips = 0
+        return
+      }
       advanceAndContinue()
       return
     }
+    consecutiveSkips = 0
     playMicro(micro, 0)
   }
 

@@ -1,11 +1,11 @@
-; Kirkouski Typographic Keyboard Layout — Inno Setup installer
+﻿; Kirkouski Typographic Keyboard Layout — Inno Setup installer
 ; Handles KLID + Layout Id auto-allocation, locked-DLL replacement via
 ; MoveFileEx, and preload cleanup — all self-contained, no PowerShell.
 ;
 ; Based on installation logic from lelegard/winkbdlayouts (MIT).
 
 #ifndef VERSION
-  #define VERSION "0.7"
+  #define VERSION "0.8"
 #endif
 
 [Setup]
@@ -38,15 +38,51 @@ UninstallDisplayName=Kirkouski Typographic Keyboard Layout
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
+Name: "polish"; MessagesFile: "compiler:Languages\Polish.isl"
+Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
+
+[CustomMessages]
+english.TypeFull=All keyboard layouts
+polish.TypeFull=Wszystkie układy klawiatury
+russian.TypeFull=Все раскладки клавиатуры
+
+english.TypeCustom=Choose layouts
+polish.TypeCustom=Wybierz układy
+russian.TypeCustom=Выбрать раскладки
+
+english.CompPolish=Polish Typographic (AltGr diacritics on Polish Programmers QWERTY)
+polish.CompPolish=Polski Typograficzny (diakrytyki AltGr na Polski Programisty QWERTY)
+russian.CompPolish=Польская типографская (диакритика AltGr на Polish Programmers QWERTY)
+
+english.CompRussian=Russian Typographic (Ukrainian/Belarusian letters + typography on ЙЦУКЕН)
+polish.CompRussian=Rosyjski Typograficzny (litery ukraińskie/białoruskie + typografia na ЙЦУКЕН)
+russian.CompRussian=Русская типографская (украинские/белорусские буквы + типографика на ЙЦУКЕН)
+
+english.CompUs=US+POL Typographic (Polish characters under English US — no extra input language)
+polish.CompUs=US+POL Typograficzny (polskie znaki pod angielskim US — bez dodatkowego języka wejściowego)
+russian.CompUs=US+POL типографская (польские символы под английским US — без дополнительного языка ввода)
+
+english.RebootWarningBody=DO NOT SWITCH to the Kirkouski Typographic layout before rebooting.%n%nWindows Explorer still holds the old keyboard state in memory. Switching now will crash Explorer. Your PC is otherwise safe to keep using until you reboot.
+polish.RebootWarningBody=NIE PRZEŁĄCZAJ się na układ Kirkouski Typographic przed ponownym uruchomieniem.%n%nEksplorator Windows wciąż trzyma starą konfigurację klawiatury w pamięci. Przełączenie teraz spowoduje awarię Eksploratora. Komputer jest bezpieczny w użyciu do czasu restartu.
+russian.RebootWarningBody=НЕ ПЕРЕКЛЮЧАЙТЕСЬ на раскладку Kirkouski Typographic до перезагрузки.%n%nПроводник Windows всё ещё хранит старое состояние клавиатуры в памяти. Переключение сейчас приведёт к сбою Проводника. В остальном компьютер безопасно использовать до перезагрузки.
+
+english.FinishedRestartLabelCustom=Setup has finished installing Kirkouski Typographic.%n%n⚠ DO NOT SWITCH TO THE KIRKOUSKI LAYOUT BEFORE REBOOTING.%nWindows Explorer still holds the old keyboard state in memory — switching to the newly installed layout now will crash Explorer.%n%nReboot when convenient, then add the layout in Settings → Time & Language → Language & Region → Keyboard.
+polish.FinishedRestartLabelCustom=Instalator zakończył instalację Kirkouski Typographic.%n%n⚠ NIE PRZEŁĄCZAJ SIĘ NA UKŁAD KIRKOUSKI PRZED PONOWNYM URUCHOMIENIEM.%nEksplorator Windows wciąż trzyma starą konfigurację klawiatury w pamięci — przełączenie się teraz spowoduje jego awarię.%n%nUruchom ponownie w dogodnym momencie, następnie dodaj układ w Ustawienia → Czas i język → Język i region → Klawiatura.
+russian.FinishedRestartLabelCustom=Установщик завершил установку Kirkouski Typographic.%n%n⚠ НЕ ПЕРЕКЛЮЧАЙТЕСЬ НА РАСКЛАДКУ KIRKOUSKI ДО ПЕРЕЗАГРУЗКИ.%nПроводник Windows всё ещё хранит старое состояние клавиатуры в памяти — переключение на новую раскладку сейчас приведёт к сбою Проводника.%n%nПерезагрузите компьютер в удобное время, затем добавьте раскладку в Параметры → Время и язык → Язык и регион → Клавиатура.
+
+[Messages]
+english.FinishedRestartLabel={cm:FinishedRestartLabelCustom}
+polish.FinishedRestartLabel={cm:FinishedRestartLabelCustom}
+russian.FinishedRestartLabel={cm:FinishedRestartLabelCustom}
 
 [Types]
-Name: "full"; Description: "All keyboard layouts"
-Name: "custom"; Description: "Choose layouts"; Flags: iscustom
+Name: "full"; Description: "{cm:TypeFull}"
+Name: "custom"; Description: "{cm:TypeCustom}"; Flags: iscustom
 
 [Components]
-Name: "polish"; Description: "Polish Typographic (AltGr diacritics on Polish Programmers QWERTY)"; Types: full
-Name: "russian"; Description: "Russian Typographic (Ukrainian/Belarusian letters + typography on ЙЦУКЕН)"; Types: full
-Name: "us"; Description: "US+POL Typographic (Polish characters under English US — no extra input language)"; Types: full
+Name: "polish"; Description: "{cm:CompPolish}"; Types: full
+Name: "russian"; Description: "{cm:CompRussian}"; Types: full
+Name: "us"; Description: "{cm:CompUs}"; Types: full
 
 [Files]
 Source: "dist\windows-v{#VERSION}\pltypo.dll"; DestDir: "{sys}"; Components: polish; \
@@ -78,6 +114,7 @@ var
 
 procedure InitLayouts;
 begin
+  // These LayoutText strings are stored in HKLM registry — keep stable English across all installer languages.
   Layouts[0].DllName := 'pltypo.dll';
   Layouts[0].LayoutText := 'Polish Typographic by Kirkouski';
   Layouts[0].LangId := '0415';
@@ -319,6 +356,8 @@ begin
       if WizardIsComponentSelected(Layouts[I].ComponentName) then
         InstallLayout(I);
     end;
+
+    MsgBox(CustomMessage('RebootWarningBody'), mbCriticalError, MB_OK);
   end;
 end;
 

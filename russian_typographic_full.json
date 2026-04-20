@@ -1,5 +1,5 @@
 {
-  "keyboard_name": "Russian Typographic by Kirkouski v0.7",
+  "keyboard_name": "Russian Typographic by Kirkouski v0.8",
   "keyboard_group": "126",
   "keyboard_id": "-31553",
   "keyboard_maxout": "3",
@@ -1154,7 +1154,7 @@
             "output": "`"
           },
           "11": {
-            "output": "ß"
+            "output": "і"
           },
           "12": {
             "output": "©"
@@ -1470,7 +1470,7 @@
             "action": "±"
           },
           "11": {
-            "output": "ẞ"
+            "output": "І"
           },
           "12": {
             "output": "≈"
@@ -1786,7 +1786,7 @@
             "output": "§"
           },
           "11": {
-            "output": "ı"
+            "output": "І"
           },
           "12": {
             "output": "≈"
