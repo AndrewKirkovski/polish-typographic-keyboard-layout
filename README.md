@@ -2,7 +2,7 @@
 
 > **[Interactive Layout Preview & Downloads](https://polish-typographic.com/)** — explore the layout, download installers, and read installation guides.
 
-> **This project is in active development.** Versions 0.x may contain bugs or breaking changes between releases. If you encounter any issues, please [report them on GitHub Issues](../../issues).
+> **This project is in active development.** If you encounter any issues, please [report them on GitHub Issues](../../issues).
 
 Custom keyboard layouts for **Windows** and **macOS** that add typographic symbols (em dash, curly quotes, copyright, euro, etc.) accessible via AltGr (Right Alt) on top of standard Polish Programmers and Russian ЙЦУКЕН layouts.
 

@@ -9,7 +9,7 @@
     "skipToMain": "Przejdź do treści"
   },
   "banner": {
-    "development": "Projekt jest aktywnie rozwijany. Wersje 0.x mogą być niestabilne.",
+    "development": "Projekt jest aktywnie rozwijany.",
     "issues": "Zgłoś problem na GitHubie"
   },
   "hero": {

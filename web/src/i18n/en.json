@@ -9,7 +9,7 @@
     "skipToMain": "Skip to main content"
   },
   "banner": {
-    "development": "This project is in active development. Versions 0.x may be unstable.",
+    "development": "This project is in active development.",
     "issues": "Report issues on GitHub"
   },
   "hero": {
