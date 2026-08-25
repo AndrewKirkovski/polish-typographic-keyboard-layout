@@ -66,7 +66,7 @@ export function trackPageview(path?: string): void {
 }
 
 export function trackDownload(
-  category: 'windows' | 'macos' | 'pdf' | 'font',
+  category: 'windows' | 'macos' | 'android' | 'pdf' | 'font',
   file: string,
   extra?: EventProps,
 ): void {

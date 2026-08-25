@@ -4,7 +4,7 @@ The full JSON (produced by extract_base.py) uses macOS keycodes and an action
 state machine for dead keys. Windows generators need flat key-ID layers and
 explicit dead key composition tables. This module bridges the gap.
 
-Used by build_kbd_c.py and build_klc.py.
+Used by build_kbd_c.py, build_klc.py and build_futo_yaml.py.
 """
 
 from typing import Any
@@ -135,8 +135,14 @@ def _entry_to_overlay_dict(val: str | dict | None) -> dict[str, str] | None:
         return {"char": val, "name": ""}
 
 
-def extract_layers_from_full_json(data: dict[str, Any]) -> dict[str, Any]:
+def extract_layers_from_full_json(
+    data: dict[str, Any], *, windows_fixups: bool = True
+) -> dict[str, Any]:
     """Convert macOS-centric full JSON to flat layers + dead key tables.
+
+    Set windows_fixups=False for non-Windows consumers (e.g. the Android/FUTO
+    generator), which want macOS' original U+02C6 circumflex terminator rather
+    than the U+005E ASCII caret Windows drivers require.
 
     Returns dict with keys:
     - "base": {key_id: char_str, ...}
@@ -185,7 +191,7 @@ def extract_layers_from_full_json(data: dict[str, Any]) -> dict[str, Any]:
 
     # macOS uses U+02C6 (MODIFIER LETTER CIRCUMFLEX) as the circumflex
     # terminator, but Windows keyboard drivers expect U+005E (ASCII CARET).
-    if "circumflex" in dk_chars and dk_chars["circumflex"] == 0x02C6:
+    if windows_fixups and "circumflex" in dk_chars and dk_chars["circumflex"] == 0x02C6:
         old_cp = 0x02C6
         new_cp = 0x005E
         dk_chars["circumflex"] = new_cp

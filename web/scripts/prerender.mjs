@@ -28,6 +28,27 @@ const FONT_PAGES = [
   { code: 'ru', path: '/ru/fonts/', lang: 'ru', ogLocale: 'ru_RU' },
 ]
 
+const ANDROID_PAGES = [
+  { code: 'en', path: '/android/',    lang: 'en', ogLocale: 'en_US' },
+  { code: 'pl', path: '/pl/android/', lang: 'pl', ogLocale: 'pl_PL' },
+  { code: 'ru', path: '/ru/android/', lang: 'ru', ogLocale: 'ru_RU' },
+]
+
+const ANDROID_META = {
+  en: {
+    title: 'Kirkouski Typographic on Android \u2014 FUTO Keyboard layouts',
+    description: 'Two keyboard layouts for FUTO Keyboard covering five languages: English and Polish on one, Russian, Belarusian and Ukrainian on the other, both with dead-key accents and typographic characters.',
+  },
+  pl: {
+    title: 'Kirkouski Typographic na Androida \u2014 uk\u0142ady FUTO Keyboard',
+    description: 'Dwa uk\u0142ady klawiatury dla FUTO Keyboard obs\u0142uguj\u0105ce pi\u0119\u0107 j\u0119zyk\u00f3w: angielski i polski w jednym, rosyjski, bia\u0142oruski i ukrai\u0144ski w drugim, oba ze znakami diakrytycznymi i typograficznymi.',
+  },
+  ru: {
+    title: 'Kirkouski Typographic \u043d\u0430 Android \u2014 \u0440\u0430\u0441\u043a\u043b\u0430\u0434\u043a\u0438 FUTO Keyboard',
+    description: '\u0414\u0432\u0435 \u0440\u0430\u0441\u043a\u043b\u0430\u0434\u043a\u0438 \u043a\u043b\u0430\u0432\u0438\u0430\u0442\u0443\u0440\u044b \u0434\u043b\u044f FUTO Keyboard \u043d\u0430 \u043f\u044f\u0442\u044c \u044f\u0437\u044b\u043a\u043e\u0432: \u0430\u043d\u0433\u043b\u0438\u0439\u0441\u043a\u0438\u0439 \u0438 \u043f\u043e\u043b\u044c\u0441\u043a\u0438\u0439 \u0432 \u043e\u0434\u043d\u043e\u0439, \u0440\u0443\u0441\u0441\u043a\u0438\u0439, \u0431\u0435\u043b\u043e\u0440\u0443\u0441\u0441\u043a\u0438\u0439 \u0438 \u0443\u043a\u0440\u0430\u0438\u043d\u0441\u043a\u0438\u0439 \u0432 \u0434\u0440\u0443\u0433\u043e\u0439.',
+  },
+}
+
 const FONT_META = {
   en: {
     title: 'Szpargalka Sans — Polish pronunciation fonts with Cyrillic and IPA hints',
@@ -114,7 +135,7 @@ function buildJsonLd(locale, path) {
     description: app.description,
     inLanguage: locale,
     applicationCategory: 'UtilitiesApplication',
-    operatingSystem: 'Windows, macOS',
+    operatingSystem: 'Windows, macOS, Android',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     author: { '@type': 'Person', name: 'Andrew Kirkouski' },
     license: 'https://opensource.org/licenses/MIT',
@@ -286,6 +307,39 @@ async function main() {
     mkdirSync(outDir, { recursive: true })
     writeFileSync(resolve(outDir, 'index.html'), html)
     console.log(`  ${fp.code} -> ${fp.path} (${appHtml.length} chars SSR) [fonts]`)
+  }
+
+  // Generate /android/ pages
+  const ANDROID_HREFLANG = ANDROID_PAGES.map(l =>
+    `<link rel="alternate" hreflang="${l.lang}" href="${BASE_URL}${l.path}" />`
+  ).concat(`<link rel="alternate" hreflang="x-default" href="${BASE_URL}/android/" />`).join('\n    ')
+
+  for (const ap of ANDROID_PAGES) {
+    const am = ANDROID_META[ap.code]
+    const appHtml = await render(ap.code, 'android')
+
+    const html = template
+      .replace('<div id="app"></div>', `<div id="app">${appHtml}</div>`)
+      .replace('<html lang="en">', `<html lang="${ap.lang}">`)
+      .replace(/<title>[^<]*<\/title>/, `<title>${am.title}</title>`)
+      .replace(/<meta name="description" content="[^"]*"/, `<meta name="description" content="${am.description}"`)
+      .replace(/<meta property="og:title" content="[^"]*"/, `<meta property="og:title" content="${am.title}"`)
+      .replace(/<meta property="og:description" content="[^"]*"/, `<meta property="og:description" content="${am.description}"`)
+      .replace(/<meta property="og:url" content="[^"]*"/, `<meta property="og:url" content="${BASE_URL}${ap.path}"`)
+      .replace(/<meta property="og:locale" content="[^"]*"/, `<meta property="og:locale" content="${ap.ogLocale}"`)
+      .replace(/<meta name="twitter:title" content="[^"]*"/, `<meta name="twitter:title" content="${am.title}"`)
+      .replace(/<meta name="twitter:description" content="[^"]*"/, `<meta name="twitter:description" content="${am.description}"`)
+      .replace(/<link rel="canonical" href="[^"]*"/, `<link rel="canonical" href="${BASE_URL}${ap.path}"`)
+      .replace(
+        /<meta name="keywords" content="[^"]*"/,
+        `<meta name="keywords" content="${META[ap.code].keywords}, Android, FUTO Keyboard"`
+      )
+      .replace('</head>', `    ${ANDROID_HREFLANG}\n  </head>`)
+
+    const outDir = ap.code === 'en' ? resolve(DIST, 'android') : resolve(DIST, ap.code, 'android')
+    mkdirSync(outDir, { recursive: true })
+    writeFileSync(resolve(outDir, 'index.html'), html)
+    console.log(`  ${ap.code} -> ${ap.path} (${appHtml.length} chars SSR) [android]`)
   }
 
   await vite.close()

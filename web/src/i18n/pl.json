@@ -3,7 +3,8 @@
     "keyboard": "Klawiatura",
     "download": "Pobierz",
     "about": "O projekcie",
-    "menu": "Menu"
+    "menu": "Menu",
+    "android": "Android"
   },
   "a11y": {
     "skipToMain": "Przejdź do treści"
@@ -67,7 +68,7 @@
           "Україна: ґудзики, їжак, єнот",
           "Беларуская мова: і, ў — вось і ўсё!",
           "© 2026 — все права защищены",
-          "ы\u0308 ы\u030B ь\u030C — фантазия"
+          "ӹ ы̋ ь̌ — фантазия"
         ]
       }
     }
@@ -107,7 +108,9 @@
     "pdfPolishColor": "Polski (kolor)",
     "pdfPolishBw": "Polski (B/W)",
     "pdfRussianColor": "Rosyjski (kolor)",
-    "pdfRussianBw": "Rosyjski (B/W)"
+    "pdfRussianBw": "Rosyjski (B/W)",
+    "android": "Android",
+    "layouts": "Pliki układów"
   },
   "install": {
     "title": "Instalacja",
@@ -241,6 +244,40 @@
       "stylusStep2": "Zainstaluj <code>szpargalka-sans.user.css</code>",
       "stylusStep3": "Stylus otworzy okno importu — kliknij <strong>Zainstaluj styl</strong>. Gotowe. Styl możesz w każdej chwili włączyć lub wyłączyć w popupie Stylusa — po instalacji jest aktywny, więc wyłącz go, jeśli wolisz sięgać po niego tylko od czasu do czasu."
     }
+  },
+  "android": {
+    "title": "Android",
+    "subtitle": "Dwa układy, pięć języków. Angielski i polski w jednym, rosyjski, białoruski i ukraiński w drugim. Oba mają warstwę typograficzną.",
+    "whyTitle": "Dlaczego FUTO Keyboard",
+    "whyText": "Android nie pozwala zainstalować układu klawiatury tak jak Windows czy macOS. FUTO Keyboard to klawiatura open source, której układy są zwykłymi plikami tekstowymi, więc układ da się przenieść bez pisania aplikacji. Działa offline i nie zbiera tego, co piszesz.",
+    "installTitle": "Instalacja",
+    "step1": "Zainstaluj FUTO Keyboard w wersji 0.1.30 lub nowszej.",
+    "step2": "Otwórz Help and Feedback i dotknij kodu wersji około ośmiu razy. W ustawieniach pojawi się Developer Settings.",
+    "step3": "Wejdź w Developer Settings, potem Custom layouts, potem new. Wklej jeden z układów poniżej i zapisz.",
+    "step4": "Przytrzymaj spację, żeby wybrać go z przełącznika układów.",
+    "upstreamNote": "Gdy układy zostaną scalone w repozytorium FUTO, pokażą się w przełączniku od razu, bez wklejania.",
+    "layoutsTitle": "Układy",
+    "latinName": "Polski / English (typograficzna)",
+    "latinDesc": "Angielski i polski w jednym układzie. Polskie znaki diakrytyczne są tam, gdzie ich szukasz — przytrzymaj a dla ą, przytrzymaj z dla ż i ź — a każdy z nich jest wydrukowany na klawiszu, więc nie musisz pamiętać, gdzie jest.",
+    "cyrillicName": "Кириллица (типографская)",
+    "cyrillicDesc": "Rosyjski, białoruski i ukraiński w jednym układzie. Dodatkowe litery są na najbliższej literze podstawowej: przytrzymaj у dla ў, г dla ґ, е dla ё i є, и dla і oraz ї.",
+    "copy": "Kopiuj",
+    "copied": "Skopiowano",
+    "accentsTitle": "Akcenty",
+    "accentsText": "Klawisz strony dodatkowej w dolnym rzędzie otwiera stronę z martwymi klawiszami. Dotknij akcentu, potem litery, i połączą się — ´ a potem o daje ó. Dotknij tego samego klawisza ponownie, żeby wrócić.",
+    "symbolsTitle": "Znaki typograficzne",
+    "symbolsText": "Większość jest już na własnych stronach symboli FUTO, więc układy celowo ich nie ruszają. Przytrzymaj cudzysłów dla „ “ ” « », łącznik dla – — ·, daszek dla strzałek, stopień dla ′ ″. Strona dodatkowa zawiera tylko to, czego nie ma nigdzie indziej, w tym niewidoczne spacje: niełamliwą, wąską niełamliwą, cienką i miękki łącznik.",
+    "localeTitle": "Jaki język ustawić",
+    "localeText": "Układ łaciński jest dostępny i dla polskiego, i dla angielskiego. Wybierz angielski, jeśli piszesz głównie po angielsku — zachowasz angielski model swipe i podpowiedzi FUTO. Wybierz polski, jeśli piszesz głównie po polsku — dostaniesz polskie podpowiedzi. Tak czy inaczej oba języki piszą się poprawnie; różni się tylko jakość podpowiedzi.",
+    "dictTitle": "Jeden słownik dla obu języków",
+    "dictText": "FUTO ładuje jeden słownik na język, więc pisanie po angielsku i polsku na jednej klawiaturze wymaga scalenia dwóch list słów. W repozytorium jest skrypt, który to robi — 344 389 słów — a wynik importuje się do FUTO jak zwykły słownik.",
+    "diffTitle": "Czym różni się od układu na komputer",
+    "diffDeadKey": "Akcent i spacja dają znak łączący, a nie samodzielny akcent, i spacja zostaje pochłonięta.",
+    "diffPositions": "Litery są na literze podstawowej, do której należą, a nie na klawiszu z układu komputerowego. W telefonie nie ma AltGr, więc przytrzymanie z dla ż i ź ma większy sens niż rozdzielanie ich na dwa klawisze.",
+    "diffMissing": "Kilka znaków z układu komputerowego nie ma odpowiednika na Androidzie i nie zostało uwzględnionych.",
+    "sourceTitle": "Źródło",
+    "sourceText": "Układy są generowane z tego samego pliku, którego używają wersje na Windowsa i macOS, więc wszystkie cztery platformy pozostają zgodne.",
+    "backToMain": "Wróć do klawiatury"
   },
   "theme": {
     "light": "Jasny",

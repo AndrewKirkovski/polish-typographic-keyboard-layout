@@ -112,6 +112,29 @@ def build_klc(layouts):
     run(["build_klc.py"] + layouts, "Building .klc files for MSKLC")
 
 
+def build_android(layouts):
+    """Build FUTO Keyboard (Android) layout YAML.
+
+    Writes straight into dist/android-v{VERSION}/, so organize_dist() has
+    nothing to move. There is no separate `us` layout: on Android the Polish
+    file is listed under both pl and en_US in the layouts repo's mapping.yaml.
+    """
+    known = [x for x in layouts if x in ("polish", "russian")]
+    skipped = [x for x in layouts if x not in ("polish", "russian")]
+    if skipped:
+        print(f"  SKIP android for {', '.join(skipped)} "
+              f"(one Android layout covers both pl and en_US)")
+
+    if not layouts:
+        # No layout filter at all -> build everything, like the other targets.
+        run(["build_futo_yaml.py", "all"], "Building FUTO Keyboard layouts")
+    elif known:
+        run(["build_futo_yaml.py"] + known, "Building FUTO Keyboard layouts")
+    else:
+        # Every requested layout was filtered out. Build nothing rather than
+        # falling back to "all", which would produce layouts nobody asked for.
+        print("  SKIP android build: no requested layout applies to Android")
+
 
 def build_inno():
     """Build Inno Setup Windows installer (.exe)."""
@@ -164,6 +187,12 @@ def build_zips():
         shutil.make_archive(zip_path, "zip", dist_dir, f"macos-v{VERSION}")
         print(f"  Created {zip_path}.zip")
 
+    android_dir = os.path.join(dist_dir, f"android-v{VERSION}")
+    if os.path.isdir(android_dir):
+        zip_path = os.path.join(dist_dir, f"kirkouski-typographic-v{VERSION}-android")
+        shutil.make_archive(zip_path, "zip", dist_dir, f"android-v{VERSION}")
+        print(f"  Created {zip_path}.zip")
+
 
 def main():
     platforms = []
@@ -180,20 +209,26 @@ def main():
             platforms.append("assets")
         elif arg == "dmg":
             platforms.append("dmg")
+        elif arg in ("android", "futo"):
+            platforms.append("android")
         elif arg in ("polish", "russian", "us"):
             layouts.append(arg)
         else:
             print(f"Unknown argument: {arg}")
-            print("Usage: python build.py [windows|macos|klc|assets|dmg] [polish|russian|us]")
+            print("Usage: python build.py [windows|macos|klc|assets|dmg|android] [polish|russian|us]")
             print("")
             print("Builds DLLs, keylayouts + .bundle, Inno Setup installer, macOS trilingual DMG, and zip archives.")
             print("`dmg` alone stages DMG payload without rebuilding other platforms (useful on Windows).")
             print("`assets` (re)generates icons, favicons, and OG image via the scripts/assets pipeline.")
+            print("`android` (or `futo`) generates FUTO Keyboard layout YAML into dist/android-v<version>/.")
             print("Prerequisites: Python 3.10+, MSVC Build Tools (windows), Inno Setup 6 (windows installer), pnpm (assets)")
             sys.exit(1)
 
     if not platforms:
-        platforms = ["windows", "macos", "klc"]
+        # "Everything" really means everything. Android is safe to include by
+        # default because it needs no native toolchain -- just Python and the
+        # same *_full.json the other generators read.
+        platforms = ["windows", "macos", "klc", "android"]
 
     for platform in platforms:
         if platform == "windows":
@@ -204,6 +239,8 @@ def main():
             build_klc(layouts)
         elif platform == "assets":
             build_assets()
+        elif platform == "android":
+            build_android(layouts)
         elif platform == "dmg":
             pass  # handled by the post-loop build_dmg hook
 

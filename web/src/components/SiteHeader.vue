@@ -12,9 +12,27 @@ const langs = [
   { code: 'ru', label: 'RU', href: '/ru/' },
 ]
 
+// The path after the locale prefix, e.g. 'android/' on /pl/android/. Used to
+// keep the reader on the same page when they switch language: previously
+// switching locale from /fonts/ or /android/ pushed a bare /pl/, so the URL
+// said homepage while the subpage was still rendered.
+function currentSubpath(): string {
+  if (typeof window === 'undefined') return ''
+  const parts = window.location.pathname.split('/').filter(Boolean)
+  if (parts[0] === 'pl' || parts[0] === 'ru') parts.shift()
+  return parts.length ? parts.join('/') + '/' : ''
+}
+
 function langHref(lang: typeof langs[0]) {
   const hash = typeof window !== 'undefined' ? window.location.hash : ''
-  return lang.href + hash
+  return lang.href + currentSubpath() + hash
+}
+
+// Locale-aware link to a standalone subpage. navHref() below handles in-page
+// anchors; this handles real paths, which anchors cannot express.
+function pageHref(page: string): string {
+  const root = locale.value === 'en' ? '/' : `/${locale.value}/`
+  return `${root}${page}/`
 }
 
 // Anchor nav (Keyboard / Download / About) only works when the homepage
@@ -61,6 +79,7 @@ function closeMenu() {
       <nav id="site-nav" class="nav" :class="{ open: menuOpen }">
         <a :href="navHref('#keyboard')" @click="closeMenu">{{ t('nav.keyboard') }}</a>
         <a :href="navHref('#download')" @click="closeMenu">{{ t('nav.download') }}</a>
+        <a :href="pageHref('android')" @click="closeMenu">{{ t('nav.android') }}</a>
         <a :href="navHref('#about')" @click="closeMenu">{{ t('nav.about') }}</a>
         <div class="lang-switcher lang-switcher--mobile">
           <a

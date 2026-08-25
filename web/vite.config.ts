@@ -13,6 +13,17 @@ const LAYOUT_FILES = ['polish_typographic.json', 'russian_typographic.json']
 // the Vue components consume the same value via __APP_VERSION__.
 const APP_VERSION: string = readFileSync(resolve(ROOT, 'VERSION'), 'utf-8').trim()
 
+// The Android layouts are build artifacts, not tracked sources, so they live
+// under dist/android-v<version>/ rather than at the repo root. The /android
+// page fetches them at runtime the same way the keyboard diagram fetches the
+// JSON. Missing files are tolerated: a clean checkout that has not run
+// `python build.py android` yet should still build the site.
+const ANDROID_LAYOUT_DIR = `dist/android-v${APP_VERSION}`
+const ANDROID_LAYOUT_FILES = [
+  'polish_english_typographic.yaml',
+  'cyrillic_typographic.yaml',
+]
+
 // Serve layout JSON files from project root in dev, copy them for production build
 function parentLayouts(): Plugin {
   return {
@@ -40,6 +51,14 @@ function parentLayouts(): Plugin {
       mkdirSync(layoutsDir, { recursive: true })
       for (const name of LAYOUT_FILES) {
         const src = resolve(ROOT, name)
+        if (existsSync(src)) {
+          copyFileSync(src, resolve(layoutsDir, name))
+        }
+      }
+
+      // Android layouts: build artifacts, so absence is not an error.
+      for (const name of ANDROID_LAYOUT_FILES) {
+        const src = resolve(ROOT, ANDROID_LAYOUT_DIR, name)
         if (existsSync(src)) {
           copyFileSync(src, resolve(layoutsDir, name))
         }

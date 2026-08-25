@@ -10,7 +10,13 @@
 //
 // SSR-safe: returns 'windows' when navigator is undefined (we ship as a
 // static SPA so this only matters for prerender/tooling, but keep it safe).
-export function detectOS(): 'windows' | 'macos' {
+export type OS = 'windows' | 'macos' | 'android'
+
+export function detectOS(): OS {
   if (typeof navigator === 'undefined') return 'windows'
-  return /Mac|iPhone|iPad|iPod/.test(navigator.userAgent) ? 'macos' : 'windows'
+  const ua = navigator.userAgent
+  // Android first. An Android UA never contains Mac/iPhone today, but ordering
+  // the cheap unambiguous test first keeps it that way if that ever changes.
+  if (/Android/.test(ua)) return 'android'
+  return /Mac|iPhone|iPad|iPod/.test(ua) ? 'macos' : 'windows'
 }

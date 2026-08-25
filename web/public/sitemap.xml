@@ -61,4 +61,34 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  <url>
+    <loc>https://polish-typographic.com/android/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://polish-typographic.com/android/" />
+    <xhtml:link rel="alternate" hreflang="pl" href="https://polish-typographic.com/pl/android/" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://polish-typographic.com/ru/android/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://polish-typographic.com/android/" />
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://polish-typographic.com/pl/android/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://polish-typographic.com/android/" />
+    <xhtml:link rel="alternate" hreflang="pl" href="https://polish-typographic.com/pl/android/" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://polish-typographic.com/ru/android/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://polish-typographic.com/android/" />
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://polish-typographic.com/ru/android/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://polish-typographic.com/android/" />
+    <xhtml:link rel="alternate" hreflang="pl" href="https://polish-typographic.com/pl/android/" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://polish-typographic.com/ru/android/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://polish-typographic.com/android/" />
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
 </urlset>

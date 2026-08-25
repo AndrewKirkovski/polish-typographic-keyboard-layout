@@ -12,6 +12,12 @@ const RELEASE_DL = `https://github.com/AndrewKirkovski/polish-typographic-keyboa
 
 const detectedOS = detectOS()
 
+const PLATFORM_ICONS: Record<'windows' | 'macos' | 'android', string> = {
+  windows: 'mdi:microsoft-windows',
+  macos: 'mdi:apple',
+  android: 'mdi:android',
+}
+
 const isMobile = typeof navigator !== 'undefined'
   && /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
 
@@ -27,7 +33,7 @@ interface PlatformFile {
   sha256Url?: string
 }
 interface Platform {
-  id: 'windows' | 'macos'
+  id: 'windows' | 'macos' | 'android'
   name: string
   files: PlatformFile[]
   primary: boolean
@@ -62,7 +68,24 @@ const platforms = computed<Platform[]>(() => {
     ],
     primary: !isMobile && detectedOS === 'macos',
   }
-  return detectedOS === 'windows' ? [win, mac] : [mac, win]
+  // Android ships the layout YAML, not an installer: you install FUTO Keyboard
+  // and load the layout into it. The /android page carries the walkthrough.
+  const androidZip = `kirkouski-typographic-v${VERSION}-android.zip`
+  const android: Platform = {
+    id: 'android',
+    name: t('download.android'),
+    files: [
+      { label: t('download.layouts'), file: androidZip, url: `${RELEASE_DL}/${androidZip}` },
+    ],
+    primary: detectedOS === 'android',
+  }
+
+  // Detected platform first, the rest in a stable order behind it.
+  const all = [win, mac, android]
+  return [
+    ...all.filter(p => p.id === detectedOS),
+    ...all.filter(p => p.id !== detectedOS),
+  ]
 })
 
 const pdfFiles = computed(() => [
@@ -88,8 +111,7 @@ const pdfFiles = computed(() => [
         >
           <div class="download-card__header">
             <span class="download-card__icon">
-              <iconify-icon v-if="platform.id === 'windows'" icon="mdi:microsoft-windows" width="22" aria-hidden="true"></iconify-icon>
-              <iconify-icon v-else icon="mdi:apple" width="22" aria-hidden="true"></iconify-icon>
+              <iconify-icon :icon="PLATFORM_ICONS[platform.id]" width="22" aria-hidden="true"></iconify-icon>
             </span>
             <h3>{{ platform.name }}</h3>
           </div>

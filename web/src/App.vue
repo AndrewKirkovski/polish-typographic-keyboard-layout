@@ -12,16 +12,24 @@ import InstallSection from './components/InstallSection.vue'
 import FaqSection from './components/FaqSection.vue'
 import AboutSection from './components/AboutSection.vue'
 import FontDemoPage from './components/FontDemoPage.vue'
+import AndroidPage from './components/AndroidPage.vue'
 
 const props = defineProps<{ ssrPage?: string }>()
 
 const { init } = useLayout()
 const { t, locale } = useI18n()
 
-const isFontsPage = computed(() => {
-  if (props.ssrPage) return props.ssrPage === 'fonts'
-  if (typeof window === 'undefined') return false
-  return window.location.pathname.includes('/fonts')
+// There is no router: SSR passes the page in, the client sniffs the pathname.
+// A named page rather than a boolean, so adding a fourth one stays a one-liner.
+type Page = 'home' | 'fonts' | 'android'
+
+const currentPage = computed<Page>(() => {
+  if (props.ssrPage) return props.ssrPage as Page
+  if (typeof window === 'undefined') return 'home'
+  const path = window.location.pathname
+  if (path.includes('/android')) return 'android'
+  if (path.includes('/fonts')) return 'fonts'
+  return 'home'
 })
 
 const fontsUrl = computed(() => {
@@ -91,8 +99,11 @@ onMounted(async () => {
           <a href="https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/issues" target="_blank" rel="noopener noreferrer nofollow">{{ t('banner.issues') }}</a>
         </p>
       </div>
-      <template v-if="isFontsPage">
+      <template v-if="currentPage === 'fonts'">
         <FontDemoPage />
+      </template>
+      <template v-else-if="currentPage === 'android'">
+        <AndroidPage />
       </template>
       <template v-else>
         <HeroSection />

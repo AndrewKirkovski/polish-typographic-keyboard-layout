@@ -26,6 +26,7 @@ ALL PLATFORM OUTPUTS READ *_full.json:
   build_kbd_c.py        →  build/*.c  (Windows DLL, via layout_adapter.py)
   compile_kbd.py        →  dist/windows/*.dll
   build_klc.py          →  dist/*.klc (MSKLC legacy, via layout_adapter.py)
+  build_futo_yaml.py    →  dist/android-v*/  (FUTO Keyboard / Android YAML)
 ```
 
 `build.py` orchestrates all of the above. For development, individual scripts
@@ -44,7 +45,8 @@ can be run standalone.
 | `build_kbd_c.py` | Generate C source for Windows DLL | `*_full.json` (via `layout_adapter.py`) | `build/*.c` |
 | `compile_kbd.py` | Compile C source to DLL via MSVC | `build/*.c` | `dist/windows/*.dll` |
 | `build_klc.py` | Generate Windows KLC files (legacy) | `*_full.json` (via `layout_adapter.py`) | `dist/*.klc` |
-| `layout_adapter.py` | Shared module: convert macOS-centric full JSON to flat Windows layers + dead key tables | (imported by build_kbd_c.py, build_klc.py) | — |
+| `build_futo_yaml.py` | Generate FUTO Keyboard (Android) layout YAML | `*_full.json` (via `layout_adapter.py`) | `dist/android-v*/*.yaml` |
+| `layout_adapter.py` | Shared module: convert macOS-centric full JSON to flat Windows layers + dead key tables. Pass `windows_fixups=False` for non-Windows consumers | (imported by build_kbd_c.py, build_klc.py, build_futo_yaml.py) | — |
 
 ### Dev/QA tools
 
@@ -145,6 +147,7 @@ When bumping VERSION, follow this exact sequence:
    python build_kbd_c.py
    python compile_kbd.py
    python build_klc.py
+   python build_futo_yaml.py all
    pip install reportlab qrcode fonttools
    python build_pdf.py --layout all --style all
    python polish_liga.py --variant cyrillic --input scripts/assets/fonts/NotoSans-Regular.ttf
