@@ -24,15 +24,37 @@ python scripts/dict/merge_wordlists.py \
     --locale pl --report
 ```
 
-Then compile to the binary `.dict` FUTO imports, using AOSP dicttool:
+Then compile to the binary `.dict` FUTO imports:
 
 ```bash
-java -jar dicttool_aosp.jar makedict \
-    -s dist/dict/en_pl_wordlist.combined -d main_pl.dict
+python scripts/dict/compile_dict.py \
+    --input dist/dict/en_pl_wordlist.combined \
+    --output dist/dict/main_pl.dict
+
+# same words, retargeted at an en_US subtype
+python scripts/dict/compile_dict.py \
+    --input dist/dict/en_pl_wordlist.combined \
+    --output dist/dict/main_en_US.dict \
+    --locale en_US --dictionary-id main:en_US
 ```
 
 Import it in FUTO: share the `.dict` to the app, or Settings → Languages →
 the language → dictionary.
+
+## Swipe depends on this
+
+Gesture typing draws its candidates from tries built over the loaded
+dictionaries (`DictionaryFacilitatorImpl.updateSwipeLayoutAndDictsIfNeeded`);
+with none loaded, `SwipeDecoderDictionary` logs `Applied tries are blank!` and
+returns nothing. FUTO bundles dictionaries for de, en, es, fr, it, pt_br and ru
+only, and offers no Polish one for download — so a Polish subtype cannot swipe
+until a dictionary is imported. That is a dictionary problem, not a layout one.
+
+The layout needs no keys for the accented letters: the trie's
+`get_letter_index` (`dictionary_itrie.cpp`) falls back to
+`CharUtils::toBaseLowerCase`, whose `BASE_CHARS` table maps all nine Polish
+diacritics onto a–z (`ł`→`l`, `ż`/`ź`→`z`, `ą`→`a`, …). Swiping l‑o‑d‑z reaches
+`łódź`.
 
 ## Facts worth knowing
 
@@ -53,8 +75,11 @@ the language → dictionary.
   `.dict` imports (magic `0x9BC13AFE`, header versions 201/202/402/403; dicttool
   emits 202).
 - **`dicttool` is not a Gradle module.** It is a Soong `java_binary_host`
-  (`tools/dicttool/Android.bp`), so building it needs the AOSP host build or a
-  prebuilt `dicttool_aosp.jar`.
+  (`tools/dicttool/Android.bp`), so there is no prebuilt jar and no Gradle task.
+  `compile_dict.py` sidesteps that by compiling only the `.combined` → VERSION202
+  path with plain `javac` against the app-repo sources. That path is pure Java;
+  only the Ver4 encoder would need `libjni_latinime`. It needs a JDK 11+ and a
+  full `android-keyboard` checkout (`--futo-repo`, or `$FUTO_KEYBOARD_REPO`).
 - **The header `locale=`** only soft-filters FUTO's import picker and enables
   English vowel fuzzing in the native proximity model. It is not validated
   against the subtype you import into.
