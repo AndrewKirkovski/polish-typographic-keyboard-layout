@@ -166,6 +166,12 @@ ALT_PAGE_KEY = (
     "showPopup: false, moreKeyMode: OnlyExplicit}}"
 )
 
+# Height multiplier for the alt page's two letter rows. The main layout has
+# three letter rows and the keyboard is drawn at that height, so at the default
+# 1.0 the alt page leaves a whole row of dead space between its rows. 3/2 spends
+# the same total height across two rows.
+ALT_ROW_HEIGHT = 1.5
+
 # The comma slot, stock's second bottom-row key. It must be a `contextual` key,
 # not a literal ",": that is the key which becomes "@" in an email field and "/"
 # in a URL field. A literal comma looks identical in a normal text field and
@@ -547,13 +553,31 @@ def emit(layout_key: str, layers: dict[str, Any], placement: str, strict: bool,
     L.append("      - $enter")
 
     # --- alt page 0: dead keys + orphans ---
+    #
+    # Two row-level settings, both of which only matter once you look at the page
+    # on a device:
+    #
+    # rowHeight -- the alt page has two letter rows where the main layout has
+    # three, but the keyboard is drawn at the height the main layout asks for.
+    # At the default 1.0 the two rows leave a row of dead space, and the page
+    # reads as unfinished. 1.5 each spends the same total height.
+    #
+    # moreKeyMode: OnlyExplicit -- otherwise the engine treats the first row of
+    # any page as the number row (`getNumForCoordinate` keys off regularRow == 0)
+    # and layers 1-0 hints over it. On a page of dead keys the digit then reads
+    # as the primary label and the accent itself renders small, which is exactly
+    # backwards. Nothing on this page wants an automatic morekey anyway.
     L.append("altPages:")
-    L.append("  - - letters:")
+    L.append(f"  - - rowHeight: {ALT_ROW_HEIGHT}")
+    L.append("      attributes: {moreKeyMode: OnlyExplicit}")
+    L.append("      letters:")
     for state, spacing, mark in dead_keys:
         spec = keyspec(spacing, mark)
         L.append(f"      - {escape_unicode(spec)}   # dead {state}")
     if orphans:
-        L.append("    - letters:")
+        L.append(f"    - rowHeight: {ALT_ROW_HEIGHT}")
+        L.append("      attributes: {moreKeyMode: OnlyExplicit}")
+        L.append("      letters:")
         for ch in orphans:
             label, hint = LABELLED.get(ch, (ch, None))
             spec = keyspec(label, ch) if ch in LABELLED else keyspec(ch)
@@ -599,7 +623,10 @@ def validate(layout_key: str, text: str, layers: dict[str, Any],
         )
 
     lines = [ln for ln in text.splitlines() if ln.strip()]
-    letter_rows = sum(1 for ln in lines if ln.strip() == "- letters:" or ln.strip() == "- - letters:")
+    # The alt page's rows carry row-level settings, so `letters:` there is a bare
+    # mapping key rather than the first entry of a sequence item.
+    letter_rows = sum(1 for ln in lines
+                      if ln.strip() in ("- letters:", "- - letters:", "letters:"))
     if not 1 <= letter_rows <= 8:
         errs.append(f"{letter_rows} letter rows; Keyboard.ensureRowsValid allows 1-8")
     if text.count("- bottom:") != 2:

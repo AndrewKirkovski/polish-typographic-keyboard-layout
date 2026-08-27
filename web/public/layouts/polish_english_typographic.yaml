@@ -54,7 +54,9 @@ rows:
       - $period
       - $enter
 altPages:
-  - - letters:
+  - - rowHeight: 1.5
+      attributes: {moreKeyMode: OnlyExplicit}
+      letters:
       - "`|\u0300"   # dead grave
       - "´|\u0301"   # dead acute
       - "ˆ|\u0302"   # dead circumflex
@@ -65,7 +67,9 @@ altPages:
       - "˝|\u030B"   # dead double-acute
       - "ˇ|\u030C"   # dead caron
       - "¸|\u0327"   # dead cedilla
-    - letters:
+    - rowHeight: 1.5
+      attributes: {moreKeyMode: OnlyExplicit}
+      letters:
       - {type: base, spec: "⍽|\u00A0", hint: "nbsp"}   # NO-BREAK SPACE
       - "✓"   # CHECK MARK
       - "−"   # MINUS SIGN
