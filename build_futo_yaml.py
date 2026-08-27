@@ -166,6 +166,18 @@ ALT_PAGE_KEY = (
     "showPopup: false, moreKeyMode: OnlyExplicit}}"
 )
 
+# The comma slot, stock's second bottom-row key. It must be a `contextual` key,
+# not a literal ",": that is the key which becomes "@" in an email field and "/"
+# in a URL field. A literal comma looks identical in a normal text field and
+# silently loses the adaptation everywhere else, which is why the layouts repo
+# README tells contributors who touch the bottom row to test it. Shape and the
+# moreKeyMode: All (which keeps stock's comma long-press) copied from
+# Default/kasroz.yaml.
+CONTEXTUAL_COMMA_KEY = (
+    '{type: contextual, fallbackKey: {type: base, spec: ",", '
+    "attributes: {moreKeyMode: All}}, attributes: {moreKeyMode: All}}"
+)
+
 # Multi-codepoint sequences the layout builds by hand, and the precomposed
 # character stock FUTO already offers instead. Stock's version is better: one
 # codepoint, and grouped by numerator on the digit long-press.
@@ -511,18 +523,27 @@ def emit(layout_key: str, layers: dict[str, Any], placement: str, strict: bool,
     # above is ignored here. "…" leads; the stock punctuation morekeys follow.
     # Stock's bottom row is symbols / contextual-comma / action / space /
     # optional-ZWNJ / period / enter. Keep every slot in its stock position and
-    # take only the ZWNJ one: $action is where the user-configurable bottom
-    # action lives -- emoji, undo, and the language switch key among them -- so
-    # a layout that drops it silently removes the language switch from the
-    # keyboard no matter what the settings say. ZWNJ is the one slot neither a
-    # Latin nor a Cyrillic typist needs.
+    # take only the ZWNJ one, which is the only slot neither a Latin nor a
+    # Cyrillic typist needs.
+    #
+    # Every other slot is a template key on purpose. Each one hides a setting
+    # that a hand-written replacement silently disables, with no error and
+    # nothing in the settings UI to suggest the layout is the reason:
+    #   $action   -- the user-configurable bottom action, which is where the
+    #                language switch key renders
+    #   contextual-- becomes "@" in an email field and "/" in a URL field
+    #   $period   -- carries the "Quick period key" flickable ? , ! variant
+    # This is why the layouts repo README tells contributors who touch the
+    # bottom row to test the action and contextual keys specifically. The
+    # ellipsis that used to sit on the period is no loss: stock already offers
+    # it on the symbols-page period.
     L.append("  - bottom:")
     L.append("      - $symbols")
-    L.append('      - ","')
+    L.append(f"      - {CONTEXTUAL_COMMA_KEY}")
     L.append("      - $action")
     L.append("      - $space")
     L.append(f"      - {ALT_PAGE_KEY}")
-    L.append('      - {type: base, spec: ".", moreKeys: ["\u2026"]}')
+    L.append("      - $period")
     L.append("      - $enter")
 
     # --- alt page 0: dead keys + orphans ---
@@ -550,11 +571,11 @@ def emit(layout_key: str, layers: dict[str, Any], placement: str, strict: bool,
     # An altPage replaces every row, bottom included, so it needs its own way back.
     L.append("    - bottom:")
     L.append("      - $symbols")
-    L.append('      - ","')
+    L.append(f"      - {CONTEXTUAL_COMMA_KEY}")
     L.append("      - $action")
     L.append("      - $space")
     L.append(f"      - {ALT_PAGE_KEY}")
-    L.append('      - "."')
+    L.append("      - $period")
     L.append("      - $enter")
     L.append("")
     return "\n".join(L)

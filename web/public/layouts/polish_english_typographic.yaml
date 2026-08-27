@@ -47,11 +47,11 @@ rows:
       - $delete
   - bottom:
       - $symbols
-      - ","
+      - {type: contextual, fallbackKey: {type: base, spec: ",", attributes: {moreKeyMode: All}}, attributes: {moreKeyMode: All}}
       - $action
       - $space
       - {type: base, spec: "⁜|!code/key_to_alt_0_layout", attributes: {width: Regular, style: Functional, showPopup: false, moreKeyMode: OnlyExplicit}}
-      - {type: base, spec: ".", moreKeys: ["…"]}
+      - $period
       - $enter
 altPages:
   - - letters:
@@ -77,9 +77,9 @@ altPages:
       - {type: base, spec: "‑|‑", hint: "nbhy"}   # NON-BREAKING HYPHEN
     - bottom:
       - $symbols
-      - ","
+      - {type: contextual, fallbackKey: {type: base, spec: ",", attributes: {moreKeyMode: All}}, attributes: {moreKeyMode: All}}
       - $action
       - $space
       - {type: base, spec: "⁜|!code/key_to_alt_0_layout", attributes: {width: Regular, style: Functional, showPopup: false, moreKeyMode: OnlyExplicit}}
-      - "."
+      - $period
       - $enter
