@@ -270,14 +270,17 @@
     "localeTitle": "Jaki język ustawić",
     "localeText": "Układ łaciński jest dostępny i dla polskiego, i dla angielskiego. Wybierz angielski, jeśli piszesz głównie po angielsku — zachowasz angielski model swipe i podpowiedzi FUTO. Wybierz polski, jeśli piszesz głównie po polsku — dostaniesz polskie podpowiedzi. Tak czy inaczej oba języki piszą się poprawnie; różni się tylko jakość podpowiedzi.",
     "dictTitle": "Jeden słownik dla obu języków",
-    "dictText": "FUTO ładuje jeden słownik na język, więc pisanie po angielsku i polsku na jednej klawiaturze wymaga scalenia dwóch list słów. W repozytorium jest skrypt, który to robi — 344 389 słów — a wynik importuje się do FUTO jak zwykły słownik.",
+    "dictText": "FUTO ładuje jeden słownik na język, więc pisanie po angielsku i polsku na jednej klawiaturze wymaga scalenia dwóch list słów. Oto gotowy plik — 344 389 słów.",
     "diffTitle": "Czym różni się od układu na komputer",
     "diffDeadKey": "Akcent i spacja dają znak łączący, a nie samodzielny akcent, i spacja zostaje pochłonięta.",
     "diffPositions": "Litery są na literze podstawowej, do której należą, a nie na klawiszu z układu komputerowego. W telefonie nie ma AltGr, więc przytrzymanie z dla ż i ź ma większy sens niż rozdzielanie ich na dwa klawisze.",
     "diffMissing": "Kilka znaków z układu komputerowego nie ma odpowiednika na Androidzie i nie zostało uwzględnionych.",
     "sourceTitle": "Źródło",
     "sourceText": "Układy są generowane z tego samego pliku, którego używają wersje na Windowsa i macOS, więc wszystkie cztery platformy pozostają zgodne.",
-    "backToMain": "Wróć do klawiatury"
+    "backToMain": "Wróć do klawiatury",
+    "dictSwipe": "Od tego zależy też pisanie gestem po polsku. Podpowiedzi gestu pochodzą z załadowanego słownika, a FUTO nie dostarcza polskiego, więc polska klawiatura w ogóle nie obsłuży gestu, dopóki słownik nie zostanie zaimportowany.",
+    "dictPick": "FUTO przypisuje słownik do języka zapisanego w pliku i nie pyta przy imporcie, więc wybierz ten, który odpowiada językowi twojej klawiatury.",
+    "dictImport": "Otwórz pobrany plik i wskaż FUTO Keyboard albo przejdź do Języki, twój język, Słownik. Zaimportowany słownik zastępuje wbudowany dla tego języka; usunięcie go przywraca oryginalny."
   },
   "theme": {
     "light": "Jasny",

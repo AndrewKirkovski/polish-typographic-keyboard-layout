@@ -270,14 +270,17 @@
     "localeTitle": "Which language to set it to",
     "localeText": "The Latin layout is offered for both Polish and English. Pick English if you mostly write English and you keep FUTO’s English swipe model and word predictions. Pick Polish if you mostly write Polish and you get Polish suggestions instead. Either way both languages type correctly — only the prediction quality differs.",
     "dictTitle": "One dictionary for both languages",
-    "dictText": "FUTO loads one dictionary per language, so typing English and Polish under a single keyboard means merging the two word lists. The repository has a script that does it — 344,389 words — and the result imports into FUTO as a normal dictionary.",
+    "dictText": "FUTO loads one dictionary per language, so typing English and Polish under a single keyboard means merging the two word lists. Here it is, already built: 344,389 words.",
     "diffTitle": "What differs from the desktop layout",
     "diffDeadKey": "An accent followed by a space gives the combining mark rather than the standalone accent, and the space is swallowed.",
     "diffPositions": "Letters sit on the base letter they belong to, not on the key the desktop layout uses. A phone has no AltGr, so holding z for both ż and ź makes more sense than splitting them across two keys.",
     "diffMissing": "A few desktop characters have no Android equivalent and are not included.",
     "sourceTitle": "Source",
     "sourceText": "The layouts are generated from the same file the Windows and macOS builds use, so all four platforms stay in step.",
-    "backToMain": "Back to the keyboard"
+    "backToMain": "Back to the keyboard",
+    "dictSwipe": "This is also what makes swipe typing work in Polish. Gesture typing draws its candidates from the loaded dictionary, and FUTO ships none for Polish, so a Polish keyboard cannot swipe at all until one is imported.",
+    "dictPick": "FUTO files a dictionary under the language written inside it and offers no choice at import time, so take the one matching the language your keyboard is set to.",
+    "dictImport": "Open the downloaded file and hand it to FUTO Keyboard, or go to Languages, your language, Dictionary. An imported dictionary replaces the built-in one for that language; removing it restores the original."
   },
   "theme": {
     "light": "Light",

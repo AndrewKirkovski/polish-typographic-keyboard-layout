@@ -17,6 +17,28 @@ interface Layout {
   descKey: string
 }
 
+// FUTO files an imported dictionary under the locale in its header and offers no
+// picker at import time, so there is one build per subtype you might be using
+// rather than one file for everyone. Same 344,389 words in each.
+interface Dict {
+  locale: string
+  label: string
+  file: string
+}
+
+const DICTS: Dict[] = [
+  { locale: 'en_US', label: 'English (US)', file: 'kirkouski-en-pl-en_US.dict' },
+  { locale: 'en_GB', label: 'English (UK)', file: 'kirkouski-en-pl-en_GB.dict' },
+  { locale: 'pl', label: 'Polski', file: 'kirkouski-en-pl-pl.dict' },
+]
+
+// Upstream review. Once these land, the layouts ship with FUTO Keyboard and the
+// custom-layout steps above stop being necessary.
+const PULL_REQUESTS = [
+  { id: 309, labelKey: 'android.latinName' },
+  { id: 310, labelKey: 'android.cyrillicName' },
+]
+
 const LAYOUTS: Layout[] = [
   {
     id: 'latin',
@@ -102,6 +124,15 @@ async function copyLayout(l: Layout) {
           <li>{{ t('android.step4') }}</li>
         </ol>
         <p class="android-note">{{ t('android.upstreamNote') }}</p>
+        <ul class="android-prs">
+          <li v-for="pr in PULL_REQUESTS" :key="pr.id">
+            <a
+              :href="`https://github.com/futo-org/futo-keyboard-layouts/pull/${pr.id}`"
+              target="_blank"
+              rel="noopener noreferrer"
+            >{{ t(pr.labelKey) }} — PR #{{ pr.id }}</a>
+          </li>
+        </ul>
       </section>
 
       <section class="demo-section">
@@ -149,6 +180,19 @@ async function copyLayout(l: Layout) {
       <section class="demo-section">
         <h2 class="demo-heading">{{ t('android.dictTitle') }}</h2>
         <p>{{ t('android.dictText') }}</p>
+        <p>{{ t('android.dictSwipe') }}</p>
+        <p class="android-note">{{ t('android.dictPick') }}</p>
+        <div class="layout-card__actions">
+          <a
+            v-for="d in DICTS"
+            :key="d.locale"
+            class="btn btn-secondary"
+            :href="`/dict/${d.file}`"
+            :download="d.file"
+            @click="trackDownload('android', d.file, { locale: d.locale })"
+          >{{ d.label }}</a>
+        </div>
+        <p class="android-note">{{ t('android.dictImport') }}</p>
       </section>
 
       <section class="demo-section">
@@ -192,8 +236,14 @@ async function copyLayout(l: Layout) {
 }
 
 .android-steps li,
-.android-diffs li {
+.android-diffs li,
+.android-prs li {
   margin-bottom: 0.5rem;
+}
+
+.android-prs {
+  margin-top: 0.5rem;
+  font-size: 0.9375rem;
 }
 
 .android-note {
