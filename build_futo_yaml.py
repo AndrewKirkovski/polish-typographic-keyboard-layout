@@ -117,14 +117,49 @@ STOCK_COVERED: set[str] = set(
 # Orphans that are invisible and need a visible popup label.
 # Short text labels beat lookalike box glyphs: four kinds of invisible space
 # all render as the same box, and autoXScale shrinks text to fit.
-LABELLED: dict[str, str] = {
-    "\u00A0": "NBSP",
-    "\u202F": "NNBSP",
-    "\u2009": "THIN",
-    "\u00AD": "SHY",
-    "\u2011": "NB-",
-    "\u2060": "WJ",
+# Invisible characters need a visible keycap. Four-letter words like "NNBSP"
+# fit only by shrinking to near-illegible, so each key gets a glyph plus an
+# optional one-character hint.
+#
+# Unicode supplies a real convention for exactly two of these:
+#   U+237D SHOULDERED OPEN BOX is the standard visible stand-in for a
+#   no-break space, and U+2027 HYPHENATION POINT is the standard way to show
+#   a soft hyphen's break opportunity.
+#
+# It supplies nothing that distinguishes a narrow no-break space from a thin
+# space from an ordinary one -- U+2423 OPEN BOX just means "space" -- and a
+# non-breaking hyphen is simply a hyphen to look at. Those reuse the nearest
+# glyph and let the hint carry the name, which is why every entry has one:
+# the glyph says "invisible character of roughly this kind", the hint says
+# exactly which.
+LABELLED: dict[str, tuple[str, str | None]] = {
+    "\u00A0": ("\u237D", "nbsp"),   # NBSP        -> shouldered open box
+    "\u202F": ("\u237D", "nnbsp"),  # NNBSP       -> shouldered open box, narrow
+    "\u2009": ("\u2423", "thin"),   # THIN SPACE  -> open box
+    "\u00AD": ("\u2027", "shy"),    # SOFT HYPHEN -> hyphenation point
+    "\u2011": ("\u2011", "nbhy"),   # NB-HYPHEN   -> itself
+    "\u2060": ("\u2422", "wj"),     # WORD JOINER -> blank symbol
 }
+
+# The key that reaches the alt page, and the one that comes back from it.
+#
+# The stock `$alt0` template hardcodes its label to the page index -- literally
+# the digit "0" (`AltLayoutKey`: `spec = "$idx|!code/key_to_alt_${idx}_layout"`),
+# which on a keycap reads as a zero and says nothing about what the page holds.
+# Writing the key out by hand is the only way to relabel it, so this mirrors
+# `FunctionalAttributes` (TemplateKeys.kt) exactly; its `labelFlags` are all
+# false by default, so they are left out.
+#
+# U+205C DOTTED CROSS. U+25CC DOTTED CIRCLE is the stricter semantic match --
+# the standard's own placeholder for "a combining mark attaches here" -- but it
+# renders low against the keycap's optical centre and reads as a stray blob.
+# The dotted cross is symmetric about its own centre, so it sits right, and its
+# dotted form still signals "placeholder" rather than a literal character.
+ALT_PAGE_KEY = (
+    '{type: base, spec: "⁜|!code/key_to_alt_0_layout", '
+    "attributes: {width: FunctionalKey, style: Functional, anchored: true, "
+    "showPopup: false, moreKeyMode: OnlyExplicit}}"
+)
 
 # Multi-codepoint sequences the layout builds by hand, and the precomposed
 # character stock FUTO already offers instead. Stock's version is better: one
@@ -472,7 +507,7 @@ def emit(layout_key: str, layers: dict[str, Any], placement: str, strict: bool,
     L.append("  - bottom:")
     L.append("      - $symbols")
     L.append('      - ","')
-    L.append("      - $alt0")
+    L.append(f"      - {ALT_PAGE_KEY}")
     L.append("      - $space")
     L.append('      - {type: base, spec: ".", moreKeys: ["\u2026"]}')
     L.append("      - $enter")
@@ -486,15 +521,22 @@ def emit(layout_key: str, layers: dict[str, Any], placement: str, strict: bool,
     if orphans:
         L.append("    - letters:")
         for ch in orphans:
-            spec = keyspec(LABELLED[ch], ch) if ch in LABELLED else keyspec(ch)
+            label, hint = LABELLED.get(ch, (ch, None))
+            spec = keyspec(label, ch) if ch in LABELLED else keyspec(ch)
             try:
                 nm = ud.name(ch)
             except ValueError:
                 nm = f"U+{ord(ch):04X}"
-            L.append(f"      - {escape_unicode(spec)}   # {nm}")
+            # escape_unicode already returns a quoted YAML scalar.
+            if hint:
+                key = (f"{{type: base, spec: {escape_unicode(spec)}, "
+                       f"hint: {escape_unicode(hint)}}}")
+            else:
+                key = escape_unicode(spec)
+            L.append(f"      - {key}   # {nm}")
     # An altPage replaces every row, bottom included, so it needs its own way back.
     L.append("    - bottom:")
-    L.append("      - $alt0")
+    L.append(f"      - {ALT_PAGE_KEY}")
     L.append('      - ","')
     L.append("      - $space")
     L.append('      - "."')

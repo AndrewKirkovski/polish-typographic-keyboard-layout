@@ -48,7 +48,7 @@ rows:
   - bottom:
       - $symbols
       - ","
-      - $alt0
+      - {type: base, spec: "⁜|!code/key_to_alt_0_layout", attributes: {width: FunctionalKey, style: Functional, anchored: true, showPopup: false, moreKeyMode: OnlyExplicit}}
       - $space
       - {type: base, spec: ".", moreKeys: ["…"]}
       - $enter
@@ -65,17 +65,17 @@ altPages:
       - "ˇ|\u030C"   # dead caron
       - "¸|\u0327"   # dead cedilla
     - letters:
-      - "NBSP|\u00A0"   # NO-BREAK SPACE
+      - {type: base, spec: "⍽|\u00A0", hint: "nbsp"}   # NO-BREAK SPACE
       - "✓"   # CHECK MARK
       - "−"   # MINUS SIGN
       - "⌀"   # DIAMETER SIGN
       - "⌃"   # UP ARROWHEAD
-      - "NNBSP|\u202F"   # NARROW NO-BREAK SPACE
-      - "THIN|\u2009"   # THIN SPACE
-      - "SHY|\u00AD"   # SOFT HYPHEN
-      - "NB-|‑"   # NON-BREAKING HYPHEN
+      - {type: base, spec: "⍽|\u202F", hint: "nnbsp"}   # NARROW NO-BREAK SPACE
+      - {type: base, spec: "␣|\u2009", hint: "thin"}   # THIN SPACE
+      - {type: base, spec: "‧|\u00AD", hint: "shy"}   # SOFT HYPHEN
+      - {type: base, spec: "‑|‑", hint: "nbhy"}   # NON-BREAKING HYPHEN
     - bottom:
-      - $alt0
+      - {type: base, spec: "⁜|!code/key_to_alt_0_layout", attributes: {width: FunctionalKey, style: Functional, anchored: true, showPopup: false, moreKeyMode: OnlyExplicit}}
       - ","
       - $space
       - "."
