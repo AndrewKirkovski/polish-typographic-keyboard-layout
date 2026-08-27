@@ -228,6 +228,7 @@ async function copyLayout(l: Layout) {
         <ul class="android-diffs">
           <li>{{ t('android.diffDeadKey') }}</li>
           <li>{{ t('android.diffPositions') }}</li>
+          <li>{{ t('android.diffCompositions') }}</li>
           <li>{{ t('android.diffMissing') }}</li>
         </ul>
       </section>

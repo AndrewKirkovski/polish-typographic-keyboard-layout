@@ -282,7 +282,8 @@
     "dictPick": "FUTO files a dictionary under the language written inside it and offers no choice at import time, so take the one matching the language your keyboard is set to.",
     "dictImport": "Open the downloaded file and hand it to FUTO Keyboard, or go to Languages, your language, Dictionary. An imported dictionary replaces the built-in one for that language; removing it restores the original.",
     "shotLetters": "Letters",
-    "shotAltPage": "Accents and typographic characters"
+    "shotAltPage": "Accents and typographic characters",
+    "diffCompositions": "On the Cyrillic layout an accent stacked onto a letter that already carries one — Й, Ё — produces a doubled mark instead of the single precomposed letter the desktop layout gives. NFC reproduces 39 of its 57 desktop compositions; the Latin layout reproduces 177 of 179."
   },
   "theme": {
     "light": "Light",

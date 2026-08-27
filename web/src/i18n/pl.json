@@ -282,7 +282,8 @@
     "dictPick": "FUTO przypisuje słownik do języka zapisanego w pliku i nie pyta przy imporcie, więc wybierz ten, który odpowiada językowi twojej klawiatury.",
     "dictImport": "Otwórz pobrany plik i wskaż FUTO Keyboard albo przejdź do Języki, twój język, Słownik. Zaimportowany słownik zastępuje wbudowany dla tego języka; usunięcie go przywraca oryginalny.",
     "shotLetters": "Litery",
-    "shotAltPage": "Akcenty i znaki typograficzne"
+    "shotAltPage": "Akcenty i znaki typograficzne",
+    "diffCompositions": "W układzie cyrylickim akcent nałożony na literę, która już go ma — Й, Ё — daje podwojony znak zamiast pojedynczej litery złożonej, jaką daje układ desktopowy. NFC odtwarza 39 z 57 złożeń desktopowych; układ łaciński odtwarza 177 z 179."
   },
   "theme": {
     "light": "Jasny",
