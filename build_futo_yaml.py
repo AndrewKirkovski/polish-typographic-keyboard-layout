@@ -155,9 +155,14 @@ LABELLED: dict[str, tuple[str, str | None]] = {
 # renders low against the keycap's optical centre and reads as a stray blob.
 # The dotted cross is symmetric about its own centre, so it sits right, and its
 # dotted form still signals "placeholder" rather than a literal character.
+# Width is Regular, not FunctionalKey. FunctionalKey guarantees a minimum
+# functional width, which here made the key two columns wide and pressed it up
+# against the spacebar -- easy to hit by accident when reaching for space. It
+# keeps the Functional *style* so it still reads as a mode key rather than a
+# character, and is not anchored, since it sits mid-row rather than at an edge.
 ALT_PAGE_KEY = (
     '{type: base, spec: "⁜|!code/key_to_alt_0_layout", '
-    "attributes: {width: FunctionalKey, style: Functional, anchored: true, "
+    "attributes: {width: Regular, style: Functional, "
     "showPopup: false, moreKeyMode: OnlyExplicit}}"
 )
 

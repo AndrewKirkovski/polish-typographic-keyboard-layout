@@ -56,7 +56,7 @@ rows:
       - ","
       - $action
       - $space
-      - {type: base, spec: "⁜|!code/key_to_alt_0_layout", attributes: {width: FunctionalKey, style: Functional, anchored: true, showPopup: false, moreKeyMode: OnlyExplicit}}
+      - {type: base, spec: "⁜|!code/key_to_alt_0_layout", attributes: {width: Regular, style: Functional, showPopup: false, moreKeyMode: OnlyExplicit}}
       - {type: base, spec: ".", moreKeys: ["…"]}
       - $enter
 altPages:
@@ -88,6 +88,6 @@ altPages:
       - ","
       - $action
       - $space
-      - {type: base, spec: "⁜|!code/key_to_alt_0_layout", attributes: {width: FunctionalKey, style: Functional, anchored: true, showPopup: false, moreKeyMode: OnlyExplicit}}
+      - {type: base, spec: "⁜|!code/key_to_alt_0_layout", attributes: {width: Regular, style: Functional, showPopup: false, moreKeyMode: OnlyExplicit}}
       - "."
       - $enter
