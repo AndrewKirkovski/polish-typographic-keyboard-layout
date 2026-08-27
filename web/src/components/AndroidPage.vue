@@ -15,6 +15,8 @@ interface Layout {
   file: string
   nameKey: string
   descKey: string
+  // Filename stem for /screenshots/<shots>-<theme>-<page>.webp
+  shots: string
 }
 
 // FUTO files an imported dictionary under the locale in its header and offers no
@@ -45,12 +47,14 @@ const LAYOUTS: Layout[] = [
     file: 'polish_english_typographic.yaml',
     nameKey: 'android.latinName',
     descKey: 'android.latinDesc',
+    shots: 'pl',
   },
   {
     id: 'cyrillic',
     file: 'cyrillic_typographic.yaml',
     nameKey: 'android.cyrillicName',
     descKey: 'android.cyrillicDesc',
+    shots: 'cy',
   },
 ]
 
@@ -141,6 +145,30 @@ async function copyLayout(l: Layout) {
         <article v-for="l in LAYOUTS" :key="l.id" class="layout-card">
           <h3 class="layout-card__name">{{ t(l.nameKey) }}</h3>
           <p>{{ t(l.descKey) }}</p>
+
+          <!-- Paired light/dark captures, selected by the browser's colour scheme
+               rather than by script, so the prerendered HTML is already correct. -->
+          <div class="layout-card__shots">
+            <figure v-for="page in (['letters', 'alt'] as const)" :key="page" class="layout-shot">
+              <picture>
+                <source
+                  :srcset="`/screenshots/${l.shots}-dark-${page}.webp`"
+                  media="(prefers-color-scheme: dark)"
+                />
+                <img
+                  :src="`/screenshots/${l.shots}-light-${page}.webp`"
+                  :alt="`${t(l.nameKey)} — ${t(page === 'letters' ? 'android.shotLetters' : 'android.shotAltPage')}`"
+                  width="1080"
+                  height="737"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </picture>
+              <figcaption>
+                {{ t(page === 'letters' ? 'android.shotLetters' : 'android.shotAltPage') }}
+              </figcaption>
+            </figure>
+          </div>
 
           <div class="layout-card__actions">
             <button
@@ -244,6 +272,33 @@ async function copyLayout(l: Layout) {
 .android-prs {
   margin-top: 0.5rem;
   font-size: 0.9375rem;
+}
+
+.layout-card__shots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin: 1.25rem 0;
+}
+
+.layout-shot {
+  margin: 0;
+}
+
+.layout-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  /* The captures are edge-to-edge keyboards, so they need an outline to read as
+     screenshots rather than as part of the page. */
+  border: 1px solid rgba(128, 128, 128, 0.25);
+}
+
+.layout-shot figcaption {
+  margin-top: 0.375rem;
+  font-size: 0.8125rem;
+  opacity: 0.7;
 }
 
 .android-note {

@@ -280,7 +280,9 @@
     "backToMain": "Wróć do klawiatury",
     "dictSwipe": "Od tego zależy też pisanie gestem po polsku. Podpowiedzi gestu pochodzą z załadowanego słownika, a FUTO nie dostarcza polskiego, więc polska klawiatura w ogóle nie obsłuży gestu, dopóki słownik nie zostanie zaimportowany.",
     "dictPick": "FUTO przypisuje słownik do języka zapisanego w pliku i nie pyta przy imporcie, więc wybierz ten, który odpowiada językowi twojej klawiatury.",
-    "dictImport": "Otwórz pobrany plik i wskaż FUTO Keyboard albo przejdź do Języki, twój język, Słownik. Zaimportowany słownik zastępuje wbudowany dla tego języka; usunięcie go przywraca oryginalny."
+    "dictImport": "Otwórz pobrany plik i wskaż FUTO Keyboard albo przejdź do Języki, twój język, Słownik. Zaimportowany słownik zastępuje wbudowany dla tego języka; usunięcie go przywraca oryginalny.",
+    "shotLetters": "Litery",
+    "shotAltPage": "Akcenty i znaki typograficzne"
   },
   "theme": {
     "light": "Jasny",

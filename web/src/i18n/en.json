@@ -280,7 +280,9 @@
     "backToMain": "Back to the keyboard",
     "dictSwipe": "This is also what makes swipe typing work in Polish. Gesture typing draws its candidates from the loaded dictionary, and FUTO ships none for Polish, so a Polish keyboard cannot swipe at all until one is imported.",
     "dictPick": "FUTO files a dictionary under the language written inside it and offers no choice at import time, so take the one matching the language your keyboard is set to.",
-    "dictImport": "Open the downloaded file and hand it to FUTO Keyboard, or go to Languages, your language, Dictionary. An imported dictionary replaces the built-in one for that language; removing it restores the original."
+    "dictImport": "Open the downloaded file and hand it to FUTO Keyboard, or go to Languages, your language, Dictionary. An imported dictionary replaces the built-in one for that language; removing it restores the original.",
+    "shotLetters": "Letters",
+    "shotAltPage": "Accents and typographic characters"
   },
   "theme": {
     "light": "Light",
