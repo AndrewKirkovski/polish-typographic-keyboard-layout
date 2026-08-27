@@ -166,12 +166,6 @@ ALT_PAGE_KEY = (
     "showPopup: false, moreKeyMode: OnlyExplicit}}"
 )
 
-# Height multiplier for the alt page's two letter rows. The main layout has
-# three letter rows and the keyboard is drawn at that height, so at the default
-# 1.0 the alt page leaves a whole row of dead space between its rows. 3/2 spends
-# the same total height across two rows.
-ALT_ROW_HEIGHT = 1.5
-
 # The comma slot, stock's second bottom-row key. It must be a `contextual` key,
 # not a literal ",": that is the key which becomes "@" in an email field and "/"
 # in a URL field. A literal comma looks identical in a normal text field and
@@ -554,44 +548,55 @@ def emit(layout_key: str, layers: dict[str, Any], placement: str, strict: bool,
 
     # --- alt page 0: dead keys + orphans ---
     #
-    # Two row-level settings, both of which only matter once you look at the page
-    # on a device:
+    # The alt page gets the same number of letter rows as the main layout, which
+    # is why the orphans are split across two rows rather than crammed into one.
     #
-    # rowHeight -- the alt page has two letter rows where the main layout has
-    # three, but the keyboard is drawn at the height the main layout asks for.
-    # At the default 1.0 the two rows leave a row of dead space, and the page
-    # reads as unfinished. 1.5 each spends the same total height.
+    # It is not for balance. The keyboard is drawn at a fixed height and
+    # `rowHeightPx = availableHeight / sum(rowHeight)` (LayoutEngine), while
+    # `rowHeightMode` defaults to `ClampHeight`, which caps a key at the standard
+    # row height and turns everything above it into vertical gap. A page with
+    # fewer rows therefore gets taller bands, keys that refuse to grow into them,
+    # and a stripe of dead space between every row. Scaling `rowHeight` does not
+    # help -- it appears in both the numerator and the denominator and divides
+    # straight back out. Matching the row count is what actually fixes it.
     #
     # moreKeyMode: OnlyExplicit -- otherwise the engine treats the first row of
     # any page as the number row (`getNumForCoordinate` keys off regularRow == 0)
     # and layers 1-0 hints over it. On a page of dead keys the digit then reads
     # as the primary label and the accent itself renders small, which is exactly
     # backwards. Nothing on this page wants an automatic morekey anyway.
+    def emit_orphan(ch: str) -> str:
+        label, hint = LABELLED.get(ch, (ch, None))
+        spec = keyspec(label, ch) if ch in LABELLED else keyspec(ch)
+        try:
+            nm = ud.name(ch)
+        except ValueError:
+            nm = f"U+{ord(ch):04X}"
+        # escape_unicode already returns a quoted YAML scalar.
+        if hint:
+            key = (f"{{type: base, spec: {escape_unicode(spec)}, "
+                   f"hint: {escape_unicode(hint)}}}")
+        else:
+            key = escape_unicode(spec)
+        return f"      - {key}   # {nm}"
+
+    n_letter_rows = sum(1 for row in PHYSICAL_ROWS if row)
     L.append("altPages:")
-    L.append(f"  - - rowHeight: {ALT_ROW_HEIGHT}")
-    L.append("      attributes: {moreKeyMode: OnlyExplicit}")
+    L.append("  - - attributes: {moreKeyMode: OnlyExplicit}")
     L.append("      letters:")
     for state, spacing, mark in dead_keys:
         spec = keyspec(spacing, mark)
         L.append(f"      - {escape_unicode(spec)}   # dead {state}")
     if orphans:
-        L.append(f"    - rowHeight: {ALT_ROW_HEIGHT}")
-        L.append("      attributes: {moreKeyMode: OnlyExplicit}")
-        L.append("      letters:")
-        for ch in orphans:
-            label, hint = LABELLED.get(ch, (ch, None))
-            spec = keyspec(label, ch) if ch in LABELLED else keyspec(ch)
-            try:
-                nm = ud.name(ch)
-            except ValueError:
-                nm = f"U+{ord(ch):04X}"
-            # escape_unicode already returns a quoted YAML scalar.
-            if hint:
-                key = (f"{{type: base, spec: {escape_unicode(spec)}, "
-                       f"hint: {escape_unicode(hint)}}}")
-            else:
-                key = escape_unicode(spec)
-            L.append(f"      - {key}   # {nm}")
+        # Fill the remaining rows evenly, widest first.
+        remaining = max(1, n_letter_rows - 1)
+        per_row = -(-len(orphans) // remaining)  # ceil
+        chunks = [orphans[i:i + per_row] for i in range(0, len(orphans), per_row)]
+        for chunk in chunks:
+            L.append("    - attributes: {moreKeyMode: OnlyExplicit}")
+            L.append("      letters:")
+            for ch in chunk:
+                L.append(emit_orphan(ch))
     # An altPage replaces every row, bottom included, so it needs its own way back.
     L.append("    - bottom:")
     L.append("      - $symbols")

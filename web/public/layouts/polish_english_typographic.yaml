@@ -54,8 +54,7 @@ rows:
       - $period
       - $enter
 altPages:
-  - - rowHeight: 1.5
-      attributes: {moreKeyMode: OnlyExplicit}
+  - - attributes: {moreKeyMode: OnlyExplicit}
       letters:
       - "`|\u0300"   # dead grave
       - "´|\u0301"   # dead acute
@@ -67,14 +66,15 @@ altPages:
       - "˝|\u030B"   # dead double-acute
       - "ˇ|\u030C"   # dead caron
       - "¸|\u0327"   # dead cedilla
-    - rowHeight: 1.5
-      attributes: {moreKeyMode: OnlyExplicit}
+    - attributes: {moreKeyMode: OnlyExplicit}
       letters:
       - {type: base, spec: "⍽|\u00A0", hint: "nbsp"}   # NO-BREAK SPACE
       - "✓"   # CHECK MARK
       - "−"   # MINUS SIGN
       - "⌀"   # DIAMETER SIGN
       - "⌃"   # UP ARROWHEAD
+    - attributes: {moreKeyMode: OnlyExplicit}
+      letters:
       - {type: base, spec: "⍽|\u202F", hint: "nnbsp"}   # NARROW NO-BREAK SPACE
       - {type: base, spec: "␣|\u2009", hint: "thin"}   # THIN SPACE
       - {type: base, spec: "‧|\u00AD", hint: "shy"}   # SOFT HYPHEN
