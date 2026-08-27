@@ -504,11 +504,19 @@ def emit(layout_key: str, layers: dict[str, Any], placement: str, strict: bool,
 
     # Bottom row. It does NOT inherit keyboard-level attributes, so anything set
     # above is ignored here. "…" leads; the stock punctuation morekeys follow.
+    # Stock's bottom row is symbols / contextual-comma / action / space /
+    # optional-ZWNJ / period / enter. Keep every slot in its stock position and
+    # take only the ZWNJ one: $action is where the user-configurable bottom
+    # action lives -- emoji, undo, and the language switch key among them -- so
+    # a layout that drops it silently removes the language switch from the
+    # keyboard no matter what the settings say. ZWNJ is the one slot neither a
+    # Latin nor a Cyrillic typist needs.
     L.append("  - bottom:")
     L.append("      - $symbols")
     L.append('      - ","')
-    L.append(f"      - {ALT_PAGE_KEY}")
+    L.append("      - $action")
     L.append("      - $space")
+    L.append(f"      - {ALT_PAGE_KEY}")
     L.append('      - {type: base, spec: ".", moreKeys: ["\u2026"]}')
     L.append("      - $enter")
 
@@ -536,9 +544,11 @@ def emit(layout_key: str, layers: dict[str, Any], placement: str, strict: bool,
             L.append(f"      - {key}   # {nm}")
     # An altPage replaces every row, bottom included, so it needs its own way back.
     L.append("    - bottom:")
-    L.append(f"      - {ALT_PAGE_KEY}")
+    L.append("      - $symbols")
     L.append('      - ","')
+    L.append("      - $action")
     L.append("      - $space")
+    L.append(f"      - {ALT_PAGE_KEY}")
     L.append('      - "."')
     L.append("      - $enter")
     L.append("")

@@ -48,8 +48,9 @@ rows:
   - bottom:
       - $symbols
       - ","
-      - {type: base, spec: "⁜|!code/key_to_alt_0_layout", attributes: {width: FunctionalKey, style: Functional, anchored: true, showPopup: false, moreKeyMode: OnlyExplicit}}
+      - $action
       - $space
+      - {type: base, spec: "⁜|!code/key_to_alt_0_layout", attributes: {width: FunctionalKey, style: Functional, anchored: true, showPopup: false, moreKeyMode: OnlyExplicit}}
       - {type: base, spec: ".", moreKeys: ["…"]}
       - $enter
 altPages:
@@ -75,8 +76,10 @@ altPages:
       - {type: base, spec: "‧|\u00AD", hint: "shy"}   # SOFT HYPHEN
       - {type: base, spec: "‑|‑", hint: "nbhy"}   # NON-BREAKING HYPHEN
     - bottom:
-      - {type: base, spec: "⁜|!code/key_to_alt_0_layout", attributes: {width: FunctionalKey, style: Functional, anchored: true, showPopup: false, moreKeyMode: OnlyExplicit}}
+      - $symbols
       - ","
+      - $action
       - $space
+      - {type: base, spec: "⁜|!code/key_to_alt_0_layout", attributes: {width: FunctionalKey, style: Functional, anchored: true, showPopup: false, moreKeyMode: OnlyExplicit}}
       - "."
       - $enter
