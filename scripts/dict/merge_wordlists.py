@@ -191,6 +191,16 @@ def emit(path: Path, header: dict[str, str], entries: list[Entry]) -> None:
                 parts.append(f"{k}={v}")
         return " " * indent + ",".join(parts)
 
+    # The header is a flat comma-separated key=value line with no escaping, so a
+    # separator inside a value (most plausibly in --description) would silently
+    # split into a bogus extra field instead of failing.
+    for k, v in header.items():
+        for bad in (",", "=", "\n", "\r"):
+            if bad in str(v):
+                raise SystemExit(
+                    f"header field {k}={v!r} contains {bad!r}, which would corrupt "
+                    f"the .combined header rather than fail")
+
     hdr = ",".join(f"{k}={v}" for k, v in header.items())
     with path.open("w", encoding="utf-8", newline="\n") as fh:
         fh.write(hdr + "\n")

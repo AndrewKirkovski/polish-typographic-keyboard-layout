@@ -229,9 +229,26 @@ def build_compiler(futo_repo: Path, work_dir: Path, java_home: str | None) -> Pa
     return classes_dir
 
 
+def check_header_value(name: str, value: str) -> str:
+    """The .combined header is a flat comma-separated key=value line with no
+    escaping, so a value containing a separator would silently split into a bogus
+    extra field rather than fail. Reject it instead."""
+    for bad in (",", "=", "\n", "\r"):
+        if bad in value:
+            raise SystemExit(
+                f"--{name} may not contain {bad!r}: the .combined header is "
+                f"comma-separated key=value with no escaping, so this would "
+                f"corrupt the header rather than fail. Got: {value!r}")
+    return value
+
+
 def retarget_header(source: Path, dest: Path, locale: str | None,
                     dictionary_id: str | None, description: str | None) -> None:
     """Copy the .combined, rewriting the header's key=value pairs in place."""
+    for name, value in (("locale", locale), ("dictionary-id", dictionary_id),
+                        ("description", description)):
+        if value is not None:
+            check_header_value(name, value)
     with source.open(encoding="utf-8") as handle:
         header = handle.readline().rstrip("\n")
         if not header.startswith("dictionary="):
@@ -315,18 +332,21 @@ def main() -> int:
 
     source = args.input
     temp_source = None
-    if args.locale or args.dictionary_id or args.description:
-        # mkstemp hands back an open descriptor; on Windows the file stays
-        # locked until it is closed, which would break the unlink below.
-        handle, temp_name = tempfile.mkstemp(suffix=".combined")
-        os.close(handle)
-        temp_source = Path(temp_name)
-        retarget_header(args.input, temp_source, args.locale,
-                        args.dictionary_id, args.description)
-        source = temp_source
-
-    args.output.parent.mkdir(parents=True, exist_ok=True)
+    # The temp file is created inside the try so that a failure in
+    # retarget_header -- a missing header, an undecodable input -- still reaches
+    # the finally below instead of leaving the file behind.
     try:
+        if args.locale or args.dictionary_id or args.description:
+            # mkstemp hands back an open descriptor; on Windows the file stays
+            # locked until it is closed, which would break the unlink below.
+            handle, temp_name = tempfile.mkstemp(suffix=".combined")
+            os.close(handle)
+            temp_source = Path(temp_name)
+            retarget_header(args.input, temp_source, args.locale,
+                            args.dictionary_id, args.description)
+            source = temp_source
+
+        args.output.parent.mkdir(parents=True, exist_ok=True)
         print(f"Converting {args.input.name} -> {args.output.name} ...")
         result = subprocess.run(
             [find_jdk_tool("java", args.java_home), f"-Xmx{args.heap}",
