@@ -82,6 +82,25 @@ EXTRA_TYPOGRAPHY: list[str] = [
     "\u2011",   # NON-BREAKING HYPHEN
 ]
 
+# Russian letters whose keycap KeySpecShortcuts replaces on a non-`ru` Cyrillic
+# subtype. The shortcut resolves the spec per locale -- on `be` the щ key becomes
+# ў and the и key becomes і, on `uk` the ы key becomes і and the э key becomes є
+# -- and for щ the shortcut list is a single element, so
+# getDefaultMoreKeysForKey's subList(1, size) contributes nothing and the
+# displaced letter has nowhere left to go.
+#
+# stock belarusian.yaml keeps them reachable by writing the pair out
+# (['ў', 'щ'], ['і', 'и', 'ї']). Do the same by naming each letter in its own
+# moreKeys: on `ru` the entry matches the base code and
+# MoreKeySpec.removeDuplicateMoreKeys drops it, so this is a no-op there, and on
+# `be`/`uk` the base has been substituted and the entry survives.
+SUBSTITUTED_ON_OTHER_CYRILLIC: dict[str, str] = {
+    "\u0449": "\u0449",   # щ -> ў on be
+    "\u044B": "\u044B",   # ы -> і on uk
+    "\u044D": "\u044D",   # э -> є on uk
+    "\u0438": "\u0438",   # и -> і on be
+}
+
 # Characters stock FUTO already provides on a `pl` subtype, verified against
 # futo-keyboard-layouts/Special/symbols{,_shift}.yaml, the per-locale tables in
 # android-keyboard/tools/make-keyboard-text-py/locales/, and KeySpecShortcuts.kt.
@@ -451,7 +470,7 @@ def collect_orphans(layers: dict[str, Any], data: dict[str, Any] | None = None) 
 # --------------------------------------------------------------------------- #
 
 def emit_letter_key(
-    key_id: str, ch: str, more: list[str], strict: bool
+    key_id: str, ch: str, more: list[str], strict: bool, hint: str | None = None
 ) -> str:
     """One letter key. Diacritic first in moreKeys, and repeated as an explicit
     hint because KeyHintsSetting defaults to false."""
@@ -474,6 +493,7 @@ def emit_letter_key(
         return f"      - {escape_unicode(ch)}"
 
     mk = ", ".join(escape_unicode(m) for m in more)
+    hint_part = f", hint: {escape_unicode(hint)}" if hint else ""
     attrs = ""
     if strict:
         # countsToKeyCoordinate=false follows from OnlyExplicit, which is why
@@ -483,7 +503,7 @@ def emit_letter_key(
         attrs = ", attributes: {moreKeyMode: OnlyExplicit}"
     return (
         f"      - {{type: base, spec: {escape_unicode(ch)}, "
-        f"moreKeys: [{mk}], hint: {escape_unicode(more[0])}{attrs}}}"
+        f"moreKeys: [{mk}]{hint_part}{attrs}}}"
     )
 
 
@@ -526,7 +546,16 @@ def emit(layout_key: str, layers: dict[str, Any], placement: str, strict: bool,
         if row_idx == len(PHYSICAL_ROWS) - 1:
             L.append("      - $shift")
         for k in keys:
-            L.append(emit_letter_key(k, base[k], diacritics.get(k, []), strict))
+            diac = diacritics.get(k, [])
+            more = list(diac)
+            keep = SUBSTITUTED_ON_OTHER_CYRILLIC.get(base[k])
+            if keep is not None and keep not in more:
+                # Trails the diacritics, so the hinted letter is still the first.
+                more.append(keep)
+            # The guard is invisible on `ru`, where dedup drops it, so it must not
+            # claim the hint; only a real diacritic does.
+            L.append(emit_letter_key(k, base[k], more, strict,
+                                     hint=diac[0] if diac else None))
         if row_idx == len(PHYSICAL_ROWS) - 1:
             L.append("      - $delete")
 
@@ -659,6 +688,9 @@ def validate(layout_key: str, text: str, layers: dict[str, Any],
             # purely "!text/..." restorations, and the bottom-row period, do not.
             if first.startswith('"!text/') or '"."' in ln:
                 continue
+            spec = ln.split("spec: ")[1].split(",")[0].strip()
+            if first == spec:
+                continue  # keycap-substitution guard; hinting it would double the label
             errs.append(f"key with a literal moreKey but no explicit hint: {ln.strip()}")
 
     # Popup width: default max is 5 columns and nothing clamps panel height.

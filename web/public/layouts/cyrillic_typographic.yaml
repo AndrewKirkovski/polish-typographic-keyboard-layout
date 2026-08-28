@@ -24,13 +24,13 @@ rows:
       - "н"
       - {type: base, spec: "г", moreKeys: ["ґ"], hint: "ґ"}
       - "ш"
-      - "щ"
+      - {type: base, spec: "щ", moreKeys: ["щ"]}
       - "з"
       - "х"
       - "ъ"
   - letters:
       - "ф"
-      - "ы"
+      - {type: base, spec: "ы", moreKeys: ["ы"]}
       - "в"
       - "а"
       - "п"
@@ -39,14 +39,14 @@ rows:
       - "л"
       - "д"
       - "ж"
-      - "э"
+      - {type: base, spec: "э", moreKeys: ["э"]}
   - letters:
       - $shift
       - "я"
       - "ч"
       - "с"
       - "м"
-      - {type: base, spec: "и", moreKeys: ["і", "ї"], hint: "і"}
+      - {type: base, spec: "и", moreKeys: ["і", "ї", "и"], hint: "і"}
       - "т"
       - "ь"
       - "б"
