@@ -82,6 +82,23 @@ EXTRA_TYPOGRAPHY: list[str] = [
     "\u2011",   # NON-BREAKING HYPHEN
 ]
 
+# Belarusian and Ukrainian spell with an apostrophe -- аб'ява, п'ять, з'їзд --
+# so it is a letter-frequency character in two of the three languages this
+# layout serves, not punctuation you reach for occasionally. Both stock layouts
+# give it a home on the letter page for exactly that reason: belarusian.yaml
+# line 16 is ['х', '’'], and ukrainian.yaml line 13 keycaps the ASCII form in
+# the bottom row.
+#
+# This layout's bottom row has no free slot (the alt-page key took the
+# optional-ZWNJ position), and the symbols page is a page switch mid-word. So
+# both forms hang off х, where Belarusian stock already puts one of them: the
+# typographic U+2019 first, since that is the correct character in both
+# orthographies, and the ASCII U+0027 behind it because that is what stock
+# Ukrainian keycaps and what most users actually type.
+APOSTROPHES_ON: dict[str, list[str]] = {
+    "\u0445": ["\u2019", "\u0027"],   # х -> ’ then '
+}
+
 # Russian letters whose keycap KeySpecShortcuts replaces on a non-`ru` Cyrillic
 # subtype. The shortcut resolves the spec per locale -- on `be` the щ key becomes
 # ў and the и key becomes і, on `uk` the ы key becomes і and the э key becomes є
@@ -552,10 +569,16 @@ def emit(layout_key: str, layers: dict[str, Any], placement: str, strict: bool,
             if keep is not None and keep not in more:
                 # Trails the diacritics, so the hinted letter is still the first.
                 more.append(keep)
+            for ap in APOSTROPHES_ON.get(base[k], []):
+                if ap not in more:
+                    more.append(ap)
             # The guard is invisible on `ru`, where dedup drops it, so it must not
-            # claim the hint; only a real diacritic does.
+            # claim the hint. A real diacritic takes it; failing that an
+            # apostrophe does, since it is mandatory in two of the three
+            # orthographies and an unhinted one would be invisible by default.
+            aps = APOSTROPHES_ON.get(base[k], [])
             L.append(emit_letter_key(k, base[k], more, strict,
-                                     hint=diac[0] if diac else None))
+                                     hint=diac[0] if diac else (aps[0] if aps else None)))
         if row_idx == len(PHYSICAL_ROWS) - 1:
             L.append("      - $delete")
 

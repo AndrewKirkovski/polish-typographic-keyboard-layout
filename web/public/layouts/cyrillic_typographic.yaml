@@ -26,7 +26,7 @@ rows:
       - "ш"
       - {type: base, spec: "щ", moreKeys: ["щ"]}
       - "з"
-      - "х"
+      - {type: base, spec: "х", moreKeys: ["’", "'"], hint: "’"}
       - "ъ"
   - letters:
       - "ф"
