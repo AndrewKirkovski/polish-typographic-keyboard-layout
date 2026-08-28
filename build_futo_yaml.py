@@ -86,6 +86,14 @@ EXTRA_TYPOGRAPHY: list[str] = [
 # futo-keyboard-layouts/Special/symbols{,_shift}.yaml, the per-locale tables in
 # android-keyboard/tools/make-keyboard-text-py/locales/, and KeySpecShortcuts.kt.
 # Anything in the layout but NOT here is an "orphan" and gets a home on altPage 0.
+#
+# Deliberately NOT listed here: the ruble and hryvnia signs. The symbols page `$`
+# key is `keyspec_currency` (KeySpecShortcuts.kt), which resolves per subtype --
+# to the hryvnia sign on `uk` (uk.json) and to the ruble sign on `ru` and `be_BY`
+# (CurrencyResolver.kt). So each is already one tap away for some of the three
+# languages this layout serves, and unreachable for the others. Keeping both on
+# the alt page costs a duplicate for the matching subtype and makes both reachable
+# on all three. Do not "fix" this by adding them above.
 STOCK_COVERED: set[str] = set(
     # symbols page taps
     "@#$_%&-+()*\"':;!?,/.0123456789"
