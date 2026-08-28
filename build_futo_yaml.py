@@ -6,10 +6,12 @@ Kirkouski layout ports without writing an app.
 
 Design (see the plan for the full reasoning):
 
-* **One file per layout.** The stock FUTO symbols pages already carry every
-  non-letter character this layout uses, so we do NOT override them. No
-  `layoutSetOverrides`, no forked `Special/symbols*.yaml`, nothing to re-diff
-  when upstream edits them.
+* **One file per layout.** Every non-letter character in the desktop layer that
+  stock FUTO already has a home for -- on a symbols page or behind a long-press,
+  the `STOCK_COVERED` set below -- is left to stock, so we do NOT override the
+  symbols pages. No `layoutSetOverrides`, no forked `Special/symbols*.yaml`,
+  nothing to re-diff when upstream edits them. The remainder goes on one alt
+  page.
 * **Dead keys port via combining marks.** `DeadKeyPreCombiner` promotes any key
   emitting U+0300-U+035B to a dead-key event, which `DeadKeyCombiner` then
   composes with `Normalizer.NFC`. So we emit `<spacing accent>|<combining mark>`
@@ -494,9 +496,10 @@ def emit(layout_key: str, layers: dict[str, Any], placement: str, strict: bool,
     L.append("# Source of truth: " + cfg["full"])
     L.append("# https://polish-typographic.com")
     L.append("#")
-    L.append("# The stock FUTO symbols pages already carry every non-letter character")
-    L.append("# this layout uses, so they are deliberately NOT overridden. Only the")
-    L.append("# dead keys and the few characters stock lacks live on the alt page.")
+    L.append("# Every non-letter character this layout carries that the stock FUTO")
+    L.append("# symbols pages already have a home for is left to stock, so those pages")
+    L.append("# are deliberately NOT overridden. The dead keys and the characters stock")
+    L.append("# has nowhere live on the alt page instead.")
     L.append("")
     L.append(f"name: {yaml_scalar(cfg['name'])}")
     L.append("description: " + yaml_scalar(cfg["blurb"]))

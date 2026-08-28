@@ -4,9 +4,10 @@
 # Source of truth: russian_typographic_full.json
 # https://polish-typographic.com
 #
-# The stock FUTO symbols pages already carry every non-letter character
-# this layout uses, so they are deliberately NOT overridden. Only the
-# dead keys and the few characters stock lacks live on the alt page.
+# Every non-letter character this layout carries that the stock FUTO
+# symbols pages already have a home for is left to stock, so those pages
+# are deliberately NOT overridden. The dead keys and the characters stock
+# has nowhere live on the alt page instead.
 
 name: "Кириллица (типографская)"
 description: "Russian, Belarusian and Ukrainian on one layout -- the extra letters sit on the base letter you would expect -- with dead-key accents and typographic characters."
