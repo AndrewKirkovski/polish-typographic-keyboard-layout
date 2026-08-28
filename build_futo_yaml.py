@@ -657,11 +657,16 @@ def emit(layout_key: str, layers: dict[str, Any], placement: str, strict: bool,
         remaining = max(1, n_letter_rows - 1)
         per_row = -(-len(orphans) // remaining)  # ceil
         chunks = [orphans[i:i + per_row] for i in range(0, len(orphans), per_row)]
-        for chunk in chunks:
+        for i, chunk in enumerate(chunks):
             L.append("    - attributes: {moreKeyMode: OnlyExplicit}")
             L.append("      letters:")
             for ch in chunk:
                 L.append(emit_orphan(ch))
+            if i == len(chunks) - 1:
+                # Every stock altPages layout closes its last letter row with
+                # $delete -- all six IPA ones do. Without it there is no way to
+                # correct a mistake without leaving the page.
+                L.append("      - $delete")
     # An altPage replaces every row, bottom included, so it needs its own way back.
     L.append("    - bottom:")
     L.append("      - $symbols")

@@ -80,6 +80,7 @@ altPages:
       - {type: base, spec: "␣|\u2009", hint: "thin"}   # THIN SPACE
       - {type: base, spec: "‧|\u00AD", hint: "shy"}   # SOFT HYPHEN
       - {type: base, spec: "‑|‑", hint: "nbhy"}   # NON-BREAKING HYPHEN
+      - $delete
     - bottom:
       - $symbols
       - {type: contextual, fallbackKey: {type: base, spec: ",", attributes: {moreKeyMode: All}}, attributes: {moreKeyMode: All}}
