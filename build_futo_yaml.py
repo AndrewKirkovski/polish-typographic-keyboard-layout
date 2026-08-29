@@ -222,13 +222,15 @@ ALT_PAGE_KEY = (
 # not a literal ",": that is the key which becomes "@" in an email field and "/"
 # in a URL field. A literal comma looks identical in a normal text field and
 # silently loses the adaptation everywhere else, which is why the layouts repo
-# README tells contributors who touch the bottom row to test it. Shape and the
-# moreKeyMode: All (which keeps stock's comma long-press) copied from
-# Default/kasroz.yaml.
-CONTEXTUAL_COMMA_KEY = (
-    '{type: contextual, fallbackKey: {type: base, spec: ",", '
-    "attributes: {moreKeyMode: All}}, attributes: {moreKeyMode: All}}"
-)
+# README tells contributors who touch the bottom row to test it.
+#
+# No `moreKeyMode: All`. An earlier version carried it on both the contextual key
+# and its fallback, copied from Default/kasroz.yaml, where it is load-bearing
+# because that bottom row sets `width: FunctionalKey` at row level. Here it was a
+# no-op: BaseKey.getEffectiveAttributes already defaults a bottom-row key of
+# Regular width to MoreKeyMode.All, and neither layout sets a row-level width.
+# Dropping it is what makes "stock's bottom row, slot for slot" literally true.
+CONTEXTUAL_COMMA_KEY = '{type: contextual, fallbackKey: {type: base, spec: ","}}'
 
 # Multi-codepoint sequences the layout builds by hand, and the precomposed
 # character stock FUTO already offers instead. Stock's version is better: one
@@ -329,18 +331,41 @@ def keyspec(label: str, output: str | None = None) -> str:
     return esc(label) if output is None else f"{esc(label)}|{esc(output)}"
 
 
-def escape_unicode(s: str) -> str:
-    r"""Render non-printable / whitespace chars as \uXXXX so the YAML stays readable."""
+def escape_inner(s: str, force: bool = False) -> str:
+    r"""Escape a YAML double-quoted scalar's contents, without the quotes.
+
+    `force` writes every character as \uXXXX. It is for the output half of a
+    keyspec, where the point is to say exactly which codepoint the key emits.
+    """
     out = []
     for ch in s:
         cp = ord(ch)
         if ch in ("\\", '"'):
             out.append("\\" + ch)
-        elif cp < 0x20 or ud.category(ch) in ("Zs", "Cf", "Mn") or cp == 0x7F:
+        elif force or cp < 0x20 or ud.category(ch) in ("Zs", "Cf", "Mn") or cp == 0x7F:
             out.append(f"\\u{cp:04X}")
         else:
             out.append(ch)
-    return '"' + "".join(out) + '"'
+    return "".join(out)
+
+
+def escape_unicode(s: str) -> str:
+    r"""Render non-printable / whitespace chars as \uXXXX so the YAML stays readable."""
+    return '"' + escape_inner(s) + '"'
+
+
+def labelled_keyspec(label: str, output: str) -> str:
+    r"""A `label|code` keyspec with the two halves escaped by different rules.
+
+    The label is the visible proxy glyph and has to stay visible. The code half
+    is always written \uXXXX, because the reader's question here is which
+    invisible character the key types, and the category test alone does not
+    answer it: U+2011 NON-BREAKING HYPHEN is Pd, not Zs/Cf/Mn, so it would
+    otherwise print as a literal indistinguishable from an ASCII hyphen -- and
+    for that one character the proxy glyph is the character itself, so both
+    halves would look identical.
+    """
+    return '"' + escape_inner(keyspec(label)) + "|" + escape_inner(output, force=True) + '"'
 
 
 # --------------------------------------------------------------------------- #
@@ -632,17 +657,19 @@ def emit(layout_key: str, layers: dict[str, Any], placement: str, strict: bool,
     # backwards. Nothing on this page wants an automatic morekey anyway.
     def emit_orphan(ch: str) -> str:
         label, hint = LABELLED.get(ch, (ch, None))
-        spec = keyspec(label, ch) if ch in LABELLED else keyspec(ch)
         try:
             nm = ud.name(ch)
         except ValueError:
             nm = f"U+{ord(ch):04X}"
-        # escape_unicode already returns a quoted YAML scalar.
-        if hint:
-            key = (f"{{type: base, spec: {escape_unicode(spec)}, "
-                   f"hint: {escape_unicode(hint)}}}")
+        # Both helpers return a quoted YAML scalar.
+        if ch in LABELLED:
+            spec_yaml = labelled_keyspec(label, ch)
         else:
-            key = escape_unicode(spec)
+            spec_yaml = escape_unicode(keyspec(ch))
+        if hint:
+            key = f"{{type: base, spec: {spec_yaml}, hint: {escape_unicode(hint)}}}"
+        else:
+            key = spec_yaml
         return f"      - {key}   # {nm}"
 
     n_letter_rows = sum(1 for row in PHYSICAL_ROWS if row)
@@ -657,12 +684,28 @@ def emit(layout_key: str, layers: dict[str, Any], placement: str, strict: bool,
         remaining = max(1, n_letter_rows - 1)
         per_row = -(-len(orphans) // remaining)  # ceil
         chunks = [orphans[i:i + per_row] for i in range(0, len(orphans), per_row)]
+
+        # Pad every short row out to the dead-key row's width with $gap.
+        #
+        # Without this the rows stagger to the right. A letter row is centered on
+        # its own content, so a 5-key row and a 4-key row centre differently, and
+        # $delete is anchored, which pulls the last row's keys over to sit beside
+        # it at the right edge. The result is three rows starting at three
+        # different x positions -- the dead keys full width, then two ragged
+        # steps. Padding to a fixed width pins every row to the same grid: real
+        # keys left, under the dead keys above them, and $delete alone at the
+        # right where the letters page also keeps it.
+        width = len(dead_keys)
         for i, chunk in enumerate(chunks):
+            last = i == len(chunks) - 1
+            pad = width - len(chunk) - (1 if last else 0)
             L.append("    - attributes: {moreKeyMode: OnlyExplicit}")
             L.append("      letters:")
             for ch in chunk:
                 L.append(emit_orphan(ch))
-            if i == len(chunks) - 1:
+            for _ in range(max(0, pad)):
+                L.append("      - $gap")
+            if last:
                 # Every stock altPages layout closes its last letter row with
                 # $delete -- all six IPA ones do. Without it there is no way to
                 # correct a mistake without leaving the page.

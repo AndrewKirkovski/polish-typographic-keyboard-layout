@@ -40,7 +40,7 @@ rows:
       - $delete
   - bottom:
       - $symbols
-      - {type: contextual, fallbackKey: {type: base, spec: ",", attributes: {moreKeyMode: All}}, attributes: {moreKeyMode: All}}
+      - {type: contextual, fallbackKey: {type: base, spec: ","}}
       - $action
       - $space
       - {type: base, spec: "⁜|!code/key_to_alt_0_layout", attributes: {width: Regular, style: Functional, showPopup: false, moreKeyMode: OnlyExplicit}}
@@ -66,16 +66,26 @@ altPages:
       - "−"   # MINUS SIGN
       - "⌀"   # DIAMETER SIGN
       - "⌃"   # UP ARROWHEAD
+      - $gap
+      - $gap
+      - $gap
+      - $gap
+      - $gap
     - attributes: {moreKeyMode: OnlyExplicit}
       letters:
       - {type: base, spec: "⍽|\u202F", hint: "nnbsp"}   # NARROW NO-BREAK SPACE
       - {type: base, spec: "␣|\u2009", hint: "thin"}   # THIN SPACE
       - {type: base, spec: "‧|\u00AD", hint: "shy"}   # SOFT HYPHEN
-      - {type: base, spec: "‑|‑", hint: "nbhy"}   # NON-BREAKING HYPHEN
+      - {type: base, spec: "‑|\u2011", hint: "nbhy"}   # NON-BREAKING HYPHEN
+      - $gap
+      - $gap
+      - $gap
+      - $gap
+      - $gap
       - $delete
     - bottom:
       - $symbols
-      - {type: contextual, fallbackKey: {type: base, spec: ",", attributes: {moreKeyMode: All}}, attributes: {moreKeyMode: All}}
+      - {type: contextual, fallbackKey: {type: base, spec: ","}}
       - $action
       - $space
       - {type: base, spec: "⁜|!code/key_to_alt_0_layout", attributes: {width: Regular, style: Functional, showPopup: false, moreKeyMode: OnlyExplicit}}
