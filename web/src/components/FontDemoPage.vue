@@ -459,18 +459,6 @@ const activeLigatures = computed(() =>
   border-left: 3px solid var(--color-altgr);
 }
 
-.demo-section {
-  margin-bottom: 3rem;
-}
-
-.demo-heading {
-  font-family: var(--font-display);
-  font-size: 1.35rem;
-  font-weight: 400;
-  margin-bottom: 1rem;
-  letter-spacing: -0.01em;
-}
-
 /* ── Content-editable area ─────────────────────────────────────────── */
 .editable-area {
   font-size: 2.25rem;

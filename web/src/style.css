@@ -235,6 +235,28 @@ code {
   margin-bottom: 2.5rem;
 }
 
+/* A section inside a sub-page (Android, fonts), one step down from `.section`.
+   These live here rather than in a component because two pages use them. They
+   were previously declared inside FontDemoPage's `<style scoped>`, which meant
+   AndroidPage referenced class names that resolved to nothing at all: its
+   headings rendered as plain body text with no margin, and its sections had no
+   vertical rhythm. */
+.demo-section {
+  margin-bottom: var(--section-gap);
+}
+
+.demo-section:last-child {
+  margin-bottom: 0;
+}
+
+.demo-heading {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 400;
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+
 /* ── Scrollbar ───────────────────────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 8px;
