@@ -268,7 +268,7 @@ SPACING_TO_COMBINING: dict[str, str] = {
     "˛": "̨",  # ogonek
 }
 
-LAYOUTS: dict[str, dict[str, str]] = {
+LAYOUTS: dict[str, dict[str, Any]] = {
     # One layout per script, not per language. The Latin file types English and
     # Polish; the Cyrillic file types Russian, Belarusian and Ukrainian. Both
     # carry the typographic layer. `languages` is metadata only (the engine keys
@@ -290,11 +290,45 @@ LAYOUTS: dict[str, dict[str, str]] = {
         "blurb": "Russian, Belarusian and Ukrainian on one layout, the extra "
                  "letters behind their base letter, with dead-key accents.",
     },
+    # Plain variants: the same letter placement, without the dead keys or the
+    # page that holds them. `plain` is what emit() and validate() branch on.
+    #
+    # Four differences from the sibling above, and nothing else: no `combiners`
+    # line, no `altPages` block, the alt-page key in the bottom row reverts to
+    # $optionalzwnj (which renders nothing, so the spacebar reclaims a full key
+    # width), and no NFC report, since there is no composition table to report on.
+    #
+    # The names say what differs. Someone choosing between two entries in a
+    # layout list should not have to install both to find out.
+    "polish_plain": {
+        "full": "polish_typographic_full.json",
+        "out": "polish_english_plain.yaml",
+        "name": "Polski / English (bez akcentów)",
+        "languages": "pl en_US",
+        "blurb": "Polish and English on one layout. The Polish letters sit on "
+                 "their base letter; no dead keys and no extra page.",
+        "plain": True,
+    },
+    "russian_plain": {
+        "full": "russian_typographic_full.json",
+        "out": "cyrillic_plain.yaml",
+        "name": "Кириллица (без диакритики)",
+        "languages": "ru be uk",
+        "blurb": "Russian, Belarusian and Ukrainian on one layout, the extra "
+                 "letters behind their base letter; no dead keys and no extra "
+                 "page.",
+        "plain": True,
+    },
 }
 
 # CLI aliases, so the script can be driven by script name as well as by the
 # source layout it is generated from.
-ALIASES: dict[str, str] = {"latin": "polish", "cyrillic": "russian"}
+ALIASES: dict[str, str] = {
+    "latin": "polish",
+    "cyrillic": "russian",
+    "latin_plain": "polish_plain",
+    "cyrillic_plain": "russian_plain",
+}
 
 
 # --------------------------------------------------------------------------- #
@@ -564,10 +598,15 @@ def emit_letter_key(
 def emit(layout_key: str, layers: dict[str, Any], placement: str, strict: bool,
          version: str, data: dict[str, Any] | None = None) -> str:
     cfg = LAYOUTS[layout_key]
+    plain = bool(cfg.get("plain"))
     base = layers["base"]
     diacritics = collect_diacritics(layers, placement)
-    dead_keys = collect_dead_keys(layers)
-    orphans = collect_orphans(layers, data) + [
+    # A plain layout has no dead keys and no page to put them on, so it also has
+    # nothing to put the orphan typographic characters on. They stay on the
+    # typographic sibling; this variant is the one for someone who wants a
+    # keyboard that types their language and nothing else.
+    dead_keys = [] if plain else collect_dead_keys(layers)
+    orphans = [] if plain else collect_orphans(layers, data) + [
         c for c in EXTRA_TYPOGRAPHY if c not in STOCK_COVERED
     ]
 
@@ -588,9 +627,14 @@ def emit(layout_key: str, layers: dict[str, Any], placement: str, strict: bool,
     # constructs DeadKeyCombiner(). Matches LatinScript/Americas/lakota.yaml,
     # including its block sequence: all twelve stock users write the list this
     # way and none uses the flow form.
-    L.append("combiners:")
-    L.append("  - DeadKeyPreCombiner")
-    L.append("  - DeadKey")
+    #
+    # Omitted entirely on a plain layout. An empty `combiners:` list would parse,
+    # but a layout that declares no combiners is what stock qwerty.yaml looks
+    # like, and that is what this variant is.
+    if not plain:
+        L.append("combiners:")
+        L.append("  - DeadKeyPreCombiner")
+        L.append("  - DeadKey")
     L.append("mirrorInOneHanded: true")
     L.append("rows:")
 
@@ -655,12 +699,22 @@ def emit(layout_key: str, layers: dict[str, Any], placement: str, strict: bool,
     L.append(f"      - {CONTEXTUAL_COMMA_KEY}")
     L.append("      - $action")
     L.append("      - $space")
-    # Every other unusual character in these files carries a trailing "# NAME"
-    # comment; without one this is the most cryptic line in the layout.
-    L.append(f"      - {ALT_PAGE_KEY}"
-             " # U+205C DOTTED CROSS, switches to the alt page")
+    if plain:
+        # Stock's own slot. It renders nothing unless the layout sets
+        # useZWNJKey, and $space is Grow, so the spacebar absorbs the width --
+        # which is the visible difference between the two variants' bottom rows.
+        L.append("      - $optionalzwnj")
+    else:
+        # Every other unusual character in these files carries a trailing
+        # "# NAME" comment; without one this is the most cryptic line here.
+        L.append(f"      - {ALT_PAGE_KEY}"
+                 " # U+205C DOTTED CROSS, switches to the alt page")
     L.append("      - $period")
     L.append("      - $enter")
+
+    if plain:
+        L.append("")
+        return "\n".join(L)
 
     # --- alt page 0: dead keys + orphans ---
     #
@@ -779,8 +833,25 @@ def validate(layout_key: str, text: str, layers: dict[str, Any],
                       if ln.strip() in ("- letters:", "- - letters:", "letters:"))
     if not 1 <= letter_rows <= 8:
         errs.append(f"{letter_rows} letter rows; Keyboard.ensureRowsValid allows 1-8")
-    if text.count("- bottom:") != 2:
-        errs.append("expected exactly one bottom row on the main layout and one on altPage 0")
+
+    # A plain layout has no alt page, so it has one bottom row rather than two,
+    # and must carry none of the dead-key machinery.
+    plain = bool(cfg.get("plain"))
+    expected_bottoms = 1 if plain else 2
+    if text.count("- bottom:") != expected_bottoms:
+        errs.append(f"expected {expected_bottoms} bottom row(s), found "
+                    f"{text.count('- bottom:')}")
+    if plain:
+        for token, why in (
+            ("altPages:", "a plain layout has no alt page"),
+            ("combiners:", "a plain layout declares no combiners"),
+            ("key_to_alt_0_layout", "a plain layout has no alt-page key"),
+            ("$gap", "the $gap padding exists only to align alt-page rows"),
+        ):
+            if token in text:
+                errs.append(f"plain layout contains {token!r}: {why}")
+    elif "altPages:" not in text:
+        errs.append("typographic layout is missing its altPages block")
 
     # Every diacritic-bearing key must carry an explicit hint (KeyHintsSetting
     # defaults to false, so an implicit hint would be invisible).
@@ -838,6 +909,13 @@ def validate(layout_key: str, text: str, layers: dict[str, Any],
                     f"letter {v!r} (key {k}) has no key and no long-press home - it is "
                     f"unreachable on Android"
                 )
+
+    # The three coverage checks below ask "did every typographic character find a
+    # home?". A plain layout answers "no, on purpose" -- it carries the letters
+    # and nothing else, and the characters live on its typographic sibling. So
+    # they are skipped rather than made to pass by weakening them.
+    if plain:
+        return errs
 
     # Off-grid characters (NBSP on AltGr+Space) are invisible to the flat
     # layers, so check them explicitly or they vanish without a word.
@@ -958,8 +1036,9 @@ def main() -> int:
         dest.write_text(text, encoding="utf-8", newline="\n")
 
         errs = validate(key, text, layers, args.placement, data)
-        dks = collect_dead_keys(layers)
-        orph = collect_orphans(layers, data) + [
+        plain = bool(cfg.get("plain"))
+        dks = [] if plain else collect_dead_keys(layers)
+        orph = [] if plain else collect_orphans(layers, data) + [
             c for c in EXTRA_TYPOGRAPHY if c not in STOCK_COVERED
         ]
         diac = collect_diacritics(layers, args.placement)
@@ -980,7 +1059,8 @@ def main() -> int:
             print(f"       ! {e}", file=sys.stderr)
             failed = True
 
-        if args.report:
+        # A plain layout composes nothing, so there is no coverage to report.
+        if args.report and not plain:
             ok, total, div = nfc_report(layers)
             pct = 100 * ok / total if total else 0.0
             print(f"       NFC reproduces {ok}/{total} desktop compositions ({pct:.1f}%)")
