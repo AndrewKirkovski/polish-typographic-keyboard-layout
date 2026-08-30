@@ -49,7 +49,7 @@ rows:
       - {type: contextual, fallbackKey: {type: base, spec: ","}}
       - $action
       - $space
-      - {type: base, spec: "⁜|!code/key_to_alt_0_layout", attributes: {width: Regular, style: Functional, showPopup: false, moreKeyMode: OnlyExplicit}}
+      - {type: base, spec: "⁜|!code/key_to_alt_0_layout", attributes: {width: Regular, style: Functional, showPopup: false, moreKeyMode: OnlyExplicit}}   # U+205C DOTTED CROSS, switches to the alt page
       - $period
       - $enter
 altPages:
@@ -94,6 +94,6 @@ altPages:
       - {type: contextual, fallbackKey: {type: base, spec: ","}}
       - $action
       - $space
-      - {type: base, spec: "⁜|!code/key_to_alt_0_layout", attributes: {width: Regular, style: Functional, showPopup: false, moreKeyMode: OnlyExplicit}}
+      - {type: base, spec: "⁜|!code/key_to_alt_0_layout", attributes: {width: Regular, style: Functional, showPopup: false, moreKeyMode: OnlyExplicit}}   # U+205C DOTTED CROSS, switches to the alt page
       - $period
       - $enter

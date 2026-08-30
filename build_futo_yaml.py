@@ -632,7 +632,10 @@ def emit(layout_key: str, layers: dict[str, Any], placement: str, strict: bool,
     L.append(f"      - {CONTEXTUAL_COMMA_KEY}")
     L.append("      - $action")
     L.append("      - $space")
-    L.append(f"      - {ALT_PAGE_KEY}")
+    # Every other unusual character in these files carries a trailing "# NAME"
+    # comment; without one this is the most cryptic line in the layout.
+    L.append(f"      - {ALT_PAGE_KEY}"
+             "   # U+205C DOTTED CROSS, switches to the alt page")
     L.append("      - $period")
     L.append("      - $enter")
 
@@ -716,7 +719,10 @@ def emit(layout_key: str, layers: dict[str, Any], placement: str, strict: bool,
     L.append(f"      - {CONTEXTUAL_COMMA_KEY}")
     L.append("      - $action")
     L.append("      - $space")
-    L.append(f"      - {ALT_PAGE_KEY}")
+    # Every other unusual character in these files carries a trailing "# NAME"
+    # comment; without one this is the most cryptic line in the layout.
+    L.append(f"      - {ALT_PAGE_KEY}"
+             "   # U+205C DOTTED CROSS, switches to the alt page")
     L.append("      - $period")
     L.append("      - $enter")
     L.append("")
