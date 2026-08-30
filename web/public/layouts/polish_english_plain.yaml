@@ -1,0 +1,48 @@
+# Polski / English (bez akcentów)
+# Contributed by Andrei Kirkouski; notes and the desktop layouts
+# this follows are at https://polish-typographic.com
+
+name: "Polski / English (bez akcentów)"
+description: "Polish and English on one layout. The Polish letters sit on their base letter; no dead keys and no extra page."
+languages: pl en_US
+mirrorInOneHanded: true
+rows:
+  - letters:
+      - "q"
+      - "w"
+      - {type: base, spec: "e", moreKeys: ["ę"], hint: "ę"}
+      - "r"
+      - "t"
+      - "y"
+      - "u"
+      - "i"
+      - {type: base, spec: "o", moreKeys: ["ó"], hint: "ó"}
+      - "p"
+  - letters:
+      - {type: base, spec: "a", moreKeys: ["ą"], hint: "ą"}
+      - {type: base, spec: "s", moreKeys: ["ś", "ß"], hint: "ś"}
+      - "d"
+      - "f"
+      - "g"
+      - "h"
+      - "j"
+      - "k"
+      - {type: base, spec: "l", moreKeys: ["ł"], hint: "ł"}
+  - letters:
+      - $shift
+      - {type: base, spec: "z", moreKeys: ["ż", "ź"], hint: "ż"}
+      - "x"
+      - {type: base, spec: "c", moreKeys: ["ć"], hint: "ć"}
+      - "v"
+      - "b"
+      - {type: base, spec: "n", moreKeys: ["ń"], hint: "ń"}
+      - "m"
+      - $delete
+  - bottom:
+      - $symbols
+      - {type: contextual, fallbackKey: ","}
+      - $action
+      - $space
+      - $optionalzwnj
+      - $period
+      - $enter

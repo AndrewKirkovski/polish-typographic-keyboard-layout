@@ -10,13 +10,23 @@ const RELEASE_TAG = `v${VERSION}`
 const RELEASE_DL = `https://github.com/AndrewKirkovski/polish-typographic-keyboard-layout/releases/download/${RELEASE_TAG}`
 const ANDROID_ZIP = `kirkouski-typographic-v${VERSION}-android.zip`
 
-interface Layout {
-  id: 'latin' | 'cyrillic'
+type VariantId = 'deadkeys' | 'plain'
+type Page = 'letters' | 'alt'
+
+interface Variant {
   file: string
   nameKey: string
-  descKey: string
   // Filename stem for /screenshots/<shots>-<theme>-<page>.webp
   shots: string
+  // The plain variant has no alt page, so it has one screenshot rather than two.
+  pages: readonly Page[]
+  labelKey: string
+}
+
+interface Layout {
+  id: 'latin' | 'cyrillic'
+  descKey: string
+  variants: Record<VariantId, Variant>
 }
 
 // FUTO files an imported dictionary under the locale in its header and offers no
@@ -44,19 +54,55 @@ const PULL_REQUESTS = [
 const LAYOUTS: Layout[] = [
   {
     id: 'latin',
-    file: 'polish_english_typographic.yaml',
-    nameKey: 'android.latinName',
     descKey: 'android.latinDesc',
-    shots: 'pl',
+    variants: {
+      deadkeys: {
+        file: 'polish_english_typographic.yaml',
+        nameKey: 'android.latinName',
+        shots: 'pl',
+        pages: ['letters', 'alt'],
+        labelKey: 'android.variantDeadKeys',
+      },
+      plain: {
+        file: 'polish_english_plain.yaml',
+        nameKey: 'android.latinPlainName',
+        shots: 'pl-plain',
+        pages: ['letters'],
+        labelKey: 'android.variantPlain',
+      },
+    },
   },
   {
     id: 'cyrillic',
-    file: 'cyrillic_typographic.yaml',
-    nameKey: 'android.cyrillicName',
     descKey: 'android.cyrillicDesc',
-    shots: 'cy',
+    variants: {
+      deadkeys: {
+        file: 'cyrillic_typographic.yaml',
+        nameKey: 'android.cyrillicName',
+        shots: 'cy',
+        pages: ['letters', 'alt'],
+        labelKey: 'android.variantDeadKeys',
+      },
+      plain: {
+        file: 'cyrillic_plain.yaml',
+        nameKey: 'android.cyrillicPlainName',
+        shots: 'cy-plain',
+        pages: ['letters'],
+        labelKey: 'android.variantPlain',
+      },
+    },
   },
 ]
+
+const VARIANT_IDS: readonly VariantId[] = ['deadkeys', 'plain']
+
+// Which variant each card is showing. Both start on the dead-key one: it is the
+// layout the page is about, and the plain one is the reduction from it.
+const variant = ref<Record<string, VariantId>>({ latin: 'deadkeys', cyrillic: 'deadkeys' })
+
+function shown(l: Layout): Variant {
+  return l.variants[variant.value[l.id]]
+}
 
 // The YAML is copied into public/layouts/ at build time by the parentLayouts()
 // Vite plugin, the same way the keyboard diagram's JSON is. Fetching at runtime
@@ -65,12 +111,15 @@ const LAYOUTS: Layout[] = [
 const source = ref<Record<string, string>>({})
 const copied = ref<string | null>(null)
 
+// Keyed by filename rather than by layout, so switching a card's variant does
+// not refetch and the four files load once between them.
 onMounted(async () => {
+  const files = LAYOUTS.flatMap((l) => VARIANT_IDS.map((v) => l.variants[v].file))
   await Promise.all(
-    LAYOUTS.map(async (l) => {
+    files.map(async (file) => {
       try {
-        const res = await fetch(`/layouts/${l.file}`)
-        if (res.ok) source.value[l.id] = await res.text()
+        const res = await fetch(`/layouts/${file}`)
+        if (res.ok) source.value[file] = await res.text()
       } catch {
         // Leave it unset; the template falls back to the download link.
       }
@@ -79,7 +128,7 @@ onMounted(async () => {
 })
 
 async function copyLayout(l: Layout) {
-  const text = source.value[l.id]
+  const text = source.value[shown(l).file]
   if (!text) return
   try {
     await navigator.clipboard.writeText(text)
@@ -143,21 +192,37 @@ async function copyLayout(l: Layout) {
         <h2 class="demo-heading">{{ t('android.layoutsTitle') }}</h2>
 
         <article v-for="l in LAYOUTS" :key="l.id" class="layout-card">
-          <h3 class="layout-card__name">{{ t(l.nameKey) }}</h3>
+          <h3 class="layout-card__name">{{ t(shown(l).nameKey) }}</h3>
           <p>{{ t(l.descKey) }}</p>
+
+          <!-- Two builds of the same layout. The switch keeps the page one card
+               per language rather than four, and swaps the screenshots in place. -->
+          <div class="variant-switch" role="group" :aria-label="t('android.variantLabel')">
+            <button
+              v-for="v in VARIANT_IDS"
+              :key="v"
+              type="button"
+              class="variant-switch__option"
+              :class="{ 'is-active': variant[l.id] === v }"
+              :aria-pressed="variant[l.id] === v"
+              @click="variant[l.id] = v"
+            >
+              {{ t(l.variants[v].labelKey) }}
+            </button>
+          </div>
 
           <!-- Paired light/dark captures, selected by the browser's colour scheme
                rather than by script, so the prerendered HTML is already correct. -->
           <div class="layout-card__shots">
-            <figure v-for="page in (['letters', 'alt'] as const)" :key="page" class="layout-shot">
+            <figure v-for="page in shown(l).pages" :key="page" class="layout-shot">
               <picture>
                 <source
-                  :srcset="`/screenshots/${l.shots}-dark-${page}.webp`"
+                  :srcset="`/screenshots/${shown(l).shots}-dark-${page}.webp`"
                   media="(prefers-color-scheme: dark)"
                 />
                 <img
-                  :src="`/screenshots/${l.shots}-light-${page}.webp`"
-                  :alt="`${t(l.nameKey)} — ${t(page === 'letters' ? 'android.shotLetters' : 'android.shotAltPage')}`"
+                  :src="`/screenshots/${shown(l).shots}-light-${page}.webp`"
+                  :alt="`${t(shown(l).nameKey)} — ${t(page === 'letters' ? 'android.shotLetters' : 'android.shotAltPage')}`"
                   width="1080"
                   height="737"
                   loading="lazy"
@@ -174,7 +239,7 @@ async function copyLayout(l: Layout) {
             <button
               type="button"
               class="btn btn-secondary"
-              :disabled="!source[l.id]"
+              :disabled="!source[shown(l).file]"
               @click="copyLayout(l)"
             >
               {{ copied === l.id ? t('android.copied') : t('android.copy') }}
@@ -182,11 +247,11 @@ async function copyLayout(l: Layout) {
             <a
               class="btn btn-secondary"
               :href="`${RELEASE_DL}/${ANDROID_ZIP}`"
-              @click="trackDownload('android', ANDROID_ZIP, { layout: l.id })"
+              @click="trackDownload('android', ANDROID_ZIP, { layout: l.id, variant: variant[l.id] })"
             >{{ t('download.layouts') }}</a>
           </div>
 
-          <pre v-if="source[l.id]" class="layout-card__source"><code>{{ source[l.id] }}</code></pre>
+          <pre v-if="source[shown(l).file]" class="layout-card__source"><code>{{ source[shown(l).file] }}</code></pre>
         </article>
       </section>
 
@@ -273,6 +338,47 @@ async function copyLayout(l: Layout) {
 .android-prs {
   margin-top: 0.5rem;
   font-size: 0.9375rem;
+}
+
+/* Two builds of one layout, so a segmented control rather than two links: the
+   choice is between alternatives, and only one can be showing. */
+.variant-switch {
+  display: inline-flex;
+  margin-top: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-elevated);
+}
+
+.variant-switch__option {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 0.875rem;
+  padding: 0.4rem 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.variant-switch__option + .variant-switch__option {
+  border-left: 1px solid var(--border);
+}
+
+.variant-switch__option:hover {
+  color: var(--text);
+}
+
+.variant-switch__option.is-active {
+  background: var(--color-altgr);
+  color: #fff;
+}
+
+.variant-switch__option:focus-visible {
+  outline: 2px solid var(--color-altgr);
+  outline-offset: -2px;
 }
 
 .layout-card__shots {

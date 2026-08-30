@@ -260,6 +260,8 @@
     "latinName": "Polski / English (typograficzna)",
     "latinDesc": "Angielski i polski w jednym układzie. Polskie znaki diakrytyczne są tam, gdzie ich szukasz — przytrzymaj a dla ą, przytrzymaj z dla ż i ź — a każdy z nich jest wydrukowany na klawiszu, więc nie musisz pamiętać, gdzie jest.",
     "cyrillicName": "Кириллица (типографская)",
+    "latinPlainName": "Polski / English (bez akcentów)",
+    "cyrillicPlainName": "Кириллица (без диакритики)",
     "cyrillicDesc": "Rosyjski, białoruski i ukraiński w jednym układzie. Dodatkowe litery są na najbliższej literze podstawowej: przytrzymaj у dla ў, г dla ґ, е dla ё i є, и dla і oraz ї.",
     "copy": "Kopiuj",
     "copied": "Skopiowano",
@@ -283,6 +285,9 @@
     "dictImport": "Otwórz pobrany plik i wskaż FUTO Keyboard albo przejdź do Języki, twój język, Słownik. Zaimportowany słownik zastępuje wbudowany dla tego języka; usunięcie go przywraca oryginalny.",
     "shotLetters": "Litery",
     "shotAltPage": "Akcenty i znaki typograficzne",
+    "variantLabel": "Która wersja",
+    "variantDeadKeys": "Z akcentami",
+    "variantPlain": "Bez akcentów",
     "diffCompositions": "W układzie cyrylickim akcent nałożony na literę, która już go ma — Й, Ё — daje podwojony znak zamiast pojedynczej litery złożonej, jaką daje układ desktopowy. NFC odtwarza 39 z 57 złożeń desktopowych; układ łaciński odtwarza 177 z 179."
   },
   "theme": {

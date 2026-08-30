@@ -22,6 +22,8 @@ const ANDROID_LAYOUT_DIR = `dist/android-v${APP_VERSION}`
 const ANDROID_LAYOUT_FILES = [
   'polish_english_typographic.yaml',
   'cyrillic_typographic.yaml',
+  'polish_english_plain.yaml',
+  'cyrillic_plain.yaml',
 ]
 
 // Serve layout JSON files from project root in dev, copy them for production build
